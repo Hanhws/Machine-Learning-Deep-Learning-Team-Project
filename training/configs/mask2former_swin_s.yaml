@@ -1,0 +1,40 @@
+# Mask2Former Swin-S — HuggingFace transformers. Transformer 계열 기준 모델.
+# 다른 크기: facebook/mask2former-swin-{tiny,base,large}-coco-instance
+name: mask2former_swin_s_768
+group: Mask2Former
+notes: 768x1376 고정 입력
+out_dir: runs
+
+data:
+  root: /content/car_seg_split_upload
+
+model:
+  family: mask2former
+  weights: facebook/mask2former-swin-small-coco-instance
+  backbone: Swin-S
+  extra:
+    image_size: [768, 1376]         # [H, W] — 16:9 유지, 32 배수
+    grad_clip: 0.01                 # Mask2Former 공식 설정 (full-model clip 0.01)
+
+train:
+  epochs: 30
+  batch: 4                          # A100 40GB 기준
+  accumulate: 2
+  imgsz: 768
+  lr0: 0.0001
+  optimizer: AdamW
+  weight_decay: 0.05
+  warmup_epochs: 1
+  workers: 8
+  amp: false                        # fp16 에서 매칭 손실이 NaN 이 되는 경우가 있어 기본 끔
+  patience: 8
+  freeze: 0                         # 1 이면 Swin 백본 동결 (메모리·시간 절약, 성능은 보통 하락)
+  hflip: 0.5
+  color_jitter: 0.2
+
+eval:
+  conf: 0.01
+  mask_threshold: 0.5
+  union_conf: 0.5
+  eval_every: 2
+  train_eval_limit: 500

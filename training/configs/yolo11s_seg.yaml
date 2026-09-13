@@ -1,0 +1,32 @@
+# YOLO11-Seg (Small) — Ultralytics. 기준 실험.
+# 다른 크기: weights 를 yolo11n/m/l/x-seg.pt 로. 실험 이름(name)은 실험마다 다르게!
+name: yolo11s_seg_1280
+group: YOLO
+notes: 기준 — 소형 차량 83% 라 imgsz 1280
+out_dir: runs                     # Colab: --set out_dir=/content/drive/MyDrive/carseg/runs
+
+data:
+  root: /content/car_seg_split_upload
+
+model:
+  family: ultralytics
+  weights: yolo11s-seg.pt
+  backbone: CSPDarknet
+
+train:
+  epochs: 100
+  batch: 16                       # A100 40GB 기준. T4 면 8, -1 이면 자동(GPU 메모리 60%)
+  imgsz: 1280
+  lr0: 0.01                       # optimizer=auto 면 ultralytics 가 lr0 를 무시하고 자동 설정
+  optimizer: auto
+  patience: 20
+  workers: 8
+  mosaic: 1.0                     # ultralytics 기본값들
+  translate: 0.1
+  scale: 0.5
+  hflip: 0.5
+
+eval:
+  conf: 0.01
+  iou: 0.7
+  union_conf: 0.5

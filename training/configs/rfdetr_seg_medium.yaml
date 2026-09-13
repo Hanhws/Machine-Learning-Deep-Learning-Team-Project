@@ -1,0 +1,30 @@
+# RF-DETR Segmentation (Medium) — Roboflow rfdetr. 실시간 DETR 계열.
+name: rfdetr_seg_m
+group: RF-DETR
+notes: 변형별 기본 해상도
+out_dir: runs
+
+data:
+  root: /content/car_seg_split_upload
+
+model:
+  family: rfdetr
+  weights: DEFAULT                  # 사전학습 (학습 후 평가 시 checkpoint_best_total.pth)
+  backbone: DINOv2
+  extra:
+    variant: RFDETRSegMedium        # RFDETRSegNano / Small / Medium / Large / XLarge
+    # resolution: 576               # 지정 시 patch 크기 배수여야 함 — 모르면 비워 두기
+    train_kwargs: {}                # 예: {tensorboard: true}
+
+train:
+  epochs: 50
+  batch: 8
+  accumulate: 2
+  lr0: 0.0001
+  weight_decay: 0.0001
+  patience: 10
+
+eval:
+  conf: 0.01
+  mask_threshold: 0.5
+  union_conf: 0.5

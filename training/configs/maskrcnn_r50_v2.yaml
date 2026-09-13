@@ -1,0 +1,43 @@
+# Mask R-CNN ResNet-50-FPN v2 — torchvision (추가 설치 없음). 2-stage 기준 모델.
+name: maskrcnn_r50v2_1080
+group: Mask R-CNN
+notes: 원본 해상도(짧은 변 1080) + 작은 앵커
+out_dir: runs
+
+data:
+  root: /content/car_seg_split_upload
+
+model:
+  family: maskrcnn
+  weights: DEFAULT                 # COCO 사전학습. 학습된 체크포인트(.pt)로 이어 시작도 가능
+  backbone: ResNet-50-FPN
+  arch_mods: small anchors
+  extra:
+    arch: maskrcnn_resnet50_fpn_v2
+    trainable_backbone_layers: 3
+    max_size: 1920
+    anchor_sizes: [[16], [32], [64], [128], [256]]   # 기본 [[32],...,[512]] — 소형 차량 대응
+    box_nms_thresh: 0.5
+    grad_clip: 10.0
+
+train:
+  epochs: 24
+  batch: 4                          # A100 40GB 기준. T4 면 2 + accumulate 2
+  accumulate: 1
+  imgsz: 1080                       # = min_size (짧은 변)
+  lr0: 0.0001
+  optimizer: AdamW
+  weight_decay: 0.0001
+  warmup_epochs: 1
+  workers: 8
+  amp: true
+  patience: 6
+  hflip: 0.5
+  color_jitter: 0.2
+
+eval:
+  conf: 0.01
+  mask_threshold: 0.5
+  union_conf: 0.5
+  eval_every: 2
+  train_eval_limit: 500
