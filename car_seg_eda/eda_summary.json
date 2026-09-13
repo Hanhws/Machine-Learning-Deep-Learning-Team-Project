@@ -1,0 +1,1565 @@
+{
+  "dataset_dir": "/Users/hantaeho/Documents/KDT/machine learning and deep learning/MLDL_project/traffic_data2/car_seg_dataset",
+  "n_images": 25589,
+  "n_clips": 226,
+  "n_objects": {
+    "car": 103075,
+    "bus": 4849,
+    "truck": 49269
+  },
+  "images_without_objects": 0,
+  "constant_attributes": [
+    "road_type"
+  ],
+  "filename_tokens": [
+    {
+      "순서": 1,
+      "파일명 토큰 예시": "Suwon, Inje",
+      "manifest 컬럼": "site",
+      "의미": "촬영 지역명 (수원, 인제 등)",
+      "고유값 수": 10,
+      "데이터 확인 결과": "Suwon(49), Gangneung(31), Jeonju(28), Busan(27), Chungju(24), Buan(23), Cheonan(18), Hongcheon(17) 외 2종",
+      "값 분포 (이미지 수/클립 수)": "Suwon 5,514/49 · Busan 3,303/27 · Jeonju 3,282/28 · Gangneung 3,237/31 · Chungju 2,697/24 · Buan 2,431/23 · Cheonan 2,221/18 · Hongcheon 1,745/17 · Jincheon 982/8 · Inje 177/1"
+    },
+    {
+      "순서": 2,
+      "파일명 토큰 예시": "CH01~CH10, injetunnel2",
+      "manifest 컬럼": "channel",
+      "의미": "카메라 채널 번호 또는 촬영 지점(터널명 등)",
+      "고유값 수": 49,
+      "데이터 확인 결과": "지역당 1~10개 · 'CHxx' 형식은 Suwon, 나머지 지역은 지점명(교량·터널 등)",
+      "값 분포 (이미지 수/클립 수)": "namioverpass 853/7 · deungcheon 756/7 · wichon2brdg 724/7 · gudeog 720/6 · CH10 698/5 · jeongeub 681/6 · CH09 649/5 · sangwoo1brdg 633/5 · taeinshelter(seoul) 632/5 · busanportbrdg6 629/5 · busanportbrdg3 624/5 · jongsin 621/5 · seongnam2 617/5 · busanportbrdg4 609/5 · ogsan 609/5 · nodong1brdg 604/5 · CH07 600/5 · jogogli 596/5 · gangdong2brdg 590/5 · CH01 550/5 · CH02 550/5 · CH05 550/5 · CH08 546/5 · CH06 545/5 · gwanggyeog1brdg 532/5 · chujeomtunnel(changwon) 531/5 · gangjeong 516/4 · busanportbrdg2 507/4 · busanportbrdg5 502/4 · sangpyeongoverpass 493/4 · guljitunnel 489/4 · danpyeong1brdg 480/4 · sajeong 479/4 · nodong 471/4 · seomgangbrdg 467/5 · soju2brdg 465/4 · chujeomtunnel(yangpyeong) 457/5 · hyangho1brdg 455/5 · CH03 448/4 · busanportbrdg1 432/4 · yeji 398/5 · hyangho2brdg 393/5 · yulchon 392/4 · daemog 379/3 · CH04 378/5 · wonchang4brdg 257/3 · injetunnel2 177/1 · dongjisan 176/2 · jangam 129/1"
+    },
+    {
+      "순서": 3,
+      "파일명 토큰 예시": "20200722",
+      "manifest 컬럼": "date",
+      "의미": "촬영 날짜 (YYYYMMDD)",
+      "고유값 수": 15,
+      "데이터 확인 결과": "20200720 ~ 20201213, 15일",
+      "값 분포 (이미지 수/클립 수)": "20201021 7,503/68 · 20201020 6,836/61 · 20201019 2,256/20 · 20200721 1,499/12 · 20200720 1,379/10 · 20201029 1,250/10 · 20201027 742/6 · 20201028 726/6 · 20201010 694/7 · 20201012 644/5 · 20200722 600/10 · 20201119 585/5 · 20201011 399/4 · 20201213 299/1 · 20201210 177/1"
+    },
+    {
+      "순서": 4,
+      "파일명 토큰 예시": "1500",
+      "manifest 컬럼": "time",
+      "의미": "촬영 시각 (HHMM, 24시간제)",
+      "고유값 수": 46,
+      "데이터 확인 결과": "0700 ~ 2149 · 3시간 구간별: 07-09(35), 10-12(41), 13-15(62), 16-18(55), 19-21(33)",
+      "값 분포 (이미지 수/클립 수)": "1730 1,751/15 · 1630 1,624/14 · 1530 1,603/14 · 1030 1,323/11 · 1330 1,179/10 · 1300 1,135/10 · 1130 1,134/10 · 1430 1,128/10 · 1500 1,072/11 · 0930 980/8 · 1800 903/8 · 1600 894/9 · 1400 857/7 · 1700 780/6 · 0830 755/7 · 1000 677/6 · 1900 676/7 · 1100 651/6 · 1230 619/6 · 0800 573/6 · 0730 516/6 · 2030 516/4 · 0900 485/4 · 1830 450/3 · 2000 315/3 · 0958 299/1 · 1930 260/3 · 1200 257/2 · 0700 213/2 · 0956 177/1 · 2130 150/1 · 1955 150/1 · 2140 149/1 · 2012 145/1 · 2023 100/1 · 2038 100/1 · 2059 100/1 · 2020 100/1 · 2058 100/1 · 1932 100/1 · 1938 100/1 · 2149 100/1 · 2022 100/1 · 1957 99/1 · 2145 98/1 · 1945 96/1"
+    },
+    {
+      "순서": 5,
+      "파일명 토큰 예시": "WED, THU, SAT",
+      "manifest 컬럼": "weekday",
+      "의미": "요일 (영문 약자)",
+      "고유값 수": 6,
+      "데이터 확인 결과": "MON(35), TUE(85), WED(78), THU(16), SAT(7), SUN(5)",
+      "값 분포 (이미지 수/클립 수)": "TUE 9,803/85 · WED 8,103/78 · MON 4,279/35 · THU 2,012/16 · SUN 698/5 · SAT 694/7"
+    },
+    {
+      "순서": 6,
+      "파일명 토큰 예시": "9m, 4.8m",
+      "manifest 컬럼": "cam_height",
+      "의미": "카메라 설치 높이",
+      "고유값 수": 5,
+      "데이터 확인 결과": "4.8m(1), 8m(27), 9m(49), 10m(12), 15m(137)",
+      "값 분포 (이미지 수/클립 수)": "15m 15,222/137 · 9m 5,514/49 · 8m 3,303/27 · 10m 1,373/12 · 4.8m 177/1"
+    },
+    {
+      "순서": 7,
+      "파일명 토큰 예시": "NH / RH",
+      "manifest 컬럼": "hour_type",
+      "의미": "정의 미확인 코드 — 상행/하행(진행 방향) 구분 또는 혼잡 시간대(Rush Hour)로 추정. 같은 카메라에서도 촬영건마다 값이 바뀜 (10_nh_rh_check.png 참고)",
+      "고유값 수": 2,
+      "데이터 확인 결과": "NH(211), RH(15) · 같은 카메라에서 NH·RH 가 모두 나오는 곳 9개",
+      "값 분포 (이미지 수/클립 수)": "NH 23,724/211 · RH 1,865/15"
+    },
+    {
+      "순서": 8,
+      "파일명 토큰 예시": "highway",
+      "manifest 컬럼": "road_type",
+      "의미": "도로 종류 (고속도로)",
+      "고유값 수": 1,
+      "데이터 확인 결과": "전부 highway (값이 하나뿐 → 분할 층화에서 제외)",
+      "값 분포 (이미지 수/클립 수)": "highway 25,589/226"
+    },
+    {
+      "순서": 9,
+      "파일명 토큰 예시": "TW5, OW5, OW2",
+      "manifest 컬럼": "lane_config",
+      "의미": "차로 방향·차로 수로 추정 (TW=양방향 / OW=편도 + 차로 수)",
+      "고유값 수": 5,
+      "데이터 확인 결과": "TW2(109), TW3(47), OW5(36), OW2(21), TW5(13) · TW 169 / OW 57클립, 차로 수 [2, 3, 5]",
+      "값 분포 (이미지 수/클립 수)": "TW2 11,988/109 · TW3 5,812/47 · OW5 4,114/36 · OW2 2,275/21 · TW5 1,400/13"
+    },
+    {
+      "순서": 10,
+      "파일명 토큰 예시": "sunny, rainy, snow",
+      "manifest 컬럼": "weather",
+      "의미": "촬영 당시 날씨",
+      "고유값 수": 5,
+      "데이터 확인 결과": "sunny(205), rainy(13), fog(6), tunnel(1), snow(1)",
+      "값 분포 (이미지 수/클립 수)": "sunny 23,324/205 · rainy 1,179/13 · fog 610/6 · snow 299/1 · tunnel 177/1"
+    },
+    {
+      "순서": 11,
+      "파일명 토큰 예시": "FHD",
+      "manifest 컬럼": "quality",
+      "의미": "해상도 등급 (Full HD)",
+      "고유값 수": 2,
+      "데이터 확인 결과": "FHD → 1080x1920 4,964장, 1920x1080 19,992장 / HD → 1280x720 633장",
+      "값 분포 (이미지 수/클립 수)": "FHD 24,956/221 · HD 633/5"
+    },
+    {
+      "순서": 12,
+      "파일명 토큰 예시": "_005.png",
+      "manifest 컬럼": "frame",
+      "의미": "해당 클립에서 추출한 프레임(이미지) 순번 — 이미지 파일명에만 있음",
+      "고유값 수": 393,
+      "데이터 확인 결과": "000 ~ 597 · 클립당 29~299장",
+      "값 분포 (이미지 수/클립 수)": ""
+    }
+  ],
+  "metadata": {
+    "region": {
+      "1.수도권영동선": {
+        "images": 5514,
+        "clips": 49
+      },
+      "2.강원": {
+        "images": 4982,
+        "clips": 48
+      },
+      "3.대전충남": {
+        "images": 2221,
+        "clips": 18
+      },
+      "4.충북": {
+        "images": 3679,
+        "clips": 32
+      },
+      "5.전북": {
+        "images": 5713,
+        "clips": 51
+      },
+      "6.부산": {
+        "images": 3303,
+        "clips": 27
+      },
+      "7-1.기타지역(터널내부_주간야간날씨구별불가지역)": {
+        "images": 177,
+        "clips": 1
+      }
+    },
+    "site": {
+      "Suwon": {
+        "images": 5514,
+        "clips": 49
+      },
+      "Busan": {
+        "images": 3303,
+        "clips": 27
+      },
+      "Jeonju": {
+        "images": 3282,
+        "clips": 28
+      },
+      "Gangneung": {
+        "images": 3237,
+        "clips": 31
+      },
+      "Chungju": {
+        "images": 2697,
+        "clips": 24
+      },
+      "Buan": {
+        "images": 2431,
+        "clips": 23
+      },
+      "Cheonan": {
+        "images": 2221,
+        "clips": 18
+      },
+      "Hongcheon": {
+        "images": 1745,
+        "clips": 17
+      },
+      "Jincheon": {
+        "images": 982,
+        "clips": 8
+      },
+      "Inje": {
+        "images": 177,
+        "clips": 1
+      }
+    },
+    "channel": {
+      "namioverpass": {
+        "images": 853,
+        "clips": 7
+      },
+      "deungcheon": {
+        "images": 756,
+        "clips": 7
+      },
+      "wichon2brdg": {
+        "images": 724,
+        "clips": 7
+      },
+      "gudeog": {
+        "images": 720,
+        "clips": 6
+      },
+      "CH10": {
+        "images": 698,
+        "clips": 5
+      },
+      "jeongeub": {
+        "images": 681,
+        "clips": 6
+      },
+      "CH09": {
+        "images": 649,
+        "clips": 5
+      },
+      "sangwoo1brdg": {
+        "images": 633,
+        "clips": 5
+      },
+      "taeinshelter(seoul)": {
+        "images": 632,
+        "clips": 5
+      },
+      "busanportbrdg6": {
+        "images": 629,
+        "clips": 5
+      },
+      "busanportbrdg3": {
+        "images": 624,
+        "clips": 5
+      },
+      "jongsin": {
+        "images": 621,
+        "clips": 5
+      },
+      "seongnam2": {
+        "images": 617,
+        "clips": 5
+      },
+      "busanportbrdg4": {
+        "images": 609,
+        "clips": 5
+      },
+      "ogsan": {
+        "images": 609,
+        "clips": 5
+      },
+      "nodong1brdg": {
+        "images": 604,
+        "clips": 5
+      },
+      "CH07": {
+        "images": 600,
+        "clips": 5
+      },
+      "jogogli": {
+        "images": 596,
+        "clips": 5
+      },
+      "gangdong2brdg": {
+        "images": 590,
+        "clips": 5
+      },
+      "CH01": {
+        "images": 550,
+        "clips": 5
+      },
+      "CH02": {
+        "images": 550,
+        "clips": 5
+      },
+      "CH05": {
+        "images": 550,
+        "clips": 5
+      },
+      "CH08": {
+        "images": 546,
+        "clips": 5
+      },
+      "CH06": {
+        "images": 545,
+        "clips": 5
+      },
+      "gwanggyeog1brdg": {
+        "images": 532,
+        "clips": 5
+      },
+      "chujeomtunnel(changwon)": {
+        "images": 531,
+        "clips": 5
+      },
+      "gangjeong": {
+        "images": 516,
+        "clips": 4
+      },
+      "busanportbrdg2": {
+        "images": 507,
+        "clips": 4
+      },
+      "busanportbrdg5": {
+        "images": 502,
+        "clips": 4
+      },
+      "sangpyeongoverpass": {
+        "images": 493,
+        "clips": 4
+      },
+      "guljitunnel": {
+        "images": 489,
+        "clips": 4
+      },
+      "danpyeong1brdg": {
+        "images": 480,
+        "clips": 4
+      },
+      "sajeong": {
+        "images": 479,
+        "clips": 4
+      },
+      "nodong": {
+        "images": 471,
+        "clips": 4
+      },
+      "seomgangbrdg": {
+        "images": 467,
+        "clips": 5
+      },
+      "soju2brdg": {
+        "images": 465,
+        "clips": 4
+      },
+      "chujeomtunnel(yangpyeong)": {
+        "images": 457,
+        "clips": 5
+      },
+      "hyangho1brdg": {
+        "images": 455,
+        "clips": 5
+      },
+      "CH03": {
+        "images": 448,
+        "clips": 4
+      },
+      "busanportbrdg1": {
+        "images": 432,
+        "clips": 4
+      },
+      "yeji": {
+        "images": 398,
+        "clips": 5
+      },
+      "hyangho2brdg": {
+        "images": 393,
+        "clips": 5
+      },
+      "yulchon": {
+        "images": 392,
+        "clips": 4
+      },
+      "daemog": {
+        "images": 379,
+        "clips": 3
+      },
+      "CH04": {
+        "images": 378,
+        "clips": 5
+      },
+      "wonchang4brdg": {
+        "images": 257,
+        "clips": 3
+      },
+      "injetunnel2": {
+        "images": 177,
+        "clips": 1
+      },
+      "dongjisan": {
+        "images": 176,
+        "clips": 2
+      },
+      "jangam": {
+        "images": 129,
+        "clips": 1
+      }
+    },
+    "date": {
+      "20200720": {
+        "images": 1379,
+        "clips": 10
+      },
+      "20200721": {
+        "images": 1499,
+        "clips": 12
+      },
+      "20200722": {
+        "images": 600,
+        "clips": 10
+      },
+      "20201010": {
+        "images": 694,
+        "clips": 7
+      },
+      "20201011": {
+        "images": 399,
+        "clips": 4
+      },
+      "20201012": {
+        "images": 644,
+        "clips": 5
+      },
+      "20201019": {
+        "images": 2256,
+        "clips": 20
+      },
+      "20201020": {
+        "images": 6836,
+        "clips": 61
+      },
+      "20201021": {
+        "images": 7503,
+        "clips": 68
+      },
+      "20201027": {
+        "images": 742,
+        "clips": 6
+      },
+      "20201028": {
+        "images": 726,
+        "clips": 6
+      },
+      "20201029": {
+        "images": 1250,
+        "clips": 10
+      },
+      "20201119": {
+        "images": 585,
+        "clips": 5
+      },
+      "20201210": {
+        "images": 177,
+        "clips": 1
+      },
+      "20201213": {
+        "images": 299,
+        "clips": 1
+      }
+    },
+    "time_band": {
+      "07-09": {
+        "images": 3998,
+        "clips": 35
+      },
+      "10-12": {
+        "images": 4661,
+        "clips": 41
+      },
+      "13-15": {
+        "images": 6974,
+        "clips": 62
+      },
+      "16-18": {
+        "images": 6402,
+        "clips": 55
+      },
+      "19-21": {
+        "images": 3554,
+        "clips": 33
+      }
+    },
+    "hour": {
+      "07": {
+        "images": 729,
+        "clips": 8
+      },
+      "08": {
+        "images": 1328,
+        "clips": 13
+      },
+      "09": {
+        "images": 1941,
+        "clips": 14
+      },
+      "10": {
+        "images": 2000,
+        "clips": 17
+      },
+      "11": {
+        "images": 1785,
+        "clips": 16
+      },
+      "12": {
+        "images": 876,
+        "clips": 8
+      },
+      "13": {
+        "images": 2314,
+        "clips": 20
+      },
+      "14": {
+        "images": 1985,
+        "clips": 17
+      },
+      "15": {
+        "images": 2675,
+        "clips": 25
+      },
+      "16": {
+        "images": 2518,
+        "clips": 23
+      },
+      "17": {
+        "images": 2531,
+        "clips": 21
+      },
+      "18": {
+        "images": 1353,
+        "clips": 11
+      },
+      "19": {
+        "images": 1481,
+        "clips": 15
+      },
+      "20": {
+        "images": 1576,
+        "clips": 14
+      },
+      "21": {
+        "images": 497,
+        "clips": 4
+      }
+    },
+    "day_night": {
+      "day": {
+        "images": 20368,
+        "clips": 178
+      },
+      "twilight": {
+        "images": 2067,
+        "clips": 19
+      },
+      "night": {
+        "images": 3154,
+        "clips": 29
+      }
+    },
+    "weekday": {
+      "MON": {
+        "images": 4279,
+        "clips": 35
+      },
+      "TUE": {
+        "images": 9803,
+        "clips": 85
+      },
+      "WED": {
+        "images": 8103,
+        "clips": 78
+      },
+      "THU": {
+        "images": 2012,
+        "clips": 16
+      },
+      "SAT": {
+        "images": 694,
+        "clips": 7
+      },
+      "SUN": {
+        "images": 698,
+        "clips": 5
+      }
+    },
+    "cam_height": {
+      "4.8m": {
+        "images": 177,
+        "clips": 1
+      },
+      "8m": {
+        "images": 3303,
+        "clips": 27
+      },
+      "9m": {
+        "images": 5514,
+        "clips": 49
+      },
+      "10m": {
+        "images": 1373,
+        "clips": 12
+      },
+      "15m": {
+        "images": 15222,
+        "clips": 137
+      }
+    },
+    "hour_type": {
+      "NH": {
+        "images": 23724,
+        "clips": 211
+      },
+      "RH": {
+        "images": 1865,
+        "clips": 15
+      }
+    },
+    "road_type": {
+      "highway": {
+        "images": 25589,
+        "clips": 226
+      }
+    },
+    "lane_config": {
+      "TW2": {
+        "images": 11988,
+        "clips": 109
+      },
+      "TW3": {
+        "images": 5812,
+        "clips": 47
+      },
+      "OW5": {
+        "images": 4114,
+        "clips": 36
+      },
+      "OW2": {
+        "images": 2275,
+        "clips": 21
+      },
+      "TW5": {
+        "images": 1400,
+        "clips": 13
+      }
+    },
+    "weather": {
+      "sunny": {
+        "images": 23324,
+        "clips": 205
+      },
+      "rainy": {
+        "images": 1179,
+        "clips": 13
+      },
+      "fog": {
+        "images": 610,
+        "clips": 6
+      },
+      "snow": {
+        "images": 299,
+        "clips": 1
+      },
+      "tunnel": {
+        "images": 177,
+        "clips": 1
+      }
+    },
+    "quality": {
+      "FHD": {
+        "images": 24956,
+        "clips": 221
+      },
+      "HD": {
+        "images": 633,
+        "clips": 5
+      }
+    },
+    "resolution": {
+      "1920x1080": {
+        "images": 19992,
+        "clips": 177
+      },
+      "1080x1920": {
+        "images": 4964,
+        "clips": 44
+      },
+      "1280x720": {
+        "images": 633,
+        "clips": 5
+      }
+    }
+  },
+  "objects_per_image": {
+    "전체": {
+      "mean": 6.143,
+      "median": 4.0,
+      "max": 61,
+      "images_with_zero": 0
+    },
+    "car": {
+      "mean": 4.028,
+      "median": 2.0,
+      "max": 47,
+      "images_with_zero": 2957
+    },
+    "bus": {
+      "mean": 0.189,
+      "median": 0.0,
+      "max": 19,
+      "images_with_zero": 21943
+    },
+    "truck": {
+      "mean": 1.925,
+      "median": 1.0,
+      "max": 19,
+      "images_with_zero": 6780
+    }
+  },
+  "object_size": {
+    "car": {
+      "small(<32²)": 0.8348,
+      "medium": 0.1639,
+      "large(≥96²)": 0.0012,
+      "median_area_pct": 0.1334
+    },
+    "bus": {
+      "small(<32²)": 0.6325,
+      "medium": 0.3273,
+      "large(≥96²)": 0.0402,
+      "median_area_pct": 0.2768
+    },
+    "truck": {
+      "small(<32²)": 0.6898,
+      "medium": 0.285,
+      "large(≥96²)": 0.0252,
+      "median_area_pct": 0.209
+    }
+  },
+  "vehicle_area_ratio_pct": {
+    "overall": {
+      "mean": 2.6513,
+      "median": 1.5131,
+      "p95": 9.1127,
+      "max": 37.1273
+    },
+    "hour_type": {
+      "RH": {
+        "n_images": 1865,
+        "mean": 4.5242,
+        "median": 2.7483,
+        "mean_objects": 11.882
+      },
+      "NH": {
+        "n_images": 23724,
+        "mean": 2.504,
+        "median": 1.4196,
+        "mean_objects": 5.692
+      }
+    },
+    "weather": {
+      "snow": {
+        "n_images": 299,
+        "mean": 2.3493,
+        "median": 1.9622,
+        "mean_objects": 8.853
+      },
+      "sunny": {
+        "n_images": 23324,
+        "mean": 2.6648,
+        "median": 1.5305,
+        "mean_objects": 6.245
+      },
+      "rainy": {
+        "n_images": 1179,
+        "mean": 3.069,
+        "median": 1.4506,
+        "mean_objects": 5.848
+      },
+      "fog": {
+        "n_images": 610,
+        "mean": 1.6673,
+        "median": 0.9645,
+        "mean_objects": 2.885
+      },
+      "tunnel": {
+        "n_images": 177,
+        "mean": 1.9881,
+        "median": 0.5278,
+        "mean_objects": 1.379
+      }
+    },
+    "time_band": {
+      "07-09": {
+        "n_images": 3998,
+        "mean": 1.7795,
+        "median": 1.071,
+        "mean_objects": 3.855
+      },
+      "10-12": {
+        "n_images": 4661,
+        "mean": 1.9309,
+        "median": 1.1242,
+        "mean_objects": 4.149
+      },
+      "13-15": {
+        "n_images": 6974,
+        "mean": 2.4535,
+        "median": 1.4707,
+        "mean_objects": 5.616
+      },
+      "16-18": {
+        "n_images": 6402,
+        "mean": 3.385,
+        "median": 1.8603,
+        "mean_objects": 8.554
+      },
+      "19-21": {
+        "n_images": 3554,
+        "mean": 3.643,
+        "median": 2.6046,
+        "mean_objects": 8.022
+      }
+    },
+    "site": {
+      "Suwon": {
+        "n_images": 5514,
+        "mean": 5.4165,
+        "median": 4.0968,
+        "mean_objects": 12.951
+      },
+      "Cheonan": {
+        "n_images": 2221,
+        "mean": 3.5143,
+        "median": 2.9599,
+        "mean_objects": 9.161
+      },
+      "Chungju": {
+        "n_images": 2697,
+        "mean": 2.2534,
+        "median": 1.5818,
+        "mean_objects": 5.448
+      },
+      "Busan": {
+        "n_images": 3303,
+        "mean": 2.1498,
+        "median": 1.3318,
+        "mean_objects": 3.978
+      },
+      "Jeonju": {
+        "n_images": 3282,
+        "mean": 1.896,
+        "median": 1.1732,
+        "mean_objects": 3.591
+      },
+      "Jincheon": {
+        "n_images": 982,
+        "mean": 1.784,
+        "median": 1.1535,
+        "mean_objects": 4.029
+      },
+      "Buan": {
+        "n_images": 2431,
+        "mean": 1.553,
+        "median": 0.9398,
+        "mean_objects": 3.922
+      },
+      "Gangneung": {
+        "n_images": 3237,
+        "mean": 0.96,
+        "median": 0.5702,
+        "mean_objects": 2.511
+      },
+      "Hongcheon": {
+        "n_images": 1745,
+        "mean": 1.0224,
+        "median": 0.5494,
+        "mean_objects": 2.267
+      },
+      "Inje": {
+        "n_images": 177,
+        "mean": 1.9881,
+        "median": 0.5278,
+        "mean_objects": 1.379
+      }
+    },
+    "lane_config": {
+      "TW5": {
+        "n_images": 1400,
+        "mean": 6.7981,
+        "median": 5.091,
+        "mean_objects": 17.389
+      },
+      "OW5": {
+        "n_images": 4114,
+        "mean": 4.9463,
+        "median": 3.8985,
+        "mean_objects": 11.44
+      },
+      "TW3": {
+        "n_images": 5812,
+        "mean": 2.7773,
+        "median": 2.0394,
+        "mean_objects": 6.017
+      },
+      "TW2": {
+        "n_images": 11988,
+        "mean": 1.5254,
+        "median": 0.8924,
+        "mean_objects": 3.738
+      },
+      "OW2": {
+        "n_images": 2275,
+        "mean": 1.5596,
+        "median": 0.7515,
+        "mean_objects": 2.637
+      }
+    }
+  },
+  "vertices_per_polygon": {
+    "car": {
+      "median": 22.0,
+      "mean": 24.44,
+      "max": 155
+    },
+    "bus": {
+      "median": 23.0,
+      "mean": 27.07,
+      "max": 145
+    },
+    "truck": {
+      "median": 23.0,
+      "mean": 26.78,
+      "max": 380
+    }
+  },
+  "frames_per_clip": {
+    "n_clips": 226,
+    "mean": 113.23,
+    "min": 29,
+    "max": 299
+  },
+  "nh_rh_check": {
+    "rush_hours": [
+      7,
+      8,
+      17,
+      18
+    ],
+    "rush_hour_clip_share": {
+      "NH": 0.237,
+      "RH": 0.2
+    },
+    "clip_hours": {
+      "NH": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        11,
+        11,
+        11,
+        11,
+        11,
+        11,
+        11,
+        11,
+        11,
+        11,
+        11,
+        11,
+        12,
+        12,
+        12,
+        12,
+        12,
+        12,
+        12,
+        13,
+        13,
+        13,
+        13,
+        13,
+        13,
+        13,
+        13,
+        13,
+        13,
+        13,
+        13,
+        13,
+        13,
+        13,
+        13,
+        13,
+        13,
+        13,
+        14,
+        14,
+        14,
+        14,
+        14,
+        14,
+        14,
+        14,
+        14,
+        14,
+        14,
+        14,
+        14,
+        14,
+        14,
+        14,
+        14,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        17,
+        17,
+        17,
+        17,
+        17,
+        17,
+        17,
+        17,
+        17,
+        17,
+        17,
+        17,
+        17,
+        17,
+        17,
+        17,
+        17,
+        17,
+        17,
+        17,
+        18,
+        18,
+        18,
+        18,
+        18,
+        18,
+        18,
+        18,
+        18,
+        19,
+        19,
+        19,
+        19,
+        19,
+        19,
+        19,
+        19,
+        19,
+        19,
+        19,
+        19,
+        19,
+        19,
+        19,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        21,
+        21,
+        21,
+        21
+      ],
+      "RH": [
+        9,
+        10,
+        10,
+        11,
+        11,
+        11,
+        11,
+        12,
+        13,
+        16,
+        16,
+        16,
+        17,
+        18,
+        18
+      ]
+    },
+    "cameras_with_both": 9,
+    "cameras_rh_more_objects": 6,
+    "overall_mean_objects": {
+      "NH": 5.62,
+      "RH": 10.93
+    },
+    "pairs": [
+      {
+        "camera": "Chungju · danpyeong1brdg",
+        "NH_objects": 11.51,
+        "RH_objects": 10.67,
+        "NH_area_pct": 2.45,
+        "RH_area_pct": 2.52,
+        "NH_hours": "10,15,16",
+        "RH_hours": "11",
+        "NH_clips": 3,
+        "RH_clips": 1
+      },
+      {
+        "camera": "Cheonan · ogsan",
+        "NH_objects": 7.38,
+        "RH_objects": 6.79,
+        "NH_area_pct": 2.363,
+        "RH_area_pct": 2.067,
+        "NH_hours": "15",
+        "RH_hours": "10,11,16,16",
+        "NH_clips": 1,
+        "RH_clips": 4
+      },
+      {
+        "camera": "Chungju · chujeomtunnel(changwon)",
+        "NH_objects": 2.21,
+        "RH_objects": 2.12,
+        "NH_area_pct": 1.447,
+        "RH_area_pct": 1.97,
+        "NH_hours": "10,15,16,17",
+        "RH_hours": "11",
+        "NH_clips": 4,
+        "RH_clips": 1
+      },
+      {
+        "camera": "Chungju · chujeomtunnel(yangpyeong)",
+        "NH_objects": 1.87,
+        "RH_objects": 2.35,
+        "NH_area_pct": 1.096,
+        "RH_area_pct": 1.897,
+        "NH_hours": "07,11,16,17",
+        "RH_hours": "12",
+        "NH_clips": 4,
+        "RH_clips": 1
+      },
+      {
+        "camera": "Chungju · jogogli",
+        "NH_objects": 3.12,
+        "RH_objects": 3.7,
+        "NH_area_pct": 2.324,
+        "RH_area_pct": 1.808,
+        "NH_hours": "07,08,12,17",
+        "RH_hours": "13",
+        "NH_clips": 4,
+        "RH_clips": 1
+      },
+      {
+        "camera": "Cheonan · seongnam2",
+        "NH_objects": 7.47,
+        "RH_objects": 8.52,
+        "NH_area_pct": 3.75,
+        "RH_area_pct": 3.775,
+        "NH_hours": "14,15",
+        "RH_hours": "09,10,16",
+        "NH_clips": 2,
+        "RH_clips": 3
+      },
+      {
+        "camera": "Chungju · sangwoo1brdg",
+        "NH_objects": 7.83,
+        "RH_objects": 9.71,
+        "NH_area_pct": 3.413,
+        "RH_area_pct": 3.293,
+        "NH_hours": "10,15,16,20",
+        "RH_hours": "11",
+        "NH_clips": 4,
+        "RH_clips": 1
+      },
+      {
+        "camera": "Suwon · CH01",
+        "NH_objects": 16.18,
+        "RH_objects": 25.45,
+        "NH_area_pct": 5.867,
+        "RH_area_pct": 9.91,
+        "NH_hours": "15,19,20",
+        "RH_hours": "17,18",
+        "NH_clips": 3,
+        "RH_clips": 2
+      },
+      {
+        "camera": "Suwon · CH02",
+        "NH_objects": 13.84,
+        "RH_objects": 31.75,
+        "NH_area_pct": 6.399,
+        "RH_area_pct": 11.821,
+        "NH_hours": "15,18,20,20",
+        "RH_hours": "18",
+        "NH_clips": 4,
+        "RH_clips": 1
+      }
+    ]
+  },
+  "brightness": {
+    "n_measured_images": 2260,
+    "by_day_night": {
+      "day": {
+        "n_images": 1780,
+        "median": 116.4
+      },
+      "twilight": {
+        "n_images": 190,
+        "median": 113.3
+      },
+      "night": {
+        "n_images": 290,
+        "median": 63.3
+      }
+    },
+    "by_weather": {
+      "fog": 122.2,
+      "rainy": 119.6,
+      "sunny": 114.1,
+      "snow": 99.2,
+      "tunnel": 97.4
+    },
+    "darkest_clips": [
+      {
+        "clip": "Chungju_sangwoo1brdg_20201019_2030_MON_15m_NH_highway_TW2_sunny_HD",
+        "brightness": 37.7,
+        "day_night": "night"
+      },
+      {
+        "clip": "Hongcheon_seomgangbrdg_20201019_1900_MON_15m_NH_highway_TW2_sunny_FHD",
+        "brightness": 45.4,
+        "day_night": "night"
+      },
+      {
+        "clip": "Suwon_CH06_20201012_2012_MON_9m_NH_highway_OW5_sunny_FHD",
+        "brightness": 49.3,
+        "day_night": "night"
+      },
+      {
+        "clip": "Suwon_CH09_20201012_2140_MON_9m_NH_highway_OW5_sunny_FHD",
+        "brightness": 51.7,
+        "day_night": "night"
+      },
+      {
+        "clip": "Suwon_CH05_20200721_2130_TUE_9m_NH_highway_OW5_sunny_FHD",
+        "brightness": 52.9,
+        "day_night": "night"
+      }
+    ]
+  },
+  "vehicle_overlap": {
+    "mean_overlap_pct_multi": 0.504,
+    "images_overlap_over_5pct": 337,
+    "median_overlap_pct_by_objects": {
+      "1": 0.0,
+      "2": 0.0,
+      "3-4": 0.0,
+      "5-8": 0.0,
+      "9-16": 0.136,
+      "17-32": 0.555,
+      "33+": 1.56
+    }
+  },
+  "class_share_by_attribute_pct": {
+    "site": {
+      "Suwon": {
+        "n_car": 75.62,
+        "n_bus": 3.43,
+        "n_truck": 20.95
+      },
+      "Busan": {
+        "n_car": 71.64,
+        "n_bus": 2.63,
+        "n_truck": 25.73
+      },
+      "Jeonju": {
+        "n_car": 55.75,
+        "n_bus": 2.77,
+        "n_truck": 41.48
+      },
+      "Gangneung": {
+        "n_car": 66.57,
+        "n_bus": 2.34,
+        "n_truck": 31.09
+      },
+      "Chungju": {
+        "n_car": 52.67,
+        "n_bus": 2.71,
+        "n_truck": 44.62
+      },
+      "Buan": {
+        "n_car": 48.39,
+        "n_bus": 1.96,
+        "n_truck": 49.65
+      },
+      "Cheonan": {
+        "n_car": 51.57,
+        "n_bus": 3.57,
+        "n_truck": 44.86
+      },
+      "Hongcheon": {
+        "n_car": 65.02,
+        "n_bus": 1.92,
+        "n_truck": 33.06
+      },
+      "Jincheon": {
+        "n_car": 52.93,
+        "n_bus": 3.59,
+        "n_truck": 43.48
+      },
+      "Inje": {
+        "n_car": 70.49,
+        "n_bus": 2.87,
+        "n_truck": 26.64
+      }
+    },
+    "lane_config": {
+      "TW2": {
+        "n_car": 56.76,
+        "n_bus": 2.33,
+        "n_truck": 40.92
+      },
+      "TW3": {
+        "n_car": 58.54,
+        "n_bus": 3.35,
+        "n_truck": 38.11
+      },
+      "OW5": {
+        "n_car": 78.19,
+        "n_bus": 2.94,
+        "n_truck": 18.87
+      },
+      "OW2": {
+        "n_car": 52.83,
+        "n_bus": 3.03,
+        "n_truck": 44.13
+      },
+      "TW5": {
+        "n_car": 70.64,
+        "n_bus": 4.39,
+        "n_truck": 24.97
+      }
+    },
+    "time_band": {
+      "07-09": {
+        "n_car": 56.55,
+        "n_bus": 2.66,
+        "n_truck": 40.79
+      },
+      "10-12": {
+        "n_car": 54.87,
+        "n_bus": 2.55,
+        "n_truck": 42.58
+      },
+      "13-15": {
+        "n_car": 59.32,
+        "n_bus": 2.79,
+        "n_truck": 37.89
+      },
+      "16-18": {
+        "n_car": 69.24,
+        "n_bus": 3.57,
+        "n_truck": 27.19
+      },
+      "19-21": {
+        "n_car": 79.25,
+        "n_bus": 3.16,
+        "n_truck": 17.59
+      }
+    },
+    "day_night": {
+      "day": {
+        "n_car": 62.92,
+        "n_bus": 3.08,
+        "n_truck": 34.0
+      },
+      "twilight": {
+        "n_car": 61.7,
+        "n_bus": 3.91,
+        "n_truck": 34.38
+      },
+      "night": {
+        "n_car": 80.56,
+        "n_bus": 2.78,
+        "n_truck": 16.66
+      }
+    },
+    "weather": {
+      "sunny": {
+        "n_car": 65.39,
+        "n_bus": 3.16,
+        "n_truck": 31.45
+      },
+      "rainy": {
+        "n_car": 65.41,
+        "n_bus": 2.1,
+        "n_truck": 32.49
+      },
+      "fog": {
+        "n_car": 47.9,
+        "n_bus": 2.16,
+        "n_truck": 49.94
+      },
+      "snow": {
+        "n_car": 87.23,
+        "n_bus": 2.19,
+        "n_truck": 10.58
+      },
+      "tunnel": {
+        "n_car": 70.49,
+        "n_bus": 2.87,
+        "n_truck": 26.64
+      }
+    },
+    "cam_height": {
+      "4.8m": {
+        "n_car": 70.49,
+        "n_bus": 2.87,
+        "n_truck": 26.64
+      },
+      "8m": {
+        "n_car": 71.64,
+        "n_bus": 2.63,
+        "n_truck": 25.73
+      },
+      "9m": {
+        "n_car": 75.62,
+        "n_bus": 3.43,
+        "n_truck": 20.95
+      },
+      "10m": {
+        "n_car": 50.49,
+        "n_bus": 3.13,
+        "n_truck": 46.38
+      },
+      "15m": {
+        "n_car": 54.97,
+        "n_bus": 2.79,
+        "n_truck": 42.24
+      }
+    },
+    "hour_type": {
+      "NH": {
+        "n_car": 66.54,
+        "n_bus": 2.95,
+        "n_truck": 30.52
+      },
+      "RH": {
+        "n_car": 59.68,
+        "n_bus": 3.94,
+        "n_truck": 36.39
+      }
+    },
+    "orientation": {
+      "landscape": {
+        "n_car": 59.23,
+        "n_bus": 2.79,
+        "n_truck": 37.98
+      },
+      "portrait": {
+        "n_car": 75.51,
+        "n_bus": 3.55,
+        "n_truck": 20.94
+      }
+    }
+  },
+  "integrity": {
+    "orphan_label": {
+      "count": 0,
+      "examples": []
+    },
+    "orphan_image": {
+      "count": 0,
+      "examples": []
+    }
+  }
+}
