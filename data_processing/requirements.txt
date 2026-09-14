@@ -1,6 +1,0 @@
-# car_seg_data_*.py (전처리 · EDA · 분할) 실행에 필요한 패키지 — Python 3.9 이상
-numpy>=1.24
-pandas>=2.0
-matplotlib>=3.6
-pillow>=9.5
-tqdm>=4.60

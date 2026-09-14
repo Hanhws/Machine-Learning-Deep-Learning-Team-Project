@@ -1,11 +1,22 @@
 #!/usr/bin/env python3
-"""car_seg_data_preprocessing.py 로 정리한 YOLO seg 데이터셋(car_seg_dataset/) EDA.
+"""car_seg_data_preprocessing.py 로 정리한 YOLO seg 데이터셋(car_seg_dataset/) EDA — **전체 데이터**를 대상으로 한다.
+
+샘플링 없이 manifest 에 있는 모든 이미지 · 모든 라벨 · 모든 픽셀 밝기를 분석한다.
+(오버레이 샘플 그림만 대표 이미지를 골라 그린다)
 
 입력
     car_seg_dataset/
-      images/  labels/  manifest.csv
+      images/(JPG)  labels/(YOLO seg)  manifest.csv  [preprocess_report.json]
 
-출력 (기본: car_seg_dataset/eda/)
+출력 (기본: car_seg_eda/ — 데이터셋 폴더와 분리)
+    EDA_REPORT.md                  ★ 데이터 설명서 — 데이터 개요 · 파일명 규약 · 속성별 통계표 · 주요 발견 · 무결성 점검
+    stats/                         세부 통계표 (CSV, 엑셀에서 바로 열림)
+      class_stats.csv                클래스별 객체 수 · 등장 이미지 · 크기(S/M/L) · 꼭짓점 수
+      attr_<속성>.csv                속성값별 이미지·클립·CCTV 수, 클래스별 객체 수, 이미지당 객체 수,
+                                     차량 면적 비, 객체 크기 비율, 밝기
+      camera_stats.csv               CCTV(카메라) 49대 각각의 위 통계 + 도로 형태 · 조건 구성 · easy/hard 비율
+      clip_stats.csv                 클립(영상) 단위 통계
+      cross_<행>_x_<열>.csv          조건 교차표 (주/야간 × 날씨, 도로 형태 × 주/야간 …)
     00_filename_tokens.md/.csv     파일명 토큰 사전 (토큰별 의미 + 실제 데이터에서 확인한 값·분포)
     01_class_distribution.png      클래스별 객체 수 / 클래스가 등장하는 이미지 비율
     02_metadata_distribution.png   파일명 메타데이터(지역·채널·날짜·시간대·요일·높이·NH/RH·차로·날씨·화질…) 분포
@@ -22,8 +33,13 @@
     12_day_night_samples.png       주간 / 여명·황혼 / 야간 대표 이미지
     13_vehicle_overlap.png         차량 폴리곤 겹침 (단순 합 vs 합집합, 차량 수별)
     14_class_by_attribute.png      속성값별 car / bus / truck 비율
-    eda_brightness.csv             11번에서 잰 이미지별 밝기·대비
-    eda_per_image.csv              이미지별 계산값 (객체 수, 차량 면적 비 …)
+    15_road_form_camera.png        도로 형태(CCTV 지점명 기준)별 분포 + CCTV 49대별 이미지 수 · 조건 구성
+    16_condition_matrix.png        조건 교차 히트맵 (주/야간 × 날씨, 도로 형태 × 주/야간, 도로 형태 × 날씨)
+    17_difficulty.png              easy(주간·맑음·일반 도로) vs hard — 비율, hard 사유, CCTV별 구성, 객체 특성 비교
+    18_image_quality.png           해상도 · 영상 방향 · JPG 용량 · 대비(contrast) 분포
+    eda_brightness.csv             11번에서 잰 이미지별 밝기·대비 (전체 이미지)
+    eda_per_image.csv              이미지별 계산값 (객체 수, 차량 면적 비, 밝기 …)
+    eda_polygons.csv.gz            폴리곤(객체) 단위 계산값 (클래스, 면적, 중심, 꼭짓점 수)
     eda_summary.json               위 내용의 수치 요약 + 데이터 무결성 점검 결과
 
 ※ 라벨에는 도로 영역이 없으므로 여기서의 '차량 면적 비'는 '이미지 전체 대비' 값입니다.
@@ -31,7 +47,7 @@
 
 사용 예
     python car_seg_data_eda.py
-    python car_seg_data_eda.py --dataset-dir car_seg_dataset --n-samples 16
+    python car_seg_data_eda.py --dataset-dir car_seg_dataset --out-dir car_seg_eda --n-samples 16
 """
 
 from __future__ import annotations
@@ -58,6 +74,11 @@ from PIL import Image, ImageDraw  # noqa: E402
 from tqdm import tqdm  # noqa: E402
 
 BASE_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(BASE_DIR))  # 같은 폴더의 car_seg_data_preprocessing 을 가져오기 위해
+
+from car_seg_data_preprocessing import (  # noqa: E402
+    EASY_CONDITION, ROAD_FORM_KO, ROAD_FORMS, day_night_of, hard_reasons, road_form_of,
+)
 
 CLASS_NAMES = {0: "car", 1: "bus", 2: "truck"}
 
@@ -65,7 +86,8 @@ CLASS_NAMES = {0: "car", 1: "bus", 2: "truck"}
 META_ATTRS = [
     ("region", "권역 (zip)"),
     ("site", "촬영 지역"),
-    ("channel", "채널 / 촬영 지점"),
+    ("camera", "CCTV (지역_지점)"),
+    ("road_form", "도로 형태 (CCTV 지점명 기준)"),
     ("date", "촬영 날짜"),
     ("time_band", "촬영 시간대"),
     ("hour", "촬영 시각 (시)"),
@@ -76,9 +98,15 @@ META_ATTRS = [
     ("road_type", "도로 종류"),
     ("lane_config", "차로 구성"),
     ("weather", "날씨"),
+    ("difficulty", "난이도 조건 (easy = 주간·맑음·일반)"),
     ("quality", "화질"),
     ("resolution", "해상도"),
 ]
+# 세부 통계표(stats/attr_*.csv, EDA_REPORT.md)를 만들 속성
+STAT_ATTRS = ["region", "site", "camera", "road_form", "day_night", "weather", "difficulty", "time_band", "hour",
+              "weekday", "date", "cam_height", "hour_type", "lane_config", "quality", "resolution", "orientation"]
+ATTR_TITLES = dict(META_ATTRS) | {"orientation": "영상 방향"}
+DIFF_COLORS = {"easy": "#c3c2bd", "hard": "#2a78d6"}
 WEEKDAY_ORDER = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
 
 # 파일명 토큰 사전: (manifest 컬럼, 파일명 예시 토큰, 의미)
@@ -94,7 +122,7 @@ FILENAME_TOKENS = [
                              "같은 카메라에서도 촬영건마다 값이 바뀜 (10_nh_rh_check.png 참고)"),
     ("road_type", "highway", "도로 종류 (고속도로)"),
     ("lane_config", "TW5, OW5, OW2", "차로 방향·차로 수로 추정 (TW=양방향 / OW=편도 + 차로 수)"),
-    ("weather", "sunny, rainy, snow", "촬영 당시 날씨"),
+    ("weather", "sunny, rainy, fog, snow, tunnel", "촬영 당시 날씨 (tunnel = 터널 내부라 날씨 구분 불가)"),
     ("quality", "FHD", "해상도 등급 (Full HD)"),
     ("frame", "_005.png", "해당 클립에서 추출한 프레임(이미지) 순번 — 이미지 파일명에만 있음"),
 ]
@@ -289,7 +317,8 @@ def analyze(df: pd.DataFrame, dataset_dir: Path, raster_scale: float, imgsz: int
     listed = set(df["image_id"])
     issues["orphan_label"] = sorted(p.stem for p in lbl_dir.glob("*.txt") if p.stem not in listed)
     listed_files = set(df["file_name"])
-    issues["orphan_image"] = sorted(p.name for p in img_dir.iterdir() if p.is_file() and p.name not in listed_files)
+    issues["orphan_image"] = sorted(p.name for p in img_dir.iterdir()
+                                    if p.is_file() and not p.name.startswith(".") and p.name not in listed_files)
 
     poly_df = pd.DataFrame(polys, columns=["image_id", "cls", "n_vertices", "area_norm", "area_px",
                                            "area_train_px", "cx", "cy", "orientation"])
@@ -297,22 +326,40 @@ def analyze(df: pd.DataFrame, dataset_dir: Path, raster_scale: float, imgsz: int
 
 
 def display_value(attr: str, value) -> str:
-    """차트에 표시할 값 이름 (주/야간은 한글로)."""
-    return SUN_PHASE_KO.get(str(value), str(value)) if attr == "day_night" else str(value)
+    """차트에 표시할 값 이름 (주/야간 · 도로 형태는 한글 병기)."""
+    if attr == "day_night":
+        return SUN_PHASE_KO.get(str(value), str(value))
+    if attr == "road_form":
+        return f"{value} ({ROAD_FORM_KO.get(str(value), '')})"
+    return str(value)
+
+
+def value_order(attr: str, values) -> list:
+    """속성값의 자연스러운 순서 (요일·시간·높이·주야간·도로 형태 등)."""
+    values = list(values)
+    if attr == "weekday":
+        return [d for d in WEEKDAY_ORDER if d in values] + [v for v in values if v not in WEEKDAY_ORDER]
+    if attr in ("date", "time_band", "hour", "region", "camera", "site"):
+        return sorted(values)
+    if attr == "cam_height":
+        return sorted(values, key=lambda v: float(str(v).rstrip("m") or 0))
+    if attr == "day_night":
+        return [p for p in SUN_PHASES if p in values] + [p for p in values if p not in SUN_PHASES]
+    if attr == "road_form":
+        return [f for f in ROAD_FORMS if f in values] + [f for f in values if f not in ROAD_FORMS]
+    if attr == "difficulty":
+        return [d for d in ("easy", "hard") if d in values]
+    if attr == "weather":
+        order = ["sunny", "rainy", "fog", "snow", "tunnel"]
+        return [w for w in order if w in values] + [w for w in values if w not in order]
+    return values
 
 
 def ordered_counts(series: pd.Series, attr: str) -> pd.Series:
     counts = series.value_counts()
-    if attr == "weekday":
-        return counts.reindex([d for d in WEEKDAY_ORDER if d in counts.index])
-    if attr in ("date", "time_band", "hour", "region"):
-        return counts.sort_index()
-    if attr == "cam_height":
-        return counts.reindex(sorted(counts.index, key=lambda v: float(str(v).rstrip("m") or 0)))
-    if attr == "day_night":
-        return counts.reindex([p for p in SUN_PHASES if p in counts.index] +
-                              [p for p in counts.index if p not in SUN_PHASES])
-    return counts
+    if attr in ("site", "camera"):
+        return counts  # 많은 순
+    return counts.reindex(value_order(attr, counts.index))
 
 
 # ----------------------------------------------------------------------------
@@ -351,7 +398,7 @@ def plot_metadata(df: pd.DataFrame, top_channels: int, out: Path) -> dict:
         clip_counts = clips[attr].astype(str).value_counts()
         summary[attr] = {k: {"images": int(v), "clips": int(clip_counts.get(k, 0))} for k, v in img_counts.items()}
 
-        if attr == "channel" and len(img_counts) > top_channels:
+        if attr in ("channel", "camera") and len(img_counts) > top_channels:
             rest = img_counts.iloc[top_channels:]
             img_counts = img_counts.iloc[:top_channels]
             img_counts[f"기타 {len(rest)}개"] = rest.sum()
@@ -417,9 +464,10 @@ def plot_object_size(poly_df: pd.DataFrame, imgsz: int, out: Path) -> dict:
 
 def plot_area_ratio(merged: pd.DataFrame, out: Path) -> dict:
     ratio = merged["vehicle_area_ratio"] * 100
-    groups = [(a, t) for a, t in (("hour_type", "NH / RH"), ("weather", "날씨"), ("time_band", "시간대"),
-                                  ("site", "촬영 지역"), ("lane_config", "차로 구성")) if a in merged.columns]
-    fig, axes = plt.subplots(2, 3, figsize=(17, 8))
+    groups = [(a, t) for a, t in (("day_night", "주 / 야간"), ("weather", "날씨"), ("road_form", "도로 형태"),
+                                  ("difficulty", "난이도 조건"), ("time_band", "시간대"), ("site", "촬영 지역"),
+                                  ("lane_config", "차로 구성"), ("hour_type", "NH / RH")) if a in merged.columns]
+    fig, axes = plt.subplots(3, 3, figsize=(17, 12))
     axes = axes.ravel()
 
     hist(axes[0], ratio, bins=60)
@@ -434,8 +482,8 @@ def plot_area_ratio(merged: pd.DataFrame, out: Path) -> dict:
                            "p95": round(float(ratio.quantile(0.95)), 4), "max": round(float(ratio.max()), 4)}}
     for ax, (attr, title) in zip(axes[1:], groups):
         order = merged.groupby(attr)["vehicle_area_ratio"].median().sort_values(ascending=False).index.tolist()
-        if attr in ("time_band",):
-            order = sorted(order)
+        if attr in ("time_band", "day_night", "road_form", "difficulty", "weather"):
+            order = value_order(attr, order)
         data = [merged.loc[merged[attr] == k, "vehicle_area_ratio"].values * 100 for k in order]
         ax.boxplot(data, vert=False, widths=0.55, patch_artist=True, showfliers=True,
                    boxprops={"facecolor": BOX_FILL, "edgecolor": SERIES},
@@ -443,7 +491,8 @@ def plot_area_ratio(merged: pd.DataFrame, out: Path) -> dict:
                    whiskerprops={"color": SERIES}, capprops={"color": SERIES},
                    flierprops={"marker": "o", "markersize": 2, "markerfacecolor": TEXT_2,
                                "markeredgecolor": "none", "alpha": 0.4})
-        ax.set_yticks(range(1, len(order) + 1), [f"{k}  (n={len(d):,})" for k, d in zip(order, data)])
+        ax.set_yticks(range(1, len(order) + 1),
+                      [f"{display_value(attr, k)}  (n={len(d):,})" for k, d in zip(order, data)])
         ax.invert_yaxis()
         ax.grid(axis="x")
         ax.set_axisbelow(True)
@@ -566,7 +615,8 @@ def plot_samples(df: pd.DataFrame, dataset_dir: Path, n: int, seed: int, out: Pa
             ax.add_patch(Polygon(xy, closed=True, facecolor=color, alpha=0.35, edgecolor="none"))
             ax.add_patch(Polygon(xy, closed=True, fill=False, edgecolor=color, linewidth=1.2))
             n_obj += 1
-        ax.set_title(f"{row['site']} · {row['weather']} · {row['hour_type']} · {W}x{H} · {n_obj}개",
+        ax.set_title(f"{row['camera']} · {SUN_PHASE_KO.get(row['day_night'], row['day_night'])} · "
+                     f"{row['weather']} · {ROAD_FORM_KO.get(row['road_form'], '')} · {n_obj}개",
                      fontsize=9, fontweight="normal")
         ax.axis("off")
     for ax in axes.ravel()[len(picks):]:
@@ -584,17 +634,21 @@ def plot_samples(df: pd.DataFrame, dataset_dir: Path, n: int, seed: int, out: Pa
 
 
 def _brightness(path: str) -> tuple[float, float]:
-    """(평균 밝기, 대비) — 0~255 흑백 기준. 1/4 로 줄여 계산 (평균값은 거의 같음)."""
+    """(평균 밝기, 대비) — 0~255 흑백 기준. JPG 는 draft 로 1/4 크기 디코딩 (평균값은 거의 같고 훨씬 빠름)."""
     try:
         with Image.open(path) as im:
-            gray = np.asarray(im.reduce(4).convert("L"), dtype=np.float32)
+            if im.format == "JPEG":
+                im.draft("L", (im.width // 4, im.height // 4))
+            else:
+                im = im.reduce(4)
+            gray = np.asarray(im.convert("L"), dtype=np.float32)
         return float(gray.mean()), float(gray.std())
     except (OSError, ValueError):
         return float("nan"), float("nan")
 
 
 def measure_brightness(df: pd.DataFrame, dataset_dir: Path, per_clip: int, workers: int, seed: int) -> pd.DataFrame:
-    """이미지 픽셀 밝기 측정. per_clip>0 이면 클립마다 그 수만큼만 샘플링 (같은 클립은 밝기가 거의 같음)."""
+    """이미지 픽셀 밝기 측정. 기본(per_clip=0)은 전체 이미지. per_clip>0 이면 클립마다 그 수만큼만 샘플링."""
     sample = df if per_clip <= 0 else df.sample(frac=1, random_state=seed).groupby("clip").head(per_clip)
     paths = [str(dataset_dir / "images" / f) for f in sample["file_name"]]
     desc = f"밝기 측정 ({'전체' if per_clip <= 0 else f'클립당 {per_clip}장'})"
@@ -773,7 +827,8 @@ def plot_overlap(merged: pd.DataFrame, out: Path) -> dict:
 def plot_class_by_attribute(merged: pd.DataFrame, out: Path) -> dict:
     """속성값별 car/bus/truck 객체 비율 (100% 누적 막대)."""
     attrs = [(a, t) for a, t in (("site", "촬영 지역"), ("lane_config", "차로 구성"), ("time_band", "시간대"),
-                                  ("day_night", "주 / 야간"), ("weather", "날씨"), ("cam_height", "카메라 높이"),
+                                  ("day_night", "주 / 야간"), ("weather", "날씨"), ("road_form", "도로 형태"),
+                                  ("difficulty", "난이도 조건"), ("cam_height", "카메라 높이"),
                                   ("hour_type", "NH / RH"), ("orientation", "영상 방향"))
              if a in merged.columns and merged[a].nunique() > 1]
     names = list(CLASS_NAMES.values())
@@ -814,6 +869,589 @@ def plot_class_by_attribute(merged: pd.DataFrame, out: Path) -> dict:
     fig.tight_layout(rect=(0, 0, 1, top))
     save(fig, out)
     return summary
+
+
+# ----------------------------------------------------------------------------
+# 세부 통계표 (stats/)
+# ----------------------------------------------------------------------------
+
+
+def group_stats(merged: pd.DataFrame, poly_m: pd.DataFrame, by, imgsz: int) -> pd.DataFrame:
+    """by(컬럼 또는 컬럼 목록)별 세부 통계 — 이미지·클립·CCTV 수, 클래스별 객체, 면적 비, 객체 크기, 밝기."""
+    names = list(CLASS_NAMES.values())
+    m = merged.assign(**{f"has_{n}": merged[f"n_{n}"] > 0 for n in names}, empty=merged["n_objects"] == 0)
+    g = m.groupby(by, dropna=False)
+    out = pd.DataFrame({"images": g.size(), "clips": g["clip"].nunique(), "cameras": g["camera"].nunique()})
+    out["image_pct"] = out["images"] / len(m) * 100
+    for n in names:
+        out[f"obj_{n}"] = g[f"n_{n}"].sum()
+    out["obj_total"] = g["n_objects"].sum()
+    out["obj_pct"] = out["obj_total"] / max(1, m["n_objects"].sum()) * 100
+    for n in names:
+        out[f"{n}_share_pct"] = out[f"obj_{n}"] / out["obj_total"].replace(0, np.nan) * 100
+    for n in names:
+        out[f"img_with_{n}_pct"] = g[f"has_{n}"].mean() * 100
+    out["obj_per_img_mean"] = g["n_objects"].mean()
+    out["obj_per_img_median"] = g["n_objects"].median()
+    out["obj_per_img_max"] = g["n_objects"].max()
+    out["empty_img_pct"] = g["empty"].mean() * 100
+    out["area_ratio_mean_pct"] = g["vehicle_area_ratio"].mean() * 100
+    out["area_ratio_median_pct"] = g["vehicle_area_ratio"].median() * 100
+    out["area_ratio_p95_pct"] = g["vehicle_area_ratio"].quantile(0.95) * 100
+    out["overlap_mean_pct"] = g["overlap_ratio"].mean() * 100
+    if "brightness" in m.columns:
+        out["brightness_mean"] = g["brightness"].mean()
+        out["brightness_median"] = g["brightness"].median()
+        out["contrast_mean"] = g["contrast"].mean()
+    if not poly_m.empty:
+        a = poly_m["area_train_px"]
+        p = poly_m.assign(small=a < 32**2, medium=(a >= 32**2) & (a < 96**2), large=a >= 96**2)
+        pg = p.groupby(by, dropna=False)
+        out[f"small_pct(imgsz{imgsz})"] = pg["small"].mean() * 100
+        out["medium_pct"] = pg["medium"].mean() * 100
+        out["large_pct"] = pg["large"].mean() * 100
+        out["obj_area_median_pct"] = pg["area_norm"].median() * 100
+        out["vertices_median"] = pg["n_vertices"].median()
+    return out.round(3)
+
+
+def build_stats(merged: pd.DataFrame, poly_df: pd.DataFrame, imgsz: int, stats_dir: Path) -> dict:
+    """stats/ 에 속성별 · 클래스 · CCTV · 클립 · 교차표 CSV 를 저장하고, 보고서용 표를 반환."""
+    stats_dir.mkdir(parents=True, exist_ok=True)
+    meta_cols = [c for c in STAT_ATTRS + ["clip"] if c in merged.columns and c not in poly_df.columns]
+    poly_m = poly_df.merge(merged[["image_id", *meta_cols]], on="image_id", how="left")
+    tables: dict = {"attr": {}}
+
+    # 클래스별 ---------------------------------------------------------------
+    rows = []
+    total_obj = max(1, len(poly_df))
+    for n in CLASS_NAMES.values():
+        sub = poly_df[poly_df["cls"] == n]
+        a = sub["area_train_px"]
+        rows.append({
+            "class": n, "objects": len(sub), "object_pct": len(sub) / total_obj * 100,
+            "images_with": int((merged[f"n_{n}"] > 0).sum()),
+            "images_with_pct": (merged[f"n_{n}"] > 0).mean() * 100,
+            "clips_with": merged.loc[merged[f"n_{n}"] > 0, "clip"].nunique(),
+            "cameras_with": merged.loc[merged[f"n_{n}"] > 0, "camera"].nunique(),
+            "per_image_mean": merged[f"n_{n}"].mean(), "per_image_max": int(merged[f"n_{n}"].max()),
+            "imbalance_vs_car": (poly_df["cls"] == "car").sum() / max(1, len(sub)),
+            "small_pct": (a < 32**2).mean() * 100 if len(a) else 0,
+            "medium_pct": ((a >= 32**2) & (a < 96**2)).mean() * 100 if len(a) else 0,
+            "large_pct": (a >= 96**2).mean() * 100 if len(a) else 0,
+            "area_median_pct": sub["area_norm"].median() * 100 if len(sub) else 0,
+            "area_median_px_orig": sub["area_px"].median() if len(sub) else 0,
+            "vertices_median": sub["n_vertices"].median() if len(sub) else 0,
+            "vertices_max": int(sub["n_vertices"].max()) if len(sub) else 0,
+        })
+    cls_df = pd.DataFrame(rows).round(3)
+    cls_df.to_csv(stats_dir / "class_stats.csv", index=False, encoding="utf-8-sig")
+    tables["class"] = cls_df
+
+    # 속성별 -----------------------------------------------------------------
+    for attr in STAT_ATTRS:
+        if attr not in merged.columns:
+            continue
+        t = group_stats(merged, poly_m, attr, imgsz)
+        t = t.reindex(value_order(attr, t.index) if attr not in ("site", "camera") else
+                      t.sort_values("images", ascending=False).index)
+        t.index.name = attr
+        t.to_csv(stats_dir / f"attr_{attr}.csv", encoding="utf-8-sig")
+        tables["attr"][attr] = t
+
+    # CCTV 별 ----------------------------------------------------------------
+    cam = group_stats(merged, poly_m, "camera", imgsz)
+    info = merged.groupby("camera").agg(
+        region=("region", "first"), site=("site", "first"), channel=("channel", "first"),
+        road_form=("road_form", "first"), cam_height=("cam_height", "first"),
+        lane_config=("lane_config", lambda s: ",".join(sorted(set(s)))),
+        resolution=("resolution", lambda s: ",".join(sorted(set(s)))),
+        dates=("date", lambda s: ",".join(sorted(set(s)))),
+        day_night_set=("day_night", lambda s: ",".join(value_order("day_night", sorted(set(s))))),
+        weather_set=("weather", lambda s: ",".join(value_order("weather", sorted(set(s))))),
+        easy_images=("difficulty", lambda s: int((s == "easy").sum())),
+        hard_images=("difficulty", lambda s: int((s == "hard").sum())),
+    )
+    info["easy_pct"] = (info["easy_images"] / (info["easy_images"] + info["hard_images"]) * 100).round(2)
+    info["only_easy"] = info["hard_images"] == 0
+    for p in SUN_PHASES:
+        info[f"{p}_images"] = merged[merged["day_night"] == p].groupby("camera").size().reindex(info.index).fillna(0) \
+            .astype(int)
+    cam_df = info.join(cam).sort_values(["region", "camera"])
+    cam_df.to_csv(stats_dir / "camera_stats.csv", encoding="utf-8-sig")
+    tables["camera"] = cam_df
+
+    # 클립 별 ----------------------------------------------------------------
+    clip = group_stats(merged, poly_m, "clip", imgsz)
+    clip_info = merged.groupby("clip")[[c for c in ("camera", "region", "date", "time", "day_night", "weather",
+                                                    "road_form", "difficulty", "hard_reasons", "lane_config",
+                                                    "resolution") if c in merged.columns]].first()
+    clip_df = clip_info.join(clip.drop(columns=["clips", "cameras"])).sort_values(["camera", "date", "time"])
+    clip_df.to_csv(stats_dir / "clip_stats.csv", encoding="utf-8-sig")
+    tables["clip"] = clip_df
+
+    # 교차표 -----------------------------------------------------------------
+    tables["cross"] = {}
+    for r, c in (("day_night", "weather"), ("road_form", "day_night"), ("road_form", "weather"),
+                 ("site", "day_night"), ("site", "road_form"), ("region", "difficulty"), ("time_band", "day_night")):
+        if r not in merged.columns or c not in merged.columns:
+            continue
+        img = pd.crosstab(merged[r], merged[c])
+        img = img.reindex(index=value_order(r, img.index), columns=value_order(c, img.columns))
+        clips = merged.drop_duplicates("clip")
+        clp = pd.crosstab(clips[r], clips[c]).reindex(index=img.index, columns=img.columns, fill_value=0)
+        both = img.astype(str) + " / " + clp.astype(str)
+        both.to_csv(stats_dir / f"cross_{r}_x_{c}.csv", encoding="utf-8-sig")
+        tables["cross"][(r, c)] = (img, clp)
+    print(f"  saved stats/ (class · attr_* {len(tables['attr'])}개 · camera · clip · cross_* {len(tables['cross'])}개)")
+    return tables
+
+
+# ----------------------------------------------------------------------------
+# 15~18 차트: 도로 형태 · CCTV / 조건 교차 / 난이도 / 이미지 품질
+# ----------------------------------------------------------------------------
+
+
+def plot_road_form_camera(merged: pd.DataFrame, cam_df: pd.DataFrame, out: Path) -> None:
+    forms = value_order("road_form", merged["road_form"].unique())
+    n_cam = len(cam_df)
+    fig = plt.figure(figsize=(17, max(9.0, 0.26 * n_cam + 2.2)))
+    gs = fig.add_gridspec(3, 2, width_ratios=[1, 1.35], hspace=0.55, wspace=0.35)
+
+    ax = fig.add_subplot(gs[0, 0])
+    imgs = [int((merged["road_form"] == f).sum()) for f in forms]
+    cams = [merged.loc[merged["road_form"] == f, "camera"].nunique() for f in forms]
+    clips = [merged.loc[merged["road_form"] == f, "clip"].nunique() for f in forms]
+    barh(ax, [display_value("road_form", f) for f in forms], imgs, SERIES,
+         [f"{v:,}장 ({v / len(merged):.0%}) · {c}클립 · CCTV {k}대" for v, c, k in zip(imgs, clips, cams)])
+    ax.set_title("도로 형태별 이미지 수")
+
+    ax = fig.add_subplot(gs[1, 0])
+    per_cam = cam_df["images"]
+    hist(ax, per_cam, bins=20)
+    ax.set_title(f"CCTV당 이미지 수 — 평균 {per_cam.mean():.0f} · 최소 {per_cam.min()} · 최대 {per_cam.max()}")
+    ax.set_xlabel("이미지 수")
+    ax.set_ylabel("CCTV 수")
+
+    ax = fig.add_subplot(gs[2, 0])
+    easy_share = cam_df["easy_pct"]
+    hist(ax, easy_share, bins=np.linspace(0, 100, 21), color=DIFF_COLORS["hard"])
+    ax.set_title(f"CCTV별 easy 비율 — easy 영상만 있는 CCTV {int(cam_df['only_easy'].sum())}대")
+    ax.set_xlabel("easy(주간·맑음·일반) 이미지 비율 (%)")
+    ax.set_ylabel("CCTV 수")
+
+    ax = fig.add_subplot(gs[:, 1])
+    order = cam_df.sort_values(["road_form", "images"], key=lambda s: s.map({f: i for i, f in enumerate(ROAD_FORMS)})
+                               if s.name == "road_form" else s, ascending=[True, False])
+    y = np.arange(len(order))
+    ax.barh(y, order["easy_images"], color=DIFF_COLORS["easy"], height=0.7, label="easy (주간·맑음·일반)")
+    ax.barh(y, order["hard_images"], left=order["easy_images"], color=DIFF_COLORS["hard"], height=0.7, label="hard")
+    ax.set_yticks(y, [f"{c}  [{ROAD_FORM_KO.get(f, f)}]" for c, f in zip(order.index, order["road_form"])],
+                  fontsize=7.5)
+    ax.invert_yaxis()
+    ax.tick_params(axis="y", length=0)
+    ax.grid(axis="x")
+    ax.set_axisbelow(True)
+    for yi, (tot, dn, w) in enumerate(zip(order["images"], order["day_night_set"], order["weather_set"])):
+        ax.text(tot + 8, yi, f"{dn} · {w}", va="center", fontsize=6.5, color=TEXT_2)
+    ax.set_xlim(0, order["images"].max() * 1.45)
+    ax.set_title(f"CCTV {n_cam}대별 이미지 수 (easy / hard) — 오른쪽 = 주야간 · 날씨 구성")
+    ax.set_xlabel("이미지 수")
+    ax.legend(loc="lower right")
+    top = header(fig, "도로 형태 · CCTV",
+                 "도로 형태는 CCTV 지점명(brdg·tunnel·overpass·shelter) 기준 — 파일명의 road_type 은 전부 highway 라 구분 불가")
+    fig.subplots_adjust(top=top - 0.02, left=0.12, right=0.98, bottom=0.05)
+    save(fig, out)
+
+
+def plot_condition_matrix(merged: pd.DataFrame, out: Path) -> None:
+    pairs = [("day_night", "weather"), ("road_form", "day_night"), ("road_form", "weather")]
+    fig, axes = plt.subplots(1, 3, figsize=(18, 4.8), gridspec_kw={"width_ratios": [5, 3, 5]})
+    clips = merged.drop_duplicates("clip")
+    for ax, (r, c) in zip(axes, pairs):
+        img = pd.crosstab(merged[r], merged[c])
+        img = img.reindex(index=value_order(r, img.index), columns=value_order(c, img.columns))
+        clp = pd.crosstab(clips[r], clips[c]).reindex(index=img.index, columns=img.columns, fill_value=0)
+        share = img / img.values.sum() * 100
+        ax.imshow(share.values, cmap=SEQ_BLUE, aspect="auto", vmin=0, vmax=max(share.values.max(), 1))
+        for i in range(img.shape[0]):
+            for j in range(img.shape[1]):
+                v = img.iat[i, j]
+                dark = share.iat[i, j] > share.values.max() * 0.55
+                ax.text(j, i, f"{v:,}\n{clp.iat[i, j]}클립" if v else "·", ha="center", va="center", fontsize=8,
+                        color="white" if dark else TEXT)
+        ax.set_xticks(range(img.shape[1]), [display_value(c, v) for v in img.columns], fontsize=8)
+        ax.set_yticks(range(img.shape[0]), [display_value(r, v) for v in img.index], fontsize=8)
+        ax.tick_params(length=0)
+        for s in ax.spines.values():
+            s.set_visible(False)
+        ax.set_title(f"{ATTR_TITLES.get(r, r).split(' (')[0]} × {ATTR_TITLES.get(c, c).split(' (')[0]}", fontsize=11)
+    top = header(fig, "촬영 조건 교차표", "칸 = 이미지 수 / 클립 수, 색 = 전체 대비 비율 — 빈 칸(·)은 그 조합의 데이터가 전혀 없음")
+    fig.tight_layout(rect=(0, 0, 1, top))
+    save(fig, out)
+
+
+def plot_difficulty(merged: pd.DataFrame, poly_m: pd.DataFrame, out: Path) -> dict:
+    names = list(CLASS_NAMES.values())
+    levels = [d for d in ("easy", "hard") if d in set(merged["difficulty"])]
+    fig, axes = plt.subplots(2, 3, figsize=(18, 9))
+    summary: dict = {}
+
+    ax = axes[0, 0]
+    x = np.arange(3)
+    total = [len(merged), merged["clip"].nunique(), merged["camera"].nunique()]
+    for k, d in enumerate(levels):
+        sub = merged[merged["difficulty"] == d]
+        vals = [len(sub), sub["clip"].nunique(), sub["camera"].nunique()]
+        pct = [v / t * 100 for v, t in zip(vals, total)]
+        ax.bar(x + (k - 0.5) * 0.38, pct, width=0.36, color=DIFF_COLORS[d], label=d)
+        for xi, v, p in zip(x, vals, pct):
+            ax.text(xi + (k - 0.5) * 0.38, p + 1, f"{v:,}\n({p:.0f}%)", ha="center", va="bottom", fontsize=8,
+                    color=TEXT_2)
+        summary[d] = {"images": vals[0], "clips": vals[1], "cameras": vals[2]}
+    ax.set_xticks(x, ["이미지", "클립", "CCTV"])
+    ax.set_ylim(0, 125)
+    ax.set_ylabel("전체 대비 (%)")
+    ax.grid(axis="y")
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper right")
+    ax.set_title("easy vs hard 규모 (CCTV 는 양쪽에 중복 가능)")
+
+    ax = axes[0, 1]
+    hard = merged[merged["difficulty"] == "hard"]
+    single = pd.Series([r for rs in hard["hard_reasons"] for r in str(rs).split("|") if r]).value_counts()
+    barh(ax, [s.replace("day_night=", "주야간 ").replace("weather=", "날씨 ").replace("road_form=", "도로 ")
+              for s in single.index], single.values.tolist(), DIFF_COLORS["hard"],
+         [f"{v:,}장 ({v / max(1, len(hard)):.0%})" for v in single.values])
+    ax.set_title("hard 사유별 이미지 수 (한 장이 여러 사유 가능)")
+    summary["hard_reasons_single"] = {k: int(v) for k, v in single.items()}
+
+    ax = axes[0, 2]
+    combo = hard["hard_reasons"].str.replace("day_night=", "", regex=False).str.replace("weather=", "", regex=False) \
+        .str.replace("road_form=", "", regex=False).str.replace("|", " + ", regex=False).value_counts().head(12)
+    barh(ax, combo.index.tolist(), combo.values.tolist(), SERIES, [f"{v:,}" for v in combo.values])
+    ax.set_title("hard 사유 조합 상위 12")
+    summary["hard_reason_combos"] = {k: int(v) for k, v in combo.items()}
+
+    ax = axes[1, 0]
+    counts = merged.groupby("difficulty")[[f"n_{n}" for n in names]].sum().reindex(levels)
+    share = counts.div(counts.sum(1), axis=0) * 100
+    left = np.zeros(len(levels))
+    for n in names:
+        vals = share[f"n_{n}"].values
+        ax.barh(levels, vals, left=left, color=CLASS_COLORS[n], edgecolor=SURFACE, linewidth=2, label=n)
+        for yi, (lft, v) in enumerate(zip(left, vals)):
+            if v >= 4:
+                ax.text(lft + v / 2, yi, f"{v:.1f}", ha="center", va="center", fontsize=8, color="white")
+        left += vals
+    ax.invert_yaxis()
+    ax.set_xlim(0, 100)
+    ax.legend(loc="lower right", ncol=3, fontsize=8)
+    ax.set_title("클래스 비율 (%)")
+    summary["class_share_pct"] = share.round(2).to_dict(orient="index")
+
+    ax = axes[1, 1]
+    data = [merged.loc[merged["difficulty"] == d, "n_objects"].values for d in levels]
+    ax.boxplot(data, vert=False, widths=0.5, patch_artist=True, showfliers=False,
+               boxprops={"facecolor": BOX_FILL, "edgecolor": SERIES}, medianprops={"color": BOX_MEDIAN, "linewidth": 2},
+               whiskerprops={"color": SERIES}, capprops={"color": SERIES})
+    ax.set_yticks(range(1, len(levels) + 1), [f"{d} (평균 {v.mean():.1f})" for d, v in zip(levels, data)])
+    ax.invert_yaxis()
+    ax.grid(axis="x")
+    ax.set_axisbelow(True)
+    ax.set_title("이미지당 객체 수")
+
+    ax = axes[1, 2]
+    if not poly_m.empty and "difficulty" in poly_m.columns:
+        a = poly_m["area_train_px"]
+        p = poly_m.assign(size=np.select([a < 32**2, a < 96**2], ["small", "medium"], "large"))
+        tab = pd.crosstab(p["difficulty"], p["size"], normalize="index").reindex(
+            index=levels, columns=["small", "medium", "large"]).fillna(0) * 100
+        xs = np.arange(3)
+        for k, d in enumerate(levels):
+            ax.bar(xs + (k - 0.5) * 0.38, tab.loc[d].values, width=0.36, color=DIFF_COLORS[d], label=d)
+        ax.set_xticks(xs, ["small (<32²)", "medium", "large (≥96²)"])
+        ax.set_ylabel("객체 비율 (%)")
+        ax.grid(axis="y")
+        ax.set_axisbelow(True)
+        ax.legend()
+        ax.set_title("객체 크기 구성 (학습 해상도 기준)")
+        summary["object_size_pct"] = tab.round(2).to_dict(orient="index")
+
+    cond = " · ".join(f"{k}={v}" for k, v in EASY_CONDITION.items())
+    top = header(fig, "난이도 조건: easy vs hard",
+                 f"easy = {cond} (기존 YOLO 가 잘 잡던 조건) — 하나라도 벗어나면 hard. 분할 시 train 축소 기준")
+    fig.tight_layout(rect=(0, 0, 1, top))
+    save(fig, out)
+    return summary
+
+
+def plot_image_quality(merged: pd.DataFrame, out: Path) -> dict:
+    fig, axes = plt.subplots(1, 4, figsize=(18, 3.8))
+    res = merged["resolution"].value_counts()
+    barh(axes[0], res.index.tolist(), res.values.tolist(), SERIES,
+         [f"{v:,}장 · {merged.loc[merged['resolution'] == k, 'camera'].nunique()}대" for k, v in res.items()])
+    axes[0].set_title("해상도")
+    ori = merged["orientation"].value_counts()
+    barh(axes[1], ori.index.tolist(), ori.values.tolist(), SERIES, [f"{v:,}장" for v in ori.values])
+    axes[1].set_title("영상 방향")
+    summary = {"resolution": res.to_dict(), "orientation": ori.to_dict()}
+    if "jpg_bytes" in merged.columns:
+        kb = pd.to_numeric(merged["jpg_bytes"], errors="coerce") / 1024
+        hist(axes[2], kb.dropna(), bins=50)
+        axes[2].set_title(f"JPG 용량 — 중앙값 {kb.median():.0f}KB · 합계 {kb.sum() / 1024**2:.1f}GB")
+        axes[2].set_xlabel("KB")
+        summary["jpg_kb"] = {"median": round(float(kb.median()), 1), "total_gb": round(float(kb.sum() / 1024**2), 2)}
+        if "src_bytes" in merged.columns:
+            src = pd.to_numeric(merged["src_bytes"], errors="coerce").sum()
+            summary["png_to_jpg_ratio_pct"] = round(float(kb.sum() * 1024 / src * 100), 1) if src else None
+    if "contrast" in merged.columns:
+        ax = axes[3]
+        phases = [p for p in SUN_PHASES if p in set(merged["day_night"])]
+        ax.hist([merged.loc[merged["day_night"] == p, "contrast"].dropna() for p in phases], bins=40, stacked=True,
+                color=[SUN_COLORS[p] for p in phases], label=[SUN_PHASE_KO[p] for p in phases], edgecolor=SURFACE,
+                linewidth=0.4)
+        ax.legend()
+        ax.set_title("대비(밝기 표준편차) — 주/야간별")
+        ax.set_xlabel("contrast")
+        ax.grid(axis="y")
+        ax.set_axisbelow(True)
+    else:
+        axes[3].set_visible(False)
+    top = header(fig, "이미지 품질 · 형식")
+    fig.tight_layout(rect=(0, 0, 1, top))
+    save(fig, out)
+    return summary
+
+
+# ----------------------------------------------------------------------------
+# EDA_REPORT.md — 데이터 설명서
+# ----------------------------------------------------------------------------
+
+
+def md_table(df: pd.DataFrame, columns: list[tuple[str, str, str]], index_title: str | None = None,
+             index_fmt=str) -> str:
+    """columns: [(컬럼, 헤더, 포맷)] — 포맷은 'int' · 'pct' · 'f1' · 'f2' · 'str'."""
+    def fmt(v, kind):
+        if v is None or (isinstance(v, float) and np.isnan(v)):
+            return "-"
+        if kind == "int":
+            return f"{int(v):,}"
+        if kind == "pct":
+            return f"{v:.1f}%"
+        if kind == "f1":
+            return f"{v:.1f}"
+        if kind == "f2":
+            return f"{v:.2f}"
+        return str(v).replace("|", "\\|")
+
+    heads = ([index_title] if index_title else []) + [h for _, h, _ in columns]
+    lines = ["| " + " | ".join(heads) + " |", "|" + "|".join("---" for _ in heads) + "|"]
+    for idx, row in df.iterrows():
+        cells = ([index_fmt(idx)] if index_title else []) + [fmt(row.get(c), k) for c, _, k in columns]
+        lines.append("| " + " | ".join(cells) + " |")
+    return "\n".join(lines)
+
+
+ATTR_COLUMNS = [
+    ("images", "이미지", "int"), ("image_pct", "비율", "pct"), ("clips", "클립", "int"), ("cameras", "CCTV", "int"),
+    ("obj_car", "car", "int"), ("obj_bus", "bus", "int"), ("obj_truck", "truck", "int"),
+    ("bus_share_pct", "bus%", "pct"), ("truck_share_pct", "truck%", "pct"),
+    ("obj_per_img_mean", "객체/장", "f1"), ("area_ratio_median_pct", "면적비 중앙", "f2"),
+]
+
+
+def write_report(out_dir: Path, df: pd.DataFrame, merged: pd.DataFrame, poly_df: pd.DataFrame, tables: dict,
+                 token_table: pd.DataFrame, summary: dict, pre_report: dict, imgsz: int) -> None:
+    names = list(CLASS_NAMES.values())
+    n_obj = {n: int((poly_df["cls"] == n).sum()) for n in names}
+    total_obj = sum(n_obj.values())
+    cls = tables["class"].set_index("class")
+    cam = tables["camera"]
+    attr = tables["attr"]
+    dates = sorted(df["date"].unique())
+    times = sorted(df["time"].unique())
+    per_clip = df.groupby("clip").size()
+    extra_cols = [(f"small_pct(imgsz{imgsz})", "small%", "pct")] if f"small_pct(imgsz{imgsz})" in \
+        next(iter(attr.values())).columns else []
+    if "brightness_median" in next(iter(attr.values())).columns:
+        extra_cols.append(("brightness_median", "밝기 중앙", "f1"))
+
+    L: list[str] = []
+    add = L.append
+    add("# 도로 CCTV 차량 세그멘테이션 데이터 — EDA 보고서\n")
+    add(f"`car_seg_data_eda.py` 가 **전체 데이터(이미지 {len(df):,}장 · 폴리곤 {total_obj:,}개)** 를 샘플링 없이 분석한 결과. "
+        "모든 표의 원본 수치는 `stats/` 폴더의 CSV 에 있다.\n")
+
+    add("## 1. 데이터 개요\n")
+    add("| 항목 | 값 |\n|---|---|")
+    add("| 출처 | AI-Hub 「교통문제 해결을 위한 CCTV 교통 데이터(고속도로)」 — 2.Validation / 폴리곤세그멘테이션 |")
+    add("| 과제 | 차량 instance segmentation (YOLO-seg) → 차량 면적 비 기반 혼잡도 측정 |")
+    add(f"| 이미지 | {len(df):,}장 (JPG) |")
+    add(f"| 클립(영상) | {df['clip'].nunique()}개 — 클립당 {per_clip.min()}~{per_clip.max()}장, 평균 {per_clip.mean():.0f}장 |")
+    add(f"| CCTV | {df['camera'].nunique()}대 (지역_지점 기준) · 촬영 지역 {df['site'].nunique()}곳 · 권역 {df['region'].nunique()}개 |")
+    add("| 객체 | " + " · ".join(f"{n} {v:,} ({v / total_obj:.1%})" for n, v in n_obj.items()) + " |")
+    add(f"| 클래스 불균형 | car : bus : truck = 1 : {n_obj['bus'] / n_obj['car']:.3f} : {n_obj['truck'] / n_obj['car']:.2f} "
+        f"(car 가 bus 의 {n_obj['car'] / max(1, n_obj['bus']):.0f}배) |")
+    add(f"| 촬영 기간 | {dates[0]} ~ {dates[-1]} ({len(dates)}일) · 시각 {times[0]} ~ {times[-1]} |")
+    add("| 해상도 | " + " · ".join(f"{k} {v:,}장" for k, v in df['resolution'].value_counts().items()) + " |")
+    img_fmt = pre_report.get("image_format", {})
+    if img_fmt.get("source_png_bytes"):
+        add(f"| 용량 | 원본 PNG {img_fmt['source_png_bytes'] / 1e9:.1f}GB → JPG(품질 {img_fmt.get('quality')}) "
+            f"{img_fmt['jpg_bytes'] / 1e9:.1f}GB |")
+    add("| 라벨 형식 | YOLO seg — `<class_id> x1 y1 x2 y2 …` (0~1 정규화) · 0=car 1=bus 2=truck |")
+    add("| 도로 영역 라벨 | 없음 — 이 보고서의 '차량 면적 비'는 **이미지 전체 대비** |")
+    unmatched = pre_report.get("unmatched", {})
+    if unmatched:
+        add(f"| 전처리 제외 | 라벨 없는 이미지 {unmatched['images_without_label']['count']:,}장 · "
+            f"이미지 없는 라벨 {unmatched['labels_without_image']['count']:,}개 · "
+            f"중복 사본 {unmatched['duplicate_image_names']['count']:,}장 |")
+    add("")
+
+    add("## 2. 데이터 계층 구조\n")
+    add("```\n권역(zip 7개) → 촬영 지역(site 10곳) → CCTV(지점 %d대) → 클립(촬영 1회, %d개) → 프레임(이미지 %s장) → 폴리곤(%s개)\n```\n"
+        % (df["camera"].nunique(), df["clip"].nunique(), f"{len(df):,}", f"{total_obj:,}"))
+    add("- **클립** = 한 CCTV 에서 한 번(같은 날짜·시각) 촬영한 영상. 같은 클립의 프레임은 배경·조명·날씨가 같고 "
+        "차량만 조금씩 움직여 **서로 매우 비슷하다** → 분할은 반드시 클립 단위로 해야 데이터 누수가 없다.")
+    add("- 촬영 조건(날짜·시각·날씨·주야간)은 **클립 단위로 고정**, CCTV 속성(지역·지점·높이·차로·해상도·도로 형태)은 **CCTV 단위로 고정**.\n")
+
+    add("## 3. 파일명 규약\n")
+    add("`Suwon_CH01_20200722_1500_WED_9m_NH_highway_TW5_sunny_FHD_005.jpg` 를 `_` 로 나눈 12개 토큰\n")
+    cols = ["순서", "manifest 컬럼", "파일명 토큰 예시", "의미", "고유값 수", "데이터 확인 결과"]
+    add(md_table(token_table.set_index("순서"), [(c, c, "str") for c in cols[1:]], "순서"))
+    add("\n### 파생 컬럼 (manifest.csv)\n")
+    add("| 컬럼 | 만드는 방법 | 값 |\n|---|---|---|")
+    add(f"| camera | `site_channel` | {df['camera'].nunique()}종 |")
+    add("| road_form | CCTV 지점명 키워드: `brdg`→bridge(교량), `tunnel`→tunnel(터널), `overpass`→overpass(육교·고가), "
+        "`shelter`→shelter(졸음쉼터), 그 외→general(일반) | " + ", ".join(
+            f"{k} {v:,}" for k, v in df["road_form"].value_counts().items()) + " |")
+    add("| day_night | 촬영 날짜·시각·지역으로 계산한 일출/일몰 기준 — ±30분은 twilight | " + ", ".join(
+        f"{k} {v:,}" for k, v in df["day_night"].value_counts().items()) + " |")
+    add("| time_band | 촬영 시각 3시간 구간 | " + ", ".join(sorted(df["time_band"].unique())) + " |")
+    add("| difficulty | " + " · ".join(f"{k}={v}" for k, v in EASY_CONDITION.items())
+        + " 이면 easy, 하나라도 다르면 hard | " + ", ".join(f"{k} {v:,}" for k, v in df["difficulty"].value_counts().items()) + " |")
+    add("| hard_reasons | easy 조건에서 벗어난 항목 목록 (`|` 구분) | 예: `day_night=night|road_form=bridge` |")
+    add("\n> ⚠️ road_form 은 **CCTV 지점명** 기준이다. 화면 텍스트로 확인한 결과 대부분 구조물 '근처'를 비추는 카메라이며 "
+        "(예: 추점터널 CCTV 는 터널 밖 도로), 실제 터널 내부 영상은 `Inje_injetunnel2`(weather=tunnel) 뿐이다.\n")
+
+    add("## 4. 클래스 통계\n")
+    add(md_table(cls, [("objects", "객체", "int"), ("object_pct", "비율", "pct"), ("images_with", "등장 이미지", "int"),
+                       ("images_with_pct", "등장 비율", "pct"), ("clips_with", "등장 클립", "int"),
+                       ("cameras_with", "등장 CCTV", "int"), ("per_image_mean", "장당 평균", "f2"),
+                       ("per_image_max", "장당 최대", "int"), ("imbalance_vs_car", "car 대비 배수", "f1"),
+                       ("small_pct", "small", "pct"), ("medium_pct", "medium", "pct"), ("large_pct", "large", "pct"),
+                       ("area_median_pct", "면적 중앙(%)", "f2"), ("vertices_median", "꼭짓점 중앙", "f1")], "class"))
+    add(f"\nsmall/medium/large 는 긴 변을 imgsz={imgsz} 로 줄였을 때의 픽셀 면적 기준 (COCO 32²/96²).\n")
+
+    add("## 5. 속성별 세부 통계\n")
+    add("열 설명: 이미지·클립·CCTV 수 / 클래스별 객체 수 / bus%·truck% = 그 값 안의 객체 중 비율 / 객체/장 = 이미지당 평균 객체 수 / "
+        "면적비 중앙 = 이미지 대비 차량 면적 비(%) 중앙값 / small% = 작은 객체 비율 / 밝기 중앙 = 0~255\n")
+    for a in ("region", "site", "road_form", "day_night", "weather", "difficulty", "time_band", "hour", "weekday",
+              "cam_height", "lane_config", "hour_type", "quality", "resolution", "orientation", "date"):
+        if a not in attr:
+            continue
+        add(f"### {ATTR_TITLES.get(a, a)} (`{a}`)\n")
+        add(md_table(attr[a], ATTR_COLUMNS + extra_cols, a, lambda v, a=a: display_value(a, v)))
+        add("")
+
+    add("## 6. CCTV 별 통계\n")
+    add(f"CCTV {len(cam)}대 — easy 영상만 있는 CCTV **{int(cam['only_easy'].sum())}대**: "
+        + ", ".join(cam.index[cam["only_easy"]]) + "\n")
+    add(md_table(cam, [("region", "권역", "str"), ("road_form", "도로 형태", "str"), ("cam_height", "높이", "str"),
+                       ("lane_config", "차로", "str"), ("resolution", "해상도", "str"), ("images", "이미지", "int"),
+                       ("clips", "클립", "int"), ("day_night_set", "주야간", "str"), ("weather_set", "날씨", "str"),
+                       ("easy_pct", "easy%", "pct"), ("obj_bus", "bus", "int"), ("obj_truck", "truck", "int"),
+                       ("obj_per_img_mean", "객체/장", "f1"), ("area_ratio_median_pct", "면적비 중앙", "f2")]
+                 + ([("brightness_median", "밝기", "f1")] if "brightness_median" in cam.columns else []), "camera"))
+    add("")
+
+    add("## 7. 조건 교차표 (이미지 수 / 클립 수)\n")
+    for (r, c), (img, clp) in tables["cross"].items():
+        if r in ("site",):
+            continue
+        both = pd.DataFrame({col: [f"{int(img.at[i, col]):,} / {int(clp.at[i, col])}" for i in img.index]
+                             for col in img.columns}, index=img.index)
+        add(f"### {r} × {c}\n")
+        add(md_table(both, [(col, display_value(c, col), "str") for col in both.columns], r,
+                     lambda v, r=r: display_value(r, v)))
+        add("")
+
+    add("## 8. 주요 발견\n")
+    s = summary
+    dn_clip = df.drop_duplicates("clip")["day_night"].value_counts()
+    small_all = (poly_df["area_train_px"] < 32**2).mean() * 100
+    bus_site = attr["site"]["obj_bus"].sort_values(ascending=False) if "site" in attr else None
+    easy = attr.get("difficulty")
+    findings = [
+        f"**클래스 불균형이 크다** — car {n_obj['car'] / total_obj:.0%}, truck {n_obj['truck'] / total_obj:.0%}, "
+        f"bus {n_obj['bus'] / total_obj:.1%}. bus 는 이미지의 {cls.at['bus', 'images_with_pct']:.0f}% 에만 등장한다.",
+        f"**작은 객체가 대부분** — imgsz={imgsz} 기준 small 객체가 {small_all:.0f}% (bus {cls.at['bus', 'small_pct']:.0f}%, "
+        f"car {cls.at['car', 'small_pct']:.0f}%). 학습 해상도를 키우는 것이 유리하다.",
+        f"**주간 편중** — 이미지의 {(df['day_night'] == 'day').mean():.0%} 가 주간, 야간 {(df['day_night'] == 'night').mean():.0%} "
+        f"({dn_clip.get('night', 0)}클립), 여명·황혼 {(df['day_night'] == 'twilight').mean():.0%}. 야간 클립은 "
+        + ", ".join(sorted(df.loc[df['day_night'] == 'night', 'site'].unique())) + " 에만 있다.",
+        f"**맑음 편중** — sunny {(df['weather'] == 'sunny').mean():.0%}; rainy {(df['weather'] == 'rainy').sum():,}장 · "
+        f"fog {(df['weather'] == 'fog').sum():,}장 · snow {(df['weather'] == 'snow').sum():,}장 · tunnel {(df['weather'] == 'tunnel').sum():,}장.",
+        f"**도로 형태** — 일반 {(df['road_form'] == 'general').mean():.0%} · 교량 {(df['road_form'] == 'bridge').mean():.0%} · "
+        f"터널 {(df['road_form'] == 'tunnel').mean():.0%} · 육교·고가 {(df['road_form'] == 'overpass').mean():.0%} · "
+        f"졸음쉼터 {(df['road_form'] == 'shelter').mean():.0%} (CCTV 지점명 기준).",
+    ]
+    if easy is not None and "easy" in easy.index:
+        findings.append(
+            f"**easy(주간·맑음·일반) = {easy.at['easy', 'images']:,}장 ({easy.at['easy', 'image_pct']:.0f}%)**, "
+            f"hard = {easy.at['hard', 'images']:,}장. easy 영상만 있는 CCTV 가 {int(cam['only_easy'].sum())}대라, "
+            "hard 만으로 train 을 구성하면 이 CCTV 들이 사라진다 → 분할 스크립트는 CCTV 비율 유지를 위해 부족분만 easy 로 채운다.")
+    few = cam.loc[cam["clips"] <= 2, "clips"]
+    if len(few):
+        few_text = ", ".join(f"{c} {int(n)}클립" for c, n in few.items())
+        findings.append(
+            f"**클립이 1~2개뿐인 CCTV {len(few)}대** ({few_text}) — "
+            "클립 단위로는 train · val · test 에 모두 넣을 수 없어, 분할 스크립트는 이 CCTV 의 클립을 시간 구간으로 나눈다.")
+    if bus_site is not None and bus_site.sum():
+        findings.append(f"**bus 는 특정 지역에 몰려 있다** — 상위 3곳({', '.join(bus_site.index[:3])})이 bus 의 "
+                        f"{bus_site.iloc[:3].sum() / bus_site.sum():.0%}.")
+    br = s.get("brightness", {}).get("by_day_night", {})
+    if br:
+        findings.append("**밝기로 주/야간 구분이 확인된다** — 밝기 중앙값 " + " · ".join(
+            f"{SUN_PHASE_KO[p]} {v['median']:.0f}" for p, v in br.items()) + f" ({s['brightness']['n_measured_images']:,}장 전수 측정).")
+    ov = s.get("vehicle_overlap", {})
+    if ov:
+        findings.append(f"**차량 폴리곤 겹침** — 2대 이상 이미지의 평균 겹침 {ov['mean_overlap_pct_multi']:.1f}% → 면적 비는 합집합으로 계산해야 한다.")
+    nh = s.get("nh_rh_check", {})
+    if nh:
+        findings.append(f"**NH/RH 정의 미확인** — RH 는 {df.loc[df['hour_type'] == 'RH', 'clip'].nunique()}클립뿐이고, "
+                        f"같은 카메라 비교에서 RH 쪽 차량이 더 많은 곳은 {nh['cameras_rh_more_objects']}/{nh['cameras_with_both']}개.")
+    for f in findings:
+        add(f"- {f}")
+    add("")
+
+    add("## 9. 데이터 무결성 점검\n")
+    add("| 항목 | 개수 |\n|---|---|")
+    for k, v in s.get("integrity", {}).items():
+        add(f"| {k} | {v['count']:,} |")
+    add(f"| images_without_objects (객체 0개 이미지) | {s.get('images_without_objects', 0):,} |")
+    add("")
+
+    add("## 10. 파일 목록\n")
+    charts = [
+        ("00_filename_tokens.md/.csv", "파일명 토큰 사전"), ("01_class_distribution.png", "클래스별 객체 수 · 등장 이미지"),
+        ("02_metadata_distribution.png", "메타데이터 전체 분포"), ("03_objects_per_image.png", "이미지당 객체 수"),
+        ("04_object_size.png", "객체 크기(S/M/L)"), ("05_vehicle_area_ratio.png", "차량 면적 비 — 조건별"),
+        ("06_centroid_heatmap.png", "객체 중심점 분포"), ("07_vertices_per_polygon.png", "폴리곤 꼭짓점 수"),
+        ("08_frames_per_clip.png", "클립당 프레임 수"), ("09_samples.png", "라벨 오버레이 샘플"),
+        ("10_nh_rh_check.png", "NH/RH 의미 확인"), ("11_brightness.png", "픽셀 밝기 (전체 이미지)"),
+        ("12_day_night_samples.png", "주간/여명·황혼/야간 샘플"), ("13_vehicle_overlap.png", "차량 폴리곤 겹침"),
+        ("14_class_by_attribute.png", "속성별 클래스 비율"), ("15_road_form_camera.png", "도로 형태 · CCTV별 구성"),
+        ("16_condition_matrix.png", "조건 교차 히트맵"), ("17_difficulty.png", "easy vs hard"),
+        ("18_image_quality.png", "해상도 · 용량 · 대비"), ("stats/", "세부 통계 CSV"),
+        ("eda_per_image.csv · eda_polygons.csv.gz · eda_brightness.csv", "이미지/폴리곤 단위 원자료"),
+        ("eda_summary.json", "수치 요약"),
+    ]
+    add("| 파일 | 내용 |\n|---|---|")
+    for f, d in charts:
+        add(f"| `{f}` | {d} |")
+    (out_dir / "EDA_REPORT.md").write_text("\n".join(L) + "\n", encoding="utf-8")
+    print("  saved EDA_REPORT.md")
 
 
 # ----------------------------------------------------------------------------
@@ -862,7 +1500,7 @@ def token_observation(df: pd.DataFrame, clips: pd.DataFrame, attr: str) -> str:
         per_clip = df.groupby("clip").size()
         return f"{int(frame.min()):03d} ~ {int(frame.max()):03d} · 클립당 {per_clip.min()}~{per_clip.max()}장"
     if s.nunique() == 1:
-        return f"전부 {s.iat[0]} (값이 하나뿐 → 분할 층화에서 제외)"
+        return f"전부 {s.iat[0]} (값이 하나뿐 → 구분 정보 없음)"
     return _value_list(s.value_counts())
 
 
@@ -1012,7 +1650,7 @@ def plot_nh_rh_check(merged: pd.DataFrame, out: Path) -> dict:
 
 def run(args: argparse.Namespace) -> int:
     dataset_dir = Path(args.dataset_dir).expanduser().resolve()
-    out_dir = Path(args.out_dir).expanduser().resolve() if args.out_dir else dataset_dir / "eda"
+    out_dir = Path(args.out_dir).expanduser().resolve()
     manifest = dataset_dir / "manifest.csv"
     if not manifest.exists():
         print(f"[error] manifest.csv 가 없습니다: {manifest}\n"
@@ -1027,13 +1665,23 @@ def run(args: argparse.Namespace) -> int:
         df[col] = df[col].astype(int)
     if "time" in df.columns:
         df["hour"] = df["time"].str[:2]  # HHMM → HH
-    if {"date", "time", "site"} <= set(df.columns) and ("day_night" not in df.columns or (df["day_night"] == "").all()):
-        # 주/야간 컬럼이 없는 예전 manifest 면 여기서 계산 (전처리를 다시 돌릴 필요 없음)
-        from car_seg_data_preprocessing import day_night_of
+    # 예전 manifest 라 파생 컬럼이 없으면 여기서 계산 (전처리를 다시 돌릴 필요 없음)
+    if "day_night" not in df.columns or (df["day_night"] == "").all():
         phases = [day_night_of(d, t, s) for d, t, s in zip(df["date"], df["time"], df["site"])]
         df["day_night"] = [p for p, _ in phases]
         df["min_from_sunset"] = [m for _, m in phases]
-    print(f"[EDA] {dataset_dir}  — 이미지 {len(df):,}장 / 클립 {df['clip'].nunique()}개")
+    if "camera" not in df.columns:
+        df["camera"] = df["site"] + "_" + df["channel"]
+    if "road_form" not in df.columns:
+        df["road_form"] = df["channel"].map(road_form_of)
+    if "difficulty" not in df.columns:
+        reasons = ["|".join(hard_reasons(r)) for r in df.to_dict(orient="records")]
+        df["hard_reasons"] = reasons
+        df["difficulty"] = ["hard" if r else "easy" for r in reasons]
+    print(f"[EDA] {dataset_dir}  — 전체 이미지 {len(df):,}장 / 클립 {df['clip'].nunique()}개 / "
+          f"CCTV {df['camera'].nunique()}대 (샘플링 없이 전수 분석)")
+    pre_report_path = dataset_dir / "preprocess_report.json"
+    pre_report = json.loads(pre_report_path.read_text(encoding="utf-8")) if pre_report_path.exists() else {}
 
     poly_df, img_df, issues = analyze(df, dataset_dir, args.raster_scale, args.imgsz)
     merged = df.merge(img_df, on="image_id", how="inner")
@@ -1041,8 +1689,17 @@ def run(args: argparse.Namespace) -> int:
         print("[error] 분석할 라벨이 없습니다.", file=sys.stderr)
         return 1
 
-    print(f"\n[EDA] 차트 저장 → {out_dir}")
+    # 밝기는 통계표 · 보고서에도 쓰므로 먼저 전수 측정
+    bdf = pd.DataFrame(columns=["image_id", "brightness", "contrast"])
+    if not args.no_brightness:
+        bdf = measure_brightness(df, dataset_dir, args.brightness_per_clip, args.workers, args.seed)
+        if not bdf.empty:
+            merged = merged.merge(bdf, on="image_id", how="left")
+
+    print(f"\n[EDA] 결과 저장 → {out_dir}")
     token_table = build_token_table(df, out_dir)
+    tables = build_stats(merged, poly_df, args.imgsz, out_dir / "stats")
+    poly_m = poly_df.merge(merged[["image_id", "difficulty"]], on="image_id", how="left")
     plot_class_distribution(poly_df, img_df, len(merged), out_dir / "01_class_distribution.png")
     meta_summary = plot_metadata(df, args.top_channels, out_dir / "02_metadata_distribution.png")
     per_image_summary = plot_objects_per_image(img_df, out_dir / "03_objects_per_image.png")
@@ -1055,23 +1712,30 @@ def run(args: argparse.Namespace) -> int:
     nh_rh_summary = plot_nh_rh_check(merged, out_dir / "10_nh_rh_check.png")
 
     brightness_summary: dict = {}
-    bdf = pd.DataFrame(columns=["image_id", "brightness", "contrast"])
-    if not args.no_brightness and "day_night" in df.columns:
-        bdf = measure_brightness(df, dataset_dir, args.brightness_per_clip, args.workers, args.seed)
-        if not bdf.empty:
-            brightness_summary = plot_brightness(bdf.merge(df, on="image_id"), out_dir / "11_brightness.png")
-            bdf.to_csv(out_dir / "eda_brightness.csv", index=False, encoding="utf-8-sig")
-    if "day_night" in df.columns:
-        plot_day_night_samples(df, bdf, dataset_dir, 4, args.seed, out_dir / "12_day_night_samples.png")
+    if not bdf.empty:
+        brightness_summary = plot_brightness(bdf.merge(df, on="image_id"), out_dir / "11_brightness.png")
+        bdf.to_csv(out_dir / "eda_brightness.csv", index=False, encoding="utf-8-sig")
+    plot_day_night_samples(df, bdf, dataset_dir, 4, args.seed, out_dir / "12_day_night_samples.png")
     overlap_summary = plot_overlap(merged, out_dir / "13_vehicle_overlap.png")
     class_attr_summary = plot_class_by_attribute(merged, out_dir / "14_class_by_attribute.png")
+    plot_road_form_camera(merged, tables["camera"], out_dir / "15_road_form_camera.png")
+    plot_condition_matrix(merged, out_dir / "16_condition_matrix.png")
+    difficulty_summary = plot_difficulty(merged, poly_m, out_dir / "17_difficulty.png")
+    quality_summary = plot_image_quality(merged, out_dir / "18_image_quality.png")
 
-    img_df.to_csv(out_dir / "eda_per_image.csv", index=False, encoding="utf-8-sig")
+    keep = ["image_id", "camera", "clip", "day_night", "weather", "road_form", "difficulty"]
+    merged[keep + [c for c in merged.columns if c in img_df.columns and c != "image_id"]
+           + [c for c in ("brightness", "contrast") if c in merged.columns]] \
+        .to_csv(out_dir / "eda_per_image.csv", index=False, encoding="utf-8-sig")
+    poly_df.round(6).to_csv(out_dir / "eda_polygons.csv.gz", index=False, compression="gzip")
     constant = [a for a, _ in META_ATTRS if a in df.columns and df[a].nunique() == 1]
     summary = {
         "dataset_dir": str(dataset_dir),
+        "analysis_scope": "전체 데이터 (샘플링 없음)",
         "n_images": int(len(df)),
         "n_clips": int(df["clip"].nunique()),
+        "n_cameras": int(df["camera"].nunique()),
+        "easy_condition": EASY_CONDITION,
         "n_objects": {name: int((poly_df["cls"] == name).sum()) for name in CLASS_NAMES.values()},
         "images_without_objects": int((img_df["n_objects"] == 0).sum()),
         "constant_attributes": constant,
@@ -1086,9 +1750,14 @@ def run(args: argparse.Namespace) -> int:
         "brightness": brightness_summary,
         "vehicle_overlap": overlap_summary,
         "class_share_by_attribute_pct": class_attr_summary,
+        "difficulty": difficulty_summary,
+        "image_quality": quality_summary,
+        "cameras_only_easy": tables["camera"].index[tables["camera"]["only_easy"]].tolist(),
         "integrity": {k: {"count": len(v), "examples": v[:50]} for k, v in issues.items()},
     }
-    (out_dir / "eda_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+    (out_dir / "eda_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2, default=str),
+                                              encoding="utf-8")
+    write_report(out_dir, df, merged, poly_df, tables, token_table, summary, pre_report, args.imgsz)
 
     # 콘솔 요약 ----------------------------------------------------------------
     n_obj = summary["n_objects"]
@@ -1125,7 +1794,7 @@ def run(args: argparse.Namespace) -> int:
         print(f"  차량 겹침    : 2대 이상 이미지 평균 {overlap_summary['mean_overlap_pct_multi']:.1f}% · "
               f"차량 수별 중앙값 " + ", ".join(f"{k}대 {v:.1f}%" for k, v in by_obj.items()))
     if constant:
-        print(f"  값이 하나뿐인 속성(분할 층화에서 자동 제외): {constant}")
+        print(f"  값이 하나뿐인 속성(구분 정보 없음): {constant}")
     problems = {k: len(v) for k, v in issues.items() if v}
     print(f"  무결성 점검  : {'문제 없음' if not problems else problems}")
     print(f"\n  결과 폴더: {out_dir}")
@@ -1139,15 +1808,15 @@ def build_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     p.add_argument("--dataset-dir", default=str(BASE_DIR / "car_seg_dataset"), help="전처리 결과 폴더")
-    p.add_argument("--out-dir", default=None, help="EDA 결과 폴더 (기본: <dataset-dir>/eda)")
+    p.add_argument("--out-dir", default=str(BASE_DIR / "car_seg_eda"), help="EDA 결과 폴더 (데이터셋과 분리)")
     p.add_argument("--n-samples", type=int, default=12, help="오버레이 샘플 이미지 수 (0 이면 생략)")
     p.add_argument("--imgsz", type=int, default=640, help="객체 크기 S/M/L 판정에 쓸 학습 해상도")
     p.add_argument("--raster-scale", type=float, default=0.25, help="면적 비 계산용 마스크 축소 비율")
     p.add_argument("--top-channels", type=int, default=15, help="채널 분포 차트에 표시할 상위 개수")
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--no-brightness", action="store_true", help="픽셀 밝기 측정(11번 차트) 생략")
-    p.add_argument("--brightness-per-clip", type=int, default=10,
-                   help="밝기를 잴 클립당 이미지 수 (0 이면 전체 — 수 분 걸림)")
+    p.add_argument("--brightness-per-clip", type=int, default=0,
+                   help="밝기를 잴 클립당 이미지 수 (0 = 전체 이미지 전수 측정)")
     p.add_argument("--workers", type=int, default=min(8, os.cpu_count() or 1), help="밝기 측정 병렬 프로세스 수")
     return p
 
