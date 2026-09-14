@@ -1,52 +1,43 @@
 #!/usr/bin/env python3
 """AI-Hub 「교통문제 해결을 위한 CCTV 교통 데이터(고속도로)」 폴리곤 세그멘테이션 데이터를
-한 곳으로 모으고, 여러 모델이 바로 쓸 수 있는 라벨 형식(YOLO · COCO · 마스크 · LabelMe)으로 만드는 스크립트.
+한 곳으로 모아 **YOLO segmentation 형식 + JPG 이미지**로 만드는 스크립트.
+
+(old_20000_version/car_seg_data_preprocessing.py 를 YOLO-seg 전용으로 다시 정리한 버전)
+  - 라벨 형식은 YOLO 하나만 만든다 (COCO · 마스크 · LabelMe 제거)
+  - 이미지는 zip 에서 꺼내는 즉시 JPG(기본 품질 95)로 변환해 저장한다 → 원본 PNG 60GB 대비 약 1/4
+  - manifest 에 CCTV(카메라) ID · 도로 형태(road_form) · 난이도 조건(difficulty) 컬럼을 추가한다
+    → EDA 와 분할(학습용 train 축소)이 같은 기준을 쓴다
 
 원본 구조 (AI-Hub 다운로드 그대로)
     traffic_data2/
       100.교통문제_…(고속도로)/01.데이터/2.Validation/라벨링데이터/폴리곤세그멘테이션/3.대전충남.zip.part0
       100.교통문제_…(고속도로) 6/01.데이터/2.Validation/원천데이터/폴리곤세그멘테이션/3.대전충남.zip.part0
-                                                                                   3.대전충남.zip.part1073741824
-                                                                                   …
-    - AI-Hub 에서 받은 download (N).tar 를 풀지 않은 상태도 그대로 읽는다 (tar 안의 조각 위치를 바로 읽음)
-      ~/Downloads/download (5).tar  →  100.교통문제_…/01.데이터/…/원천데이터/폴리곤세그멘테이션/3.대전충남.zip.part0 …
+                                                                                   3.대전충남.zip.part1073741824 …
+    - AI-Hub 에서 받은 download (N).tar 를 풀지 않은 상태도 그대로 읽는다
     - 분할 zip 조각의 접미사 숫자 = 그 조각의 시작 바이트 오프셋
     - 라벨: CVAT 1.1 XML (클립 1개 = XML 1개, <image> 안에 car/bus/truck <polygon>)
     - 이미지: <클립명>_NNN.png (일부 클립은 '<클립명> NNN.png' 처럼 공백 구분)
 
 처리 과정
     1. 모든 .zip.partN 조각을 zip 단위로 묶고 오프셋 연속성(누락 조각)을 검사
-    2. 조각을 디스크에 합치지 않고 가상으로 이어 붙여 바로 읽음 (병합본 60GB를 따로 만들지 않음)
+    2. 조각을 디스크에 합치지 않고 가상으로 이어 붙여 바로 읽음
     3. 라벨 XML 파싱 → 정규화한 이미지 파일명 기준으로 원천 이미지와 매칭
-    4. 매칭된 이미지만 images/ 에 풀고, 폴리곤을 YOLO seg 라벨로 labels/ 에 저장
-    5. YOLO 라벨에서 다른 형식(COCO JSON, semantic 마스크 PNG, LabelMe JSON)을 생성
+    4. 매칭된 이미지를 PNG 디코딩 → JPG 로 저장 (여러 프로세스 병렬), 폴리곤 → YOLO seg 라벨
+    5. manifest.csv / preprocess_report.json / classes.json 저장
 
 결과 구조
     car_seg_dataset/
-      images/<클립명>_NNN.png
-      labels/<클립명>_NNN.txt           [yolo]    "<class_id> x1 y1 x2 y2 …" (0~1 정규화, class 0부터)
-      annotations/instances_all.json   [coco]    COCO instance segmentation (픽셀 좌표, category 1부터)
-      masks/<클립명>_NNN.png            [mask]    semantic 마스크 (0=배경 1=car 2=bus 3=truck)
-      labelme/<클립명>_NNN.json         [labelme] LabelMe 폴리곤 (라벨링 툴에서 열어 수정할 때)
-      classes.json                     형식별 클래스 번호표
-      manifest.csv                     이미지 1장 = 1행 (파일명 메타데이터 + GT 개수)
-      preprocess_report.json           요약 통계, 매칭 실패·제외 목록
-
-    형식별 쓰는 모델
-      yolo    Ultralytics YOLO (v8 / 11 / 26 …)
-      coco    Mask R-CNN · Detectron2 · MMDetection · Mask2Former(instance) · RT-DETR 등
-      mask    SegFormer · DeepLabV3 · U-Net · Mask2Former(semantic) 등
-      labelme LabelMe / X-AnyLabeling 등 라벨링 툴
-
-    train / val / test 분할은 car_seg_data_split.py 가 모든 형식에 똑같이 적용한다.
+      images/<클립명>_NNN.jpg          JPG (RGB, 품질 95)
+      labels/<클립명>_NNN.txt          YOLO seg  "<class_id> x1 y1 x2 y2 …" (0~1 정규화, 0=car 1=bus 2=truck)
+      classes.json                    클래스 번호표
+      manifest.csv                    이미지 1장 = 1행 (파일명 메타데이터 + CCTV · 도로 형태 · 난이도 + GT 개수)
+      preprocess_report.json          요약 통계, 매칭 실패·제외 목록
 
 사용 예
     python car_seg_data_preprocessing.py --dry-run          # 조각/매칭만 점검 (아무것도 쓰지 않음)
-    python car_seg_data_preprocessing.py                    # 전체 실행 (yolo + coco + mask)
-    python car_seg_data_preprocessing.py --raw-root ~/Downloads            # 받은 tar 파일들에서 바로
-    python car_seg_data_preprocessing.py --raw-root ~/Downloads ./폴더     # tar + 풀어 둔 폴더 함께 (중복은 자동 제거)
-    python car_seg_data_preprocessing.py --formats yolo,coco,mask,labelme
-    python car_seg_data_preprocessing.py --formats-only     # 압축 해제 없이 기존 결과에 형식만 (다시) 생성
+    python car_seg_data_preprocessing.py                    # 전체 실행
+    python car_seg_data_preprocessing.py --raw-root ~/Downloads
+    python car_seg_data_preprocessing.py --jpg-quality 90 --workers 8
 """
 
 from __future__ import annotations
@@ -59,21 +50,19 @@ import json
 import math
 import os
 import re
-import shutil
 import sys
 import tarfile
 import unicodedata
 import xml.etree.ElementTree as ET
 import zipfile
 from collections import Counter, defaultdict
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import date as datetime_date
-from datetime import datetime
 from pathlib import Path
 
-from PIL import Image, ImageDraw, UnidentifiedImageError
+from PIL import Image, UnidentifiedImageError
 from tqdm import tqdm
 
 # ----------------------------------------------------------------------------
@@ -84,14 +73,8 @@ BASE_DIR = Path(__file__).resolve().parent
 
 IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".bmp"}
 
-# GT 클래스 -> YOLO class id (traffic_project/src/prepare_data.py 와 동일한 매핑)
+# GT 클래스 -> YOLO class id
 CLASS_TO_ID = {"car": 0, "bus": 1, "truck": 2}
-
-# 라벨 형식 — yolo(labels/)는 다른 형식의 원본이자 분할의 기준이라 항상 만든다
-FORMATS = ("yolo", "coco", "mask", "labelme")
-DEFAULT_FORMATS = "yolo,coco,mask"
-# 마스크 팔레트 (픽셀값 = YOLO class id + 1, 0 = 배경). 색은 EDA 차트와 동일
-MASK_PALETTE = {0: (0, 0, 0), 1: (42, 120, 214), 2: (235, 104, 52), 3: (27, 175, 122)}
 
 # 'xxx.zip.part1073741824' -> ('xxx.zip', 1073741824)
 PART_RE = re.compile(r"^(?P<zip>.+\.zip)\.part(?P<offset>\d+)$", re.IGNORECASE)
@@ -99,12 +82,12 @@ PART_RE = re.compile(r"^(?P<zip>.+\.zip)\.part(?P<offset>\d+)$", re.IGNORECASE)
 # macOS 가 같은 이름의 다운로드 폴더에 붙이는 ' 2', ' 3' … 접미사
 DOWNLOAD_COPY_SUFFIX_RE = re.compile(r" \d+$")
 
-# 파일명 규약 (230개 클립 전부 '_' 기준 11토큰):
+# 파일명 규약 (클립 전부 '_' 기준 11토큰):
 #   Suwon_CH01_20200721_1700_TUE_9m_RH_highway_TW5_sunny_FHD_001.png
 #   Inje_injetunnel2_20201210_0956_THU_4.8m_NH_highway_OW2_tunnel_FHD 005.png
 META_FIELDS = (
     "site",         # 촬영 지역 (Suwon, Inje, …)
-    "channel",      # 카메라 채널 / 촬영 지점 (CH01, injetunnel2, …)
+    "channel",      # CCTV 채널 / 설치 지점명 (CH01, injetunnel2, busanportbrdg1 …)
     "date",         # YYYYMMDD
     "time",         # HHMM
     "weekday",      # MON ~ SUN
@@ -116,10 +99,28 @@ META_FIELDS = (
     "quality",      # FHD / HD
 )
 
-# 촬영 시각(07~21시)을 3시간 단위로 묶은 구간 — 층화 분할/EDA 용
+# 촬영 시각(07~21시)을 3시간 단위로 묶은 구간
 TIME_BANDS = ((7, 10, "07-09"), (10, 13, "10-12"), (13, 16, "13-15"), (16, 19, "16-18"), (19, 22, "19-21"))
 
 LANE_DIRECTION = {"TW": "two_way", "OW": "one_way"}
+
+# 도로 형태 — 파일명의 road_type 은 전부 'highway' 라 구분이 안 되므로, CCTV 설치 지점명(channel)의
+# 키워드로 구분한다. 화면 속 텍스트로 확인한 결과 채널명은 'CCTV 지점명'(예: 추점터널, 남이육교, 태인졸음쉼터)이며,
+# 카메라가 그 구조물 '근처'를 비추는 경우가 대부분이다 (실제 터널 내부 영상은 injetunnel2 뿐 — weather=tunnel).
+# 키워드에 걸리지 않는 지점(CH01, ogsan, jongsin …)은 일반 도로(general).
+ROAD_FORM_KEYWORDS = (
+    ("tunnel", "tunnel"),       # 터널 (입구 부근 포함)
+    ("brdg", "bridge"),         # 교량
+    ("bridge", "bridge"),
+    ("overpass", "overpass"),   # 육교 / 고가
+    ("shelter", "shelter"),     # 졸음쉼터
+)
+ROAD_FORMS = ("general", "bridge", "tunnel", "overpass", "shelter")
+ROAD_FORM_KO = {"general": "일반", "bridge": "교량", "tunnel": "터널", "overpass": "육교·고가", "shelter": "졸음쉼터"}
+
+# 기존 YOLO 가 '잘 잡던' 조건 = 주간 · 맑음 · 일반 도로. 셋을 모두 만족하면 easy, 하나라도 벗어나면 hard.
+# car_seg_data_eda.py 와 car_seg_data_split.py 가 이 정의를 그대로 가져다 쓴다.
+EASY_CONDITION = {"day_night": "day", "weather": "sunny", "road_form": "general"}
 
 # 촬영 지역 좌표 (위도, 경도) — 일출/일몰 계산용. 목록에 없는 지역은 한국 중부로 계산
 SITE_COORDS = {
@@ -146,8 +147,8 @@ def nfc(text: str) -> str:
 class Part:
     """zip 조각 하나의 실제 위치. 일반 파일이면 파일 전체, tar 안에 있으면 tar 파일 속 바이트 구간."""
 
-    path: Path          # 조각 파일, 또는 조각이 들어 있는 tar 파일
-    start: int          # path 안에서 조각 데이터가 시작하는 위치
+    path: Path
+    start: int
     size: int
     in_tar: bool = False
 
@@ -156,8 +157,6 @@ class MultiPartReader(io.RawIOBase):
     """분할 zip 조각들을 하나의 연속된 파일처럼 읽는 read-only 스트림.
 
     조각 접미사가 곧 시작 오프셋이므로, 현재 위치가 속한 조각을 이분 탐색해서 읽는다.
-    조각이 tar 안에 있으면 tar 파일에서 그 조각의 바이트 구간을 바로 읽는다 (tar 도 풀지 않음).
-    zipfile 은 seek/tell/read 만 쓰기 때문에 실제로 합친 파일 없이 바로 압축을 풀 수 있다.
     """
 
     def __init__(self, parts: list[tuple[int, Part]]):
@@ -192,7 +191,7 @@ class MultiPartReader(io.RawIOBase):
         return pos
 
     def _file(self, path: Path):
-        if path not in self._fps:  # 같은 tar 안의 조각들은 파일 핸들 하나를 같이 쓴다
+        if path not in self._fps:
             self._fps[path] = open(path, "rb")
         return self._fps[path]
 
@@ -224,11 +223,11 @@ class MultiPartReader(io.RawIOBase):
 class Archive:
     """zip 한 개 (조각 여러 개로 나뉘어 있을 수 있음)."""
 
-    key: str                                  # 다운로드 루트 기준 상대경로 (조각을 묶는 키)
-    name: str                                 # zip 파일명, 예: '3.대전충남.zip'
+    key: str
+    name: str
     parts: list[tuple[int, Part]] = field(default_factory=list)
     kind: str = ""                            # 'label' | 'image' | 'unknown'
-    error: str = ""                           # 조각 누락/손상 등
+    error: str = ""
 
     @property
     def stem(self) -> str:
@@ -245,11 +244,7 @@ class Archive:
 
 
 def _archive_entry(rel_dirs: list[str], filename: str) -> tuple[str, str, int] | None:
-    """zip 조각이면 (묶음 키, zip 파일명, 시작 오프셋), 아니면 None.
-
-    같은 zip의 조각이 '100.교통…', '100.교통… 2' 처럼 다른 다운로드 폴더(또는 tar)에 흩어져 있어도
-    최상위 폴더의 ' N' 접미사를 떼고 상대경로로 묶으므로 하나로 합쳐진다.
-    """
+    """zip 조각이면 (묶음 키, zip 파일명, 시작 오프셋), 아니면 None."""
     m = PART_RE.match(filename)
     if m:
         zip_name, offset = m["zip"], int(m["offset"])
@@ -264,15 +259,15 @@ def _archive_entry(rel_dirs: list[str], filename: str) -> tuple[str, str, int] |
 
 
 def scan_tar(path: Path, add) -> str:
-    """AI-Hub 다운로드 tar(download (N).tar) 안의 zip 조각을 등록. tar 는 풀지 않고 위치만 기록한다."""
+    """AI-Hub 다운로드 tar 안의 zip 조각을 등록. tar 는 풀지 않고 위치만 기록한다."""
     try:
-        with tarfile.open(path, "r:") as tf:  # 압축 안 된 tar 여야 원하는 위치를 바로 읽을 수 있다
+        with tarfile.open(path, "r:") as tf:
             n = 0
             for member in tf:
                 if not member.isfile():
                     continue
                 names = [p for p in nfc(member.name).split("/") if p not in ("", ".")]
-                if not names or names[-1].startswith(".") or "__MACOSX" in names:  # macOS 의 ._ 메타데이터 파일
+                if not names or names[-1].startswith(".") or "__MACOSX" in names:
                     continue
                 entry = _archive_entry(names[:-1], names[-1])
                 if entry:
@@ -284,11 +279,7 @@ def scan_tar(path: Path, add) -> str:
 
 
 def discover_archives(raw_roots: list[Path], skip_dirs: list[Path]) -> tuple[list[Archive], list[str]]:
-    """raw_roots 아래의 .zip / .zip.partN 과 .tar 안의 조각을 모두 찾아 zip 단위로 묶는다.
-
-    같은 조각이 폴더와 tar 양쪽에 있어도(tar 를 풀어 둔 경우) 하나만 사용한다.
-    반환: (zip 목록, tar 별 요약 메시지)
-    """
+    """raw_roots 아래의 .zip / .zip.partN 과 .tar 안의 조각을 모두 찾아 zip 단위로 묶는다."""
     skip = {path.resolve() for path in skip_dirs}
     archives: dict[str, Archive] = {}
     tar_notes: list[str] = []
@@ -299,18 +290,20 @@ def discover_archives(raw_roots: list[Path], skip_dirs: list[Path]) -> tuple[lis
         if dup is not None:
             if dup.size != part.size:
                 arc.error = f"같은 오프셋({offset})의 조각이 크기가 다르게 중복됨: {dup.path} / {part.path}"
-            return  # 같은 조각이 두 번 있으면(재다운로드, tar + 풀어 둔 폴더) 하나만 사용
+            return
         arc.parts.append((offset, part))
 
     for root in raw_roots:
-        if root.is_file() and root.suffix.lower() == ".tar":  # tar 파일을 직접 지정한 경우
+        if root.is_file() and root.suffix.lower() == ".tar":
             tar_notes.append(scan_tar(root, add))
             continue
         for dirpath, dirnames, filenames in os.walk(root):
             here = Path(dirpath)
+            # 결과 폴더(car_seg_*)와 예전 버전 폴더(old_*)는 뒤지지 않는다
             dirnames[:] = [
                 d for d in dirnames
-                if not d.startswith(".") and not d.startswith("car_seg_") and (here / d).resolve() not in skip
+                if not d.startswith(".") and not d.startswith("car_seg_") and not d.startswith("old_")
+                and (here / d).resolve() not in skip
             ]
             for filename in filenames:
                 if filename.startswith("."):
@@ -362,7 +355,7 @@ def is_junk_member(name: str) -> bool:
 
 
 # ----------------------------------------------------------------------------
-# 파일명 / XML 파싱
+# 파일명 / 메타데이터 / XML 파싱
 # ----------------------------------------------------------------------------
 
 
@@ -424,6 +417,28 @@ def day_night_of(yyyymmdd: str, hhmm: str, site: str = "") -> tuple[str, int | s
     return phase, round(t - sunset)
 
 
+def road_form_of(channel: str) -> str:
+    """CCTV 지점명 → 도로 형태 (general / bridge / tunnel / overpass / shelter)."""
+    c = channel.lower()
+    for keyword, form in ROAD_FORM_KEYWORDS:
+        if keyword in c:
+            return form
+    return "general"
+
+
+def hard_reasons(row) -> list[str]:
+    """EASY_CONDITION 에서 벗어난 항목 목록. 빈 목록이면 easy (주간·맑음·일반 도로).
+
+    row 는 dict · pandas Series · namedtuple 어느 것이든 속성/키로 day_night·weather·road_form 을 읽는다.
+    """
+    get = row.get if hasattr(row, "get") else (lambda k, d="": getattr(row, k, d))
+    return [f"{k}={get(k, '')}" for k, v in EASY_CONDITION.items() if str(get(k, "")) != v]
+
+
+def difficulty_of(row) -> str:
+    return "hard" if hard_reasons(row) else "easy"
+
+
 def parse_clip_name(clip: str) -> dict:
     """클립명(11토큰)을 메타데이터 dict 로. 규약에 맞지 않으면 meta_parsed=False."""
     tokens = clip.split("_")
@@ -431,6 +446,7 @@ def parse_clip_name(clip: str) -> dict:
         return {"meta_parsed": False}
 
     meta: dict = {"meta_parsed": True, **dict(zip(META_FIELDS, tokens))}
+    meta["camera"] = f"{meta['site']}_{meta['channel']}"
     meta["time_band"] = time_band_of(meta["time"])
     try:
         meta["cam_height_m"] = float(meta["cam_height"].rstrip("m"))
@@ -440,6 +456,10 @@ def parse_clip_name(clip: str) -> dict:
     meta["lane_direction"] = LANE_DIRECTION.get(lane[:2], "")
     meta["lane_count"] = int(lane[2:]) if lane[2:].isdigit() else ""
     meta["day_night"], meta["min_from_sunset"] = day_night_of(meta["date"], meta["time"], meta["site"])
+    meta["road_form"] = road_form_of(meta["channel"])
+    reasons = hard_reasons(meta)
+    meta["difficulty"] = "hard" if reasons else "easy"
+    meta["hard_reasons"] = "|".join(reasons)
     return meta
 
 
@@ -529,158 +549,36 @@ def to_yolo_lines(frame: FrameLabel, width: int, height: int, min_area: float) -
     return lines, counts, dropped
 
 
-# ----------------------------------------------------------------------------
-# 다른 라벨 형식 (YOLO 라벨 → COCO / 마스크 / LabelMe)
-# ----------------------------------------------------------------------------
-
-
-def parse_formats(text: str) -> list[str]:
-    formats = [f.strip().lower() for f in text.split(",") if f.strip()]
-    unknown = [f for f in formats if f not in FORMATS]
-    if unknown:
-        raise ValueError(f"알 수 없는 형식: {unknown} (가능: {', '.join(FORMATS)})")
-    return ["yolo"] + [f for f in FORMATS[1:] if f in formats]  # yolo 는 항상 포함
-
-
-def read_yolo_polygons(label_path: Path, width: int, height: int) -> list[tuple[int, list[tuple[float, float]]]]:
-    """YOLO seg 라벨 → [(class_id, [(x, y) 픽셀 좌표 …])]."""
-    polys = []
-    for line in label_path.read_text(encoding="utf-8").splitlines():
-        t = line.split()
-        if len(t) < 7 or len(t) % 2 == 0:  # class + (x, y) 3쌍 이상
-            continue
-        v = [float(x) for x in t[1:]]
-        polys.append((int(t[0]), [(v[i] * width, v[i + 1] * height) for i in range(0, len(v), 2)]))
-    return polys
-
-
-def _render_mask(job: tuple[str, str, int, int]) -> int:
-    """YOLO 라벨 → 팔레트 마스크 PNG (픽셀값 = class id + 1).
-
-    차량이 겹치는 곳은 화면 아래쪽(카메라에 가까운) 차량이 위에 오도록 먼 차량부터 칠한다.
-    (원본 XML 의 z_order 는 실제 앞뒤 관계와 맞지 않아 쓰지 않음. 겹침은 차량 면적의 약 0.5%)
-    """
-    label_path, out_path, width, height = job
-    polys = read_yolo_polygons(Path(label_path), width, height)
-    polys.sort(key=lambda p: max(y for _, y in p[1]))
-    mask = Image.new("P", (width, height), 0)
-    mask.putpalette([c for i in range(256) for c in MASK_PALETTE.get(i, (0, 0, 0))])
-    draw = ImageDraw.Draw(mask)
-    for cls, pts in polys:
-        draw.polygon(pts, fill=cls + 1)
-    mask.save(out_path)
-    return len(polys)
-
-
 def class_table() -> dict:
-    """형식마다 다른 클래스 번호 규칙을 한 파일로 정리."""
     names = [name for name, _ in sorted(CLASS_TO_ID.items(), key=lambda kv: kv[1])]
-    return {
-        "yolo": {str(i): n for i, n in enumerate(names)},                          # 0부터
-        "coco": {str(i + 1): n for i, n in enumerate(names)},                      # 1부터 (COCO 규약)
-        "mask": {"0": "background", **{str(i + 1): n for i, n in enumerate(names)}},  # 0 = 배경
-        "mask_palette": {str(k): list(v) for k, v in MASK_PALETTE.items() if k <= len(names)},
-    }
+    return {"yolo": {str(i): n for i, n in enumerate(names)}}
 
 
-def build_formats(out_dir: Path, formats: list[str], workers: int) -> dict:
-    """manifest.csv + labels/(YOLO) 로부터 나머지 형식을 만든다. 형식별 결과 요약을 반환."""
-    rows = list(csv.DictReader((out_dir / "manifest.csv").open(encoding="utf-8-sig")))
-    lbl_dir = out_dir / "labels"
-    names = [name for name, _ in sorted(CLASS_TO_ID.items(), key=lambda kv: kv[1])]
-    (out_dir / "classes.json").write_text(json.dumps(class_table(), ensure_ascii=False, indent=2), encoding="utf-8")
-    summary: dict = {"yolo": {"dir": "labels/", "files": sum(1 for _ in lbl_dir.glob("*.txt"))}}
-
-    if "coco" in formats:
-        images, annotations = [], []
-        for image_id, r in enumerate(tqdm(rows, desc="COCO", unit="img", dynamic_ncols=True), 1):
-            w, h = int(r["width"]), int(r["height"])
-            images.append({"id": image_id, "file_name": r["file_name"], "width": w, "height": h})
-            for cls, pts in read_yolo_polygons(lbl_dir / f"{r['image_id']}.txt", w, h):
-                xs, ys = [p[0] for p in pts], [p[1] for p in pts]
-                annotations.append({
-                    "id": len(annotations) + 1,
-                    "image_id": image_id,
-                    "category_id": cls + 1,
-                    "segmentation": [[round(c, 2) for p in pts for c in p]],
-                    "area": round(polygon_area(pts), 2),
-                    "bbox": [round(min(xs), 2), round(min(ys), 2), round(max(xs) - min(xs), 2),
-                             round(max(ys) - min(ys), 2)],
-                    "iscrowd": 0,
-                })
-        coco = {
-            "info": {"description": "AI-Hub 교통문제 해결을 위한 CCTV 교통 데이터(고속도로) — 폴리곤 세그멘테이션",
-                     "date_created": datetime.now().strftime("%Y-%m-%d")},
-            "licenses": [],
-            "images": images,
-            "annotations": annotations,
-            "categories": [{"id": i + 1, "name": n, "supercategory": "vehicle"} for i, n in enumerate(names)],
-        }
-        (out_dir / "annotations").mkdir(exist_ok=True)
-        (out_dir / "annotations" / "instances_all.json").write_text(
-            json.dumps(coco, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-        summary["coco"] = {"file": "annotations/instances_all.json", "images": len(images),
-                           "annotations": len(annotations)}
-
-    if "labelme" in formats:
-        ld = out_dir / "labelme"
-        if ld.exists():
-            shutil.rmtree(ld)  # 전부 labels/ 에서 다시 만드는 파생 파일
-        ld.mkdir()
-        for r in tqdm(rows, desc="LabelMe", unit="img", dynamic_ncols=True):
-            w, h = int(r["width"]), int(r["height"])
-            shapes = [{"label": names[cls], "points": [[round(x, 2), round(y, 2)] for x, y in pts],
-                       "group_id": None, "description": "", "shape_type": "polygon", "flags": {}}
-                      for cls, pts in read_yolo_polygons(lbl_dir / f"{r['image_id']}.txt", w, h)]
-            (ld / f"{r['image_id']}.json").write_text(json.dumps({
-                "version": "5.4.1", "flags": {}, "shapes": shapes,
-                "imagePath": f"../images/{r['file_name']}", "imageData": None,
-                "imageHeight": h, "imageWidth": w,
-            }, ensure_ascii=False), encoding="utf-8")
-        summary["labelme"] = {"dir": "labelme/", "files": len(rows)}
-
-    if "mask" in formats:
-        md = out_dir / "masks"
-        if md.exists():
-            shutil.rmtree(md)  # 전부 labels/ 에서 다시 만드는 파생 파일
-        md.mkdir()
-        jobs = [(str(lbl_dir / f"{r['image_id']}.txt"), str(md / f"{r['image_id']}.png"),
-                 int(r["width"]), int(r["height"])) for r in rows]
-        with ProcessPoolExecutor(max_workers=max(1, workers)) as ex:
-            list(tqdm(ex.map(_render_mask, jobs, chunksize=32), total=len(jobs), desc="마스크", unit="img",
-                      dynamic_ncols=True))
-        summary["mask"] = {"dir": "masks/", "files": len(jobs)}
-
-    return summary
+# ----------------------------------------------------------------------------
+# 이미지 → JPG (워커 프로세스)
+# ----------------------------------------------------------------------------
 
 
-def print_format_summary(summary: dict) -> None:
-    labels = {"yolo": "YOLO", "coco": "COCO", "mask": "Mask", "labelme": "LabelMe"}
-    for fmt, info in summary.items():
-        where = info.get("dir") or info.get("file")
-        detail = (f"이미지 {info['images']:,} · 폴리곤 {info['annotations']:,}" if fmt == "coco"
-                  else f"파일 {info['files']:,}개")
-        print(f"  {labels[fmt]:8s}: {where:32s} {detail}")
+def _encode_jpg(job: tuple[bytes, str, int, bool]) -> tuple[str, int, int, str, int, str]:
+    """PNG 바이트 → JPG 파일. (dst, 폭, 높이, 원본 모드, jpg 바이트 수, 오류 메시지) 반환.
 
-
-def formats_only(args: argparse.Namespace, formats: list[str]) -> int:
-    """이미 만들어 둔 car_seg_dataset 에 형식만 (다시) 생성 — 압축 해제는 하지 않는다."""
-    out_dir = Path(args.out_dir).expanduser().resolve()
-    if not (out_dir / "manifest.csv").exists():
-        print(f"[error] {out_dir / 'manifest.csv'} 가 없습니다. 먼저 전체 전처리를 실행하세요.", file=sys.stderr)
-        return 1
-    print(f"[formats] {out_dir} 에 {', '.join(formats)} 형식 생성")
-    summary = build_formats(out_dir, formats, args.workers)
-    report_path = out_dir / "preprocess_report.json"
-    if report_path.exists():
-        report = json.loads(report_path.read_text(encoding="utf-8"))
-        report["formats"] = summary
-        report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-    print("\n" + "=" * 66)
-    print_format_summary(summary)
-    print(f"  클래스 번호표: {out_dir / 'classes.json'}")
-    print("=" * 66)
-    return 0
+    임시 파일에 쓴 뒤 교체하므로 중간에 끊겨도 반쯤 쓰인 JPG 가 남지 않는다.
+    """
+    data, dst, quality, verify = job
+    tmp = dst + ".tmp"
+    try:
+        if verify:
+            with Image.open(io.BytesIO(data)) as im:
+                im.verify()  # PNG 청크 CRC 검사 — 잘린/손상된 PNG 를 걸러낸다
+        with Image.open(io.BytesIO(data)) as im:
+            width, height, mode = im.width, im.height, im.mode
+            im.convert("RGB").save(tmp, "JPEG", quality=quality)
+        os.replace(tmp, dst)
+        return dst, width, height, mode, os.path.getsize(dst), ""
+    except (UnidentifiedImageError, OSError, SyntaxError, ValueError, EOFError) as exc:
+        if os.path.exists(tmp):
+            os.remove(tmp)
+        return dst, 0, 0, "", 0, f"{exc.__class__.__name__}: {exc}"
 
 
 # ----------------------------------------------------------------------------
@@ -752,50 +650,37 @@ def print_archive_table(archives: list[Archive]) -> None:
               f"{arc.key}{status}")
 
 
-def inspect_image(path: Path, verify: bool) -> tuple[int, int, str]:
-    with Image.open(path) as im:
-        width, height = im.size
-        mode = im.mode
-        if verify:
-            im.verify()  # 청크 CRC 검사 — 잘린/손상된 PNG 를 걸러낸다
-    return width, height, mode
-
-
-def extract_member(zf: zipfile.ZipFile, info: zipfile.ZipInfo, dst: Path) -> None:
-    """임시 파일에 쓴 뒤 교체 — 중간에 끊겨도 반쯤 쓰인 이미지가 남지 않는다."""
-    tmp = dst.with_name(dst.name + ".tmp")
-    with zf.open(info) as src, open(tmp, "wb") as out:
-        shutil.copyfileobj(src, out, length=1 << 20)
-    os.replace(tmp, dst)
+def existing_jpg(dst: Path) -> tuple[int, int] | None:
+    """이미 변환된 JPG 가 정상이면 (폭, 높이). 중단 후 재실행 시 이어서 하기 위함."""
+    if not dst.is_file() or dst.stat().st_size == 0:
+        return None
+    try:
+        with Image.open(dst) as im:
+            if im.format != "JPEG":
+                return None
+            return im.size
+    except (UnidentifiedImageError, OSError):
+        return None
 
 
 def preprocess(args: argparse.Namespace) -> int:
-    try:
-        formats = parse_formats(args.formats)
-    except ValueError as exc:
-        print(f"[error] {exc}", file=sys.stderr)
-        return 1
-    if args.formats_only:
-        return formats_only(args, formats)
-
     raw_roots = [Path(p).expanduser().resolve() for p in args.raw_root]
     out_dir = Path(args.out_dir).expanduser().resolve()
     missing = [p for p in raw_roots if not p.exists()]
     if missing:
         print(f"[error] 원본 경로가 없습니다: {', '.join(map(str, missing))}", file=sys.stderr)
         return 1
+    if not (1 <= args.jpg_quality <= 100):
+        print("[error] --jpg-quality 는 1~100 사이여야 합니다", file=sys.stderr)
+        return 1
 
-    # 1) zip 조각 수집 (폴더 + tar) ----------------------------------------------
+    # 1) zip 조각 수집 --------------------------------------------------------
     print("[1/5] zip 조각 검색: " + " · ".join(map(str, raw_roots)))
     archives, tar_notes = discover_archives(raw_roots, skip_dirs=[out_dir])
-    if tar_notes:
-        print(f"  tar {len(tar_notes)}개 (풀지 않고 안의 조각을 바로 읽음):")
-        for note in tar_notes:
-            print(f"    {note}")
+    for note in tar_notes:
+        print(f"    {note}")
     if not archives:
-        print("[error] .zip / .zip.partN / .tar 에서 zip 조각을 찾지 못했습니다.\n"
-              "        AI-Hub 에서 받은 download (N).tar 파일(또는 풀어 둔 '100.교통문제_…' 폴더)이 있는 곳을\n"
-              "        --raw-root 로 지정하세요.  예) python car_seg_data_preprocessing.py --raw-root ~/Downloads",
+        print("[error] .zip / .zip.partN / .tar 에서 zip 조각을 찾지 못했습니다. --raw-root 를 확인하세요.",
               file=sys.stderr)
         return 1
 
@@ -803,11 +688,9 @@ def preprocess(args: argparse.Namespace) -> int:
     print(f"[2/5] zip {len(archives)}개 내용 확인 및 라벨 XML 파싱 중 ...")
     label_index, duplicate_labels, image_members = classify_and_index(archives)
     print_archive_table(archives)
-
     broken = [arc for arc in archives if arc.error]
     if broken:
-        print(f"\n[warn] 문제가 있는 zip {len(broken)}개는 건너뜁니다 (위 ❌ 표시). "
-              f"다운로드가 끝났는지 확인하세요.")
+        print(f"\n[warn] 문제가 있는 zip {len(broken)}개는 건너뜁니다 (위 ❌ 표시).")
 
     # 3) 이미지 ↔ 라벨 매칭 ----------------------------------------------------
     jobs: list[ExtractJob] = []
@@ -817,8 +700,7 @@ def preprocess(args: argparse.Namespace) -> int:
     arc_by_key = {arc.key: arc for arc in archives}
 
     for arc_key, members in image_members.items():
-        # 같은 이름이 두 번 들어있는 경우(예: 5.전북 의 <클립>/<클립>/NNN.png 이중 폴더)는 경로가 짧은 쪽을 사용.
-        # 두 사본은 픽셀이 동일하고 PNG 압축만 다름을 확인함.
+        # 같은 이름이 두 번 들어있는 경우(5.전북 의 이중 폴더)는 경로가 짧은 쪽을 사용 (픽셀 동일 확인됨)
         for info, name in sorted(members, key=lambda m: (m[1].count("/"), m[1])):
             key = match_key(name)
             frame = label_index.get(key)
@@ -835,7 +717,7 @@ def preprocess(args: argparse.Namespace) -> int:
         f"{frame.label_archive}:{frame.image_name}" for key, frame in label_index.items() if key not in seen
     )
 
-    print(f"\n[3/5] 매칭 결과")
+    print("\n[3/5] 매칭 결과")
     print(f"  라벨 프레임(XML <image>) : {len(label_index):,}")
     print(f"  이미지 파일              : {sum(len(m) for m in image_members.values()):,}")
     print(f"  매칭 성공                : {len(jobs):,}")
@@ -844,20 +726,6 @@ def preprocess(args: argparse.Namespace) -> int:
     if duplicate_labels or duplicate_images:
         print(f"  같은 이름의 사본 (경로가 짧은 쪽 사용): 라벨 {len(duplicate_labels)} / 이미지 {len(duplicate_images)}")
 
-    # 짝이 되는 zip 을 아예 안 받은 경우 알려준다 (예: 이미지 zip 만 받고 라벨 zip 을 안 받음)
-    matched_per_image_zip = Counter(job.archive.name for job in jobs)
-    matched_per_label_zip = Counter(label_index[k].label_archive for k in seen)
-    no_label = [arc for arc in archives if arc.kind == "image" and not matched_per_image_zip[arc.name]]
-    no_image = [arc for arc in archives if arc.kind == "label" and not matched_per_label_zip[arc.name]]
-    if no_label:
-        print("\n  [주의] 라벨이 하나도 없는 이미지 zip — AI-Hub 의 '라벨링데이터' 에서 같은 지역 라벨 파일을 받으세요:")
-        for arc in no_label:
-            print(f"    {arc.name} (이미지 {len(image_members.get(arc.key, [])):,}장 제외됨)")
-    if no_image:
-        print("\n  [주의] 이미지가 하나도 없는 라벨 zip — AI-Hub 의 '원천데이터' 에서 같은 지역 이미지 파일을 받으세요:")
-        for arc in no_image:
-            print(f"    {arc.name}")
-
     if args.dry_run:
         print("\n--dry-run: 여기서 종료합니다 (아무 파일도 쓰지 않음).")
         return 0
@@ -865,121 +733,144 @@ def preprocess(args: argparse.Namespace) -> int:
         print("[error] 매칭된 이미지가 없습니다.", file=sys.stderr)
         return 1
 
-    # 4) 추출 + YOLO 라벨 변환 -------------------------------------------------
+    # 4) JPG 변환 + YOLO 라벨 -------------------------------------------------
     img_dir = out_dir / "images"
     lbl_dir = out_dir / "labels"
     img_dir.mkdir(parents=True, exist_ok=True)
     lbl_dir.mkdir(parents=True, exist_ok=True)
-    for tmp in img_dir.glob("*.tmp"):  # 이전 실행이 중간에 끊겨 남은 반쪽 파일
+    for tmp in img_dir.glob("*.tmp"):
         tmp.unlink()
 
-    rows: list[dict] = []
+    rows: dict[str, dict] = {}          # image_id → manifest 행
     skipped: list[dict] = []
     dropped_total: Counter = Counter()
     n_reused = 0
+    src_bytes_total = 0
+    jpg_bytes_total = 0
+
+    def finish_row(job: ExtractJob, out_stem: str, width: int, height: int, mode: str, jpg_bytes: int) -> None:
+        """이미지 크기가 확정된 뒤 라벨을 쓰고 manifest 행을 만든다."""
+        nonlocal jpg_bytes_total
+        frame = job.frame
+        xml_w, xml_h = frame.width or width, frame.height or height
+        size_scaled = (width, height) != (xml_w, xml_h)
+        if size_scaled and abs(width * xml_h - height * xml_w) > 0.01 * width * xml_h:
+            (img_dir / f"{out_stem}.jpg").unlink(missing_ok=True)
+            skipped.append({"image": job.zip_member,
+                            "reason": f"XML 크기({xml_w}x{xml_h})와 이미지 크기({width}x{height})의 종횡비가 다름"})
+            return
+        # 좌표는 XML 좌표계 기준으로 정규화 (같은 종횡비 리사이즈면 0~1 좌표가 그대로 맞음)
+        lines, counts, dropped = to_yolo_lines(frame, xml_w, xml_h, args.min_area)
+        dropped_total.update(dropped)
+        (lbl_dir / f"{out_stem}.txt").write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
+        jpg_bytes_total += jpg_bytes
+
+        row = {
+            "image_id": out_stem,
+            "file_name": f"{out_stem}.jpg",
+            "clip": frame.clip,
+            "region": job.archive.stem,
+            "image_archive": job.archive.name,
+            "label_archive": frame.label_archive,
+            "zip_member": job.zip_member,
+            "xml_member": frame.xml_member,
+            "width": width,
+            "height": height,
+            "xml_width": xml_w,
+            "xml_height": xml_h,
+            "size_scaled": size_scaled,
+            "resolution": f"{width}x{height}",
+            "orientation": "landscape" if width > height else "portrait" if height > width else "square",
+            "src_mode": mode,
+            "src_bytes": job.info.file_size,
+            "jpg_bytes": jpg_bytes,
+            "gt_car": counts.get("car", 0),
+            "gt_bus": counts.get("bus", 0),
+            "gt_truck": counts.get("truck", 0),
+            "gt_total": sum(counts.values()),
+            "n_dropped_polygons": sum(dropped.values()),
+        }
+        meta = parse_clip_name(frame.clip)
+        m = re.search(r"(\d+)$", out_stem)
+        meta["frame"] = int(m.group(1)) if m else ""
+        row.update(meta)
+        rows[out_stem] = row
 
     jobs_by_arc: dict[str, list[ExtractJob]] = defaultdict(list)
     for job in jobs:
         jobs_by_arc[job.archive.key].append(job)
 
-    print(f"\n[4/5] 이미지 {len(jobs):,}장 추출 + 라벨 변환 → {out_dir}")
+    print(f"\n[4/5] 이미지 {len(jobs):,}장 → JPG(품질 {args.jpg_quality}) 변환 + YOLO 라벨 → {out_dir}")
     progress = tqdm(total=len(jobs), unit="img", dynamic_ncols=True)
-    for arc_key, arc_jobs in jobs_by_arc.items():
-        arc = arc_by_key[arc_key]
-        progress.set_postfix_str(arc.stem[:24])
-        with open_archive(arc) as zf:
-            # zip 안의 저장 순서대로 읽어야 조각 파일을 순차적으로 훑는다 (훨씬 빠름)
-            for job in sorted(arc_jobs, key=lambda j: j.info.header_offset):
-                progress.update(1)
-                frame = job.frame
-                out_stem = normalize_stem(job.zip_member)
-                ext = Path(job.zip_member).suffix.lower()
-                dst = img_dir / f"{out_stem}{ext}"
+    max_inflight = max(4, args.workers * 4)  # 메모리에 동시에 올려 두는 PNG 수 제한 (장당 ~2-3MB)
+    with ProcessPoolExecutor(max_workers=max(1, args.workers)) as pool:
+        pending: dict = {}
 
-                # 4-1) 추출 (이미 같은 크기로 풀려 있으면 재사용 → 중단 후 재실행 시 이어서)
-                try:
-                    if (not args.overwrite and dst.is_file()
-                            and dst.stat().st_size == job.info.file_size):
-                        n_reused += 1
-                    else:
-                        extract_member(zf, job.info, dst)
-                    width, height, mode = inspect_image(dst, verify=not args.no_verify)
-                except (zipfile.BadZipFile, UnidentifiedImageError, OSError, SyntaxError, EOFError) as exc:
-                    dst.unlink(missing_ok=True)
-                    skipped.append({"image": job.zip_member, "reason": f"이미지 추출/검증 실패: {exc}"})
-                    continue
+        def drain(block_until_below: int) -> None:
+            while len(pending) >= block_until_below:
+                done, _ = wait(list(pending), return_when=FIRST_COMPLETED)
+                for fut in done:
+                    job, out_stem = pending.pop(fut)
+                    _, width, height, mode, jpg_bytes, err = fut.result()
+                    progress.update(1)
+                    if err:
+                        skipped.append({"image": job.zip_member, "reason": f"이미지 디코딩/JPG 변환 실패: {err}"})
+                        continue
+                    finish_row(job, out_stem, width, height, mode, jpg_bytes)
 
-                # 4-2) XML 크기와 비교 — 같은 종횡비의 단순 리사이즈만 허용
-                xml_w, xml_h = frame.width or width, frame.height or height
-                size_scaled = (width, height) != (xml_w, xml_h)
-                if size_scaled and abs(width * xml_h - height * xml_w) > 0.01 * width * xml_h:
-                    dst.unlink(missing_ok=True)
-                    skipped.append({
-                        "image": job.zip_member,
-                        "reason": f"XML 크기({xml_w}x{xml_h})와 이미지 크기({width}x{height})의 종횡비가 다름",
-                    })
-                    continue
+        for arc_key, arc_jobs in jobs_by_arc.items():
+            arc = arc_by_key[arc_key]
+            progress.set_postfix_str(arc.stem[:24])
+            with open_archive(arc) as zf:
+                # zip 안의 저장 순서대로 읽어야 조각 파일을 순차적으로 훑는다 (훨씬 빠름)
+                for job in sorted(arc_jobs, key=lambda j: j.info.header_offset):
+                    out_stem = normalize_stem(job.zip_member)
+                    dst = img_dir / f"{out_stem}.jpg"
+                    src_bytes_total += job.info.file_size
 
-                # 4-3) YOLO 라벨 — 좌표는 XML 좌표계 기준으로 정규화
-                lines, counts, dropped = to_yolo_lines(frame, xml_w, xml_h, args.min_area)
-                dropped_total.update(dropped)
-                (lbl_dir / f"{out_stem}.txt").write_text(
-                    "\n".join(lines) + ("\n" if lines else ""), encoding="utf-8"
-                )
-
-                row = {
-                    "image_id": out_stem,
-                    "file_name": dst.name,
-                    "clip": frame.clip,
-                    "region": arc.stem,
-                    "image_archive": arc.name,
-                    "label_archive": frame.label_archive,
-                    "zip_member": job.zip_member,
-                    "xml_member": frame.xml_member,
-                    "width": width,
-                    "height": height,
-                    "xml_width": xml_w,
-                    "xml_height": xml_h,
-                    "size_scaled": size_scaled,
-                    "resolution": f"{width}x{height}",
-                    "orientation": "landscape" if width > height else "portrait" if height > width else "square",
-                    "pil_mode": mode,
-                    "gt_car": counts.get("car", 0),
-                    "gt_bus": counts.get("bus", 0),
-                    "gt_truck": counts.get("truck", 0),
-                    "gt_total": sum(counts.values()),
-                    "n_dropped_polygons": sum(dropped.values()),
-                }
-                meta = parse_clip_name(frame.clip)
-                m = re.search(r"(\d+)$", out_stem)
-                meta["frame"] = int(m.group(1)) if m else ""
-                row.update(meta)
-                rows.append(row)
+                    if not args.overwrite:
+                        size = existing_jpg(dst)
+                        if size is not None:
+                            n_reused += 1
+                            progress.update(1)
+                            # 재사용 시엔 원본 PNG 를 디코딩하지 않으므로 원본 모드는 알 수 없음 → 빈칸
+                            finish_row(job, out_stem, size[0], size[1], "", dst.stat().st_size)
+                            continue
+                    try:
+                        data = zf.read(job.info)
+                    except (zipfile.BadZipFile, OSError, EOFError) as exc:
+                        progress.update(1)
+                        skipped.append({"image": job.zip_member, "reason": f"zip 에서 읽기 실패: {exc}"})
+                        continue
+                    fut = pool.submit(_encode_jpg, (data, str(dst), args.jpg_quality, not args.no_verify))
+                    pending[fut] = (job, out_stem)
+                    drain(max_inflight)
+        drain(1)
     progress.close()
 
     if not rows:
         print("[error] 정리된 이미지가 없습니다.", file=sys.stderr)
         return 1
 
-    # manifest.csv ------------------------------------------------------------
-    rows.sort(key=lambda r: r["image_id"])
+    # 5) manifest / report ----------------------------------------------------
+    print("\n[5/5] manifest · report 저장")
+    row_list = [rows[k] for k in sorted(rows)]
     fieldnames: list[str] = []
-    for row in rows:
+    for row in row_list:
         fieldnames.extend(k for k in row if k not in fieldnames)
     manifest_path = out_dir / "manifest.csv"
     with manifest_path.open("w", newline="", encoding="utf-8-sig") as fp:
         writer = csv.DictWriter(fp, fieldnames=fieldnames, restval="")
         writer.writeheader()
-        writer.writerows(rows)
+        writer.writerows(row_list)
+    (out_dir / "classes.json").write_text(json.dumps(class_table(), ensure_ascii=False, indent=2), encoding="utf-8")
 
-    # 이전 실행에서 남은(이번 manifest 에 없는) 파일 경고
-    produced = {r["image_id"] for r in rows}
+    produced = set(rows)
     stale = [p.name for p in img_dir.iterdir() if p.is_file() and p.stem not in produced]
     stale += [p.name for p in lbl_dir.iterdir() if p.suffix == ".txt" and p.stem not in produced]
 
-    # preprocess_report.json --------------------------------------------------
     def dist(key: str) -> dict:
-        return dict(Counter(str(r.get(key, "")) for r in rows).most_common())
+        return dict(Counter(str(r.get(key, "")) for r in row_list).most_common())
 
     def head(items: list, n: int = 100) -> list:
         return items[:n]
@@ -988,23 +879,28 @@ def preprocess(args: argparse.Namespace) -> int:
         "raw_roots": [str(p) for p in raw_roots],
         "tar_files": tar_notes,
         "out_dir": str(out_dir),
+        "label_format": "yolo-seg",
+        "image_format": {"format": "jpg", "quality": args.jpg_quality,
+                         "source_png_bytes": src_bytes_total, "jpg_bytes": jpg_bytes_total},
         "classes": {cid: name for name, cid in CLASS_TO_ID.items()},
+        "easy_condition": EASY_CONDITION,
         "archives": [
             {"key": a.key, "kind": a.kind, "n_parts": len(a.parts), "bytes": a.total_bytes, "error": a.error}
             for a in archives
         ],
-        "n_images": len(rows),
-        "n_clips": len({r["clip"] for r in rows}),
+        "n_images": len(row_list),
+        "n_clips": len({r["clip"] for r in row_list}),
+        "n_cameras": len({r.get("camera", "") for r in row_list}),
         "n_reused_existing": n_reused,
         "n_skipped": len(skipped),
-        "n_size_scaled": sum(1 for r in rows if r["size_scaled"]),
-        "n_meta_unparsed": sum(1 for r in rows if not r.get("meta_parsed")),
-        "gt_objects": {name: sum(r[f"gt_{name}"] for r in rows) for name in CLASS_TO_ID},
+        "n_size_scaled": sum(1 for r in row_list if r["size_scaled"]),
+        "n_meta_unparsed": sum(1 for r in row_list if not r.get("meta_parsed")),
+        "gt_objects": {name: sum(r[f"gt_{name}"] for r in row_list) for name in CLASS_TO_ID},
         "dropped_polygons": dict(dropped_total),
         "distributions": {
             key: dist(key)
-            for key in ("region", "site", "hour_type", "weather", "time_band", "day_night", "lane_config",
-                        "cam_height", "quality", "resolution", "orientation")
+            for key in ("region", "site", "camera", "hour_type", "weather", "time_band", "day_night", "road_form",
+                        "difficulty", "lane_config", "cam_height", "quality", "resolution", "orientation")
         },
         "unmatched": {
             "images_without_label": {"count": len(unlabeled_images), "examples": head(unlabeled_images)},
@@ -1015,54 +911,44 @@ def preprocess(args: argparse.Namespace) -> int:
         "stale_files": {"count": len(stale), "examples": head(stale)},
         "skipped": skipped,
     }
-
-    # 5) 다른 라벨 형식 --------------------------------------------------------
-    print(f"\n[5/5] 라벨 형식 생성: {', '.join(formats)}")
-    report["formats"] = build_formats(out_dir, formats, args.workers)
-
     report_path = out_dir / "preprocess_report.json"
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    # 콘솔 요약 ----------------------------------------------------------------
     gt = report["gt_objects"]
-    print("\n" + "=" * 66)
-    print(f"완료: 이미지 {len(rows):,}장 / 클립 {report['n_clips']}개 / 제외 {len(skipped)}건"
-          f" (기존 파일 재사용 {n_reused:,}장)")
+    print("\n" + "=" * 70)
+    print(f"완료: 이미지 {len(row_list):,}장 / 클립 {report['n_clips']}개 / CCTV {report['n_cameras']}대 / "
+          f"제외 {len(skipped)}건 (기존 JPG 재사용 {n_reused:,}장)")
     print(f"  객체: car={gt['car']:,}  bus={gt['bus']:,}  truck={gt['truck']:,}")
+    if src_bytes_total:
+        print(f"  용량: PNG {src_bytes_total / 1e9:.1f}GB → JPG {jpg_bytes_total / 1e9:.1f}GB "
+              f"({jpg_bytes_total * 100 / src_bytes_total:.0f}%)")
     if dropped_total:
         print(f"  제외된 폴리곤: {dict(dropped_total)}")
-    if report["n_size_scaled"]:
-        print(f"  XML 과 크기가 다른(같은 종횡비) 이미지: {report['n_size_scaled']}장 — XML 좌표계로 정규화함")
-    for key in ("region", "weather", "orientation"):
-        print(f"  {key:12s}: {report['distributions'][key]}")
+    for key in ("region", "day_night", "weather", "road_form", "difficulty"):
+        print(f"  {key:11s}: {report['distributions'][key]}")
     if stale:
         print(f"  [warn] 이번 결과에 없는 이전 파일 {len(stale)}개가 images/labels 에 남아 있습니다.")
     print(f"\n  결과 폴더: {out_dir}")
-    print(f"  images  : images/ ({len(rows):,}장)")
-    print_format_summary(report["formats"])
-    print(f"  classes : classes.json (형식별 클래스 번호표)")
-    print(f"  manifest: {manifest_path.name} · report: {report_path.name}")
-    print("=" * 66)
+    print("  images/ (JPG) · labels/ (YOLO seg) · manifest.csv · preprocess_report.json · classes.json")
+    print("=" * 70)
     return 0
 
 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
-        description="AI-Hub 도로 CCTV 폴리곤 데이터 → images + YOLO / COCO / 마스크 / LabelMe 라벨",
+        description="AI-Hub 도로 CCTV 폴리곤 데이터 → JPG 이미지 + YOLO seg 라벨",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     p.add_argument("--raw-root", nargs="+", default=[str(BASE_DIR)],
-                   help="AI-Hub 다운로드 위치 — 폴더 또는 .tar 파일, 여러 개 가능 (폴더 안의 .tar 도 자동으로 읽음)")
+                   help="AI-Hub 다운로드 위치 — 폴더 또는 .tar 파일, 여러 개 가능")
     p.add_argument("--out-dir", default=str(BASE_DIR / "car_seg_dataset"), help="결과 출력 폴더")
     p.add_argument("--dry-run", action="store_true", help="조각 검사와 매칭 통계만 출력하고 종료")
-    p.add_argument("--overwrite", action="store_true", help="이미 풀려 있는 이미지도 다시 추출")
+    p.add_argument("--overwrite", action="store_true", help="이미 변환된 JPG 도 다시 만든다")
+    p.add_argument("--jpg-quality", type=int, default=95, metavar="1-100",
+                   help="JPEG 품질 (95: 픽셀 MAE 0.7/255 수준으로 학습 성능 손실 거의 없음)")
     p.add_argument("--no-verify", action="store_true", help="PNG 무결성(CRC) 검사 생략 — 조금 빨라짐")
     p.add_argument("--min-area", type=float, default=1.0, help="이보다 작은(px²) 폴리곤은 제외")
-    p.add_argument("--formats", default=DEFAULT_FORMATS,
-                   help=f"만들 라벨 형식, 쉼표로 구분 ({', '.join(FORMATS)}). yolo 는 항상 포함")
-    p.add_argument("--formats-only", action="store_true",
-                   help="압축 해제 없이, 이미 만든 --out-dir 에 라벨 형식만 (다시) 생성")
-    p.add_argument("--workers", type=int, default=min(8, os.cpu_count() or 1), help="마스크 생성 병렬 프로세스 수")
+    p.add_argument("--workers", type=int, default=min(8, os.cpu_count() or 1), help="JPG 변환 병렬 프로세스 수")
     return p
 
 
