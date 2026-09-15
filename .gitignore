@@ -1,0 +1,23 @@
+# 원본 데이터 (AI-Hub 데이터는 재배포 금지, 용량도 GitHub 한도 초과 → Google Drive 로 공유)
+/images/
+/*.zip
+
+# 개발 환경
+.venv/
+__pycache__/
+.DS_Store
+
+# 모델 가중치 (다운로드하거나 다시 학습)
+road_lane/weights/
+road_lane/outputs/**/*.pt
+
+# road_lane 장면별 중간 산출물 (run_all.sh 로 다시 만듦)
+road_lane/outputs/s1/
+road_lane/outputs/s2/
+road_lane/outputs/s2b/crops/
+road_lane/outputs/s2b/crops.csv
+road_lane/outputs/s3/*/
+road_lane/outputs/s3/lane_frames.csv
+road_lane/outputs/s3/group_frames.csv
+road_lane/outputs/s4/lane_delay.csv
+road_lane/outputs/s4/group_delay.csv

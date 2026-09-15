@@ -1,0 +1,4636 @@
+{
+ "Buan_daemog_20201019_1730_MON_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.027,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.958,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Buan_daemog_20201020_1130_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.99,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.046,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Buan_daemog_20201020_1630_TUE_15m_NH_highway_TW2_sunny_FHD__view0": {
+  "1": {
+   "n": 60,
+   "p_front": 0.047,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.979,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Buan_daemog_20201020_1630_TUE_15m_NH_highway_TW2_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.948,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.014,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Buan_dongjisan_20201021_0800_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 44,
+   "p_front": 0.959,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.035,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Buan_dongjisan_20201021_1300_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.982,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.037,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Buan_jongsin_20201019_1600_MON_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.596,
+   "cnn": "toward",
+   "confident": false,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.031,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Buan_jongsin_20201020_1130_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.912,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.07,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Buan_jongsin_20201020_1630_TUE_15m_NH_highway_TW2_sunny_FHD__view0": {
+  "1": {
+   "n": 60,
+   "p_front": 0.103,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.736,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Buan_jongsin_20201020_1630_TUE_15m_NH_highway_TW2_sunny_FHD__view1": {
+  "1": {
+   "n": 60,
+   "p_front": 0.086,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.964,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Buan_jongsin_20201021_1030_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.888,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.029,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Buan_jongsin_20201021_1530_WED_15m_NH_highway_TW2_rainy_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.899,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.058,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Buan_soju2brdg_20201020_0800_TUE_15m_NH_highway_TW2_fog_FHD": {
+  "0": {
+   "n": 55,
+   "p_front": 0.956,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 51,
+   "p_front": 0.089,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Buan_soju2brdg_20201020_1300_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.119,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.96,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Buan_soju2brdg_20201021_0830_WED_15m_NH_highway_TW2_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.957,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.024,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Buan_soju2brdg_20201021_0830_WED_15m_NH_highway_TW2_sunny_FHD__view1": {
+  "0": {
+   "n": 20,
+   "p_front": 0.981,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 13,
+   "p_front": 0.002,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Buan_soju2brdg_20201021_1330_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.051,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.95,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Buan_yeji_20201019_1600_MON_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 54,
+   "p_front": 0.039,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.92,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Buan_yeji_20201020_1100_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 50,
+   "p_front": 0.947,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 29,
+   "p_front": 0.038,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Buan_yeji_20201021_0730_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 36,
+   "p_front": 0.022,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 26,
+   "p_front": 0.971,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Buan_yeji_20201021_1230_WED_15m_NH_highway_TW2_sunny_FHD__view0": {
+  "0": {
+   "n": 42,
+   "p_front": 0.954,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 42,
+   "p_front": 0.019,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Buan_yeji_20201021_1230_WED_15m_NH_highway_TW2_sunny_FHD__view1": {
+  "0": {
+   "n": 37,
+   "p_front": 0.98,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 17,
+   "p_front": 0.007,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Buan_yeji_20201021_1730_WED_15m_NH_highway_TW2_rainy_FHD": {
+  "1": {
+   "n": 35,
+   "p_front": 0.026,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 28,
+   "p_front": 0.982,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Buan_yulchon_20201020_1100_TUE_15m_NH_highway_TW2_sunny_FHD__view0": {
+  "0": {
+   "n": 28,
+   "p_front": 0.998,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 51,
+   "p_front": 0.011,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Buan_yulchon_20201020_1100_TUE_15m_NH_highway_TW2_sunny_FHD__view1": {
+  "0": {
+   "n": 25,
+   "p_front": 0.995,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 21,
+   "p_front": 0.058,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Buan_yulchon_20201020_1600_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.997,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.043,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Buan_yulchon_20201021_1000_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.935,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.048,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Buan_yulchon_20201021_1500_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 30,
+   "p_front": 0.011,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 45,
+   "p_front": 0.989,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Busan_busanportbrdg1_20201027_1430_TUE_8m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.946,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.033,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Busan_busanportbrdg1_20201028_1300_TUE_8m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.99,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 37,
+   "p_front": 0.017,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Busan_busanportbrdg1_20201029_1330_THU_8m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.98,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.021,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Busan_busanportbrdg1_20201119_1230_THU_8m_NH_highway_TW2_rainy_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.036,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.972,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Busan_busanportbrdg2_20201027_1630_TUE_8m_NH_highway_TW3_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.016,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.981,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Busan_busanportbrdg2_20201028_1400_TUE_8m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.96,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.031,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Busan_busanportbrdg2_20201029_1130_THU_8m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.985,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.038,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Busan_busanportbrdg2_20201029_1630_THU_8m_NH_highway_TW3_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.007,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.988,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Busan_busanportbrdg3_20201027_1300_TUE_8m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.959,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.195,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Busan_busanportbrdg3_20201028_1100_TUE_8m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.981,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.164,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Busan_busanportbrdg3_20201028_1600_TUE_8m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.988,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.156,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Busan_busanportbrdg3_20201029_1330_THU_8m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.963,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.205,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Busan_busanportbrdg3_20201119_1030_THU_8m_NH_highway_TW3_rainy_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.051,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.956,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Busan_busanportbrdg4_20201027_1530_TUE_8m_NH_highway_TW3_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.179,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.965,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Busan_busanportbrdg4_20201028_1300_TUE_8m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.99,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.254,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Busan_busanportbrdg4_20201029_0930_THU_8m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.961,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.062,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Busan_busanportbrdg4_20201029_1430_THU_8m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.982,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.145,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Busan_busanportbrdg4_20201119_1130_THU_8m_NH_highway_TW3_rainy_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.935,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.065,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Busan_busanportbrdg5_20201027_1530_TUE_8m_NH_highway_TW3_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.302,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.954,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Busan_busanportbrdg5_20201029_0930_THU_8m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.955,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.303,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Busan_busanportbrdg5_20201029_1430_THU_8m_NH_highway_TW3_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.215,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.964,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Busan_busanportbrdg5_20201119_1100_THU_8m_NH_highway_TW3_rainy_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.184,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.901,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Busan_busanportbrdg6_20201027_1500_TUE_8m_NH_highway_TW3_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.469,
+   "cnn": "away",
+   "confident": false,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.965,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Busan_busanportbrdg6_20201028_1330_TUE_8m_NH_highway_TW3_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.401,
+   "cnn": "away",
+   "confident": false,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.954,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Busan_busanportbrdg6_20201029_1000_THU_8m_NH_highway_TW3_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.32,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.938,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Busan_busanportbrdg6_20201029_1500_THU_8m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.961,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.477,
+   "cnn": "away",
+   "confident": false,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Busan_busanportbrdg6_20201119_1230_THU_8m_NH_highway_TW3_rainy_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.236,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.945,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Cheonan_gangjeong_20201019_1730_MON_15m_NH_highway_TW3_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.041,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.781,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Cheonan_gangjeong_20201020_1400_TUE_15m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.915,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.074,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Cheonan_gangjeong_20201021_0830_WED_15m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.914,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.075,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Cheonan_gangjeong_20201021_1330_WED_15m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.896,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.042,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Cheonan_ogsan_20201019_1630_MON_15m_RH_highway_TW3_sunny_FHD": {
+  "2": {
+   "n": 60,
+   "p_front": 0.985,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "3": {
+   "n": 60,
+   "p_front": 0.052,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 46,
+   "p_front": 0.973,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.984,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Cheonan_ogsan_20201020_1100_TUE_15m_RH_highway_TW3_sunny_FHD": {
+  "2": {
+   "n": 60,
+   "p_front": 0.985,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "3": {
+   "n": 60,
+   "p_front": 0.046,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.999,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Cheonan_ogsan_20201020_1600_TUE_15m_RH_highway_TW3_sunny_FHD": {
+  "3": {
+   "n": 60,
+   "p_front": 0.066,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "2": {
+   "n": 60,
+   "p_front": 0.981,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "0": {
+   "n": 46,
+   "p_front": 0.943,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 24,
+   "p_front": 0.925,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Cheonan_ogsan_20201021_1000_WED_15m_RH_highway_TW3_sunny_FHD": {
+  "3": {
+   "n": 60,
+   "p_front": 0.086,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.903,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "2": {
+   "n": 60,
+   "p_front": 0.992,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "0": {
+   "n": 14,
+   "p_front": 0.956,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Cheonan_ogsan_20201021_1500_WED_15m_NH_highway_TW3_sunny_FHD": {
+  "3": {
+   "n": 60,
+   "p_front": 0.049,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "2": {
+   "n": 60,
+   "p_front": 0.974,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.976,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 7,
+   "p_front": 0.941,
+   "cnn": "toward",
+   "confident": false,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Cheonan_sajeong_20201019_1730_MON_15m_NH_highway_TW3_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.032,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.871,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Cheonan_sajeong_20201020_1330_TUE_15m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.963,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.05,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Cheonan_sajeong_20201021_0730_WED_15m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.952,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.107,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Cheonan_sajeong_20201021_1330_WED_15m_NH_highway_TW3_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.075,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.967,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Cheonan_seongnam2_20201019_1630_MON_10m_RH_highway_TW3_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.054,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.962,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Cheonan_seongnam2_20201020_1030_TUE_10m_RH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.865,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.094,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Cheonan_seongnam2_20201020_1530_TUE_10m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.947,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.061,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Cheonan_seongnam2_20201021_0930_WED_10m_RH_highway_TW3_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.05,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.892,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Cheonan_seongnam2_20201021_1430_WED_10m_NH_highway_TW3_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.057,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.948,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Chungju_chujeomtunnel(changwon)_20201019_1730_MON_15m_NH_highway_OW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.048,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Chungju_chujeomtunnel(changwon)_20201020_1130_TUE_15m_RH_highway_OW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.076,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Chungju_chujeomtunnel(changwon)_20201020_1630_TUE_15m_NH_highway_OW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.068,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Chungju_chujeomtunnel(changwon)_20201021_1030_WED_15m_NH_highway_OW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.059,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Chungju_chujeomtunnel(changwon)_20201021_1530_WED_15m_NH_highway_OW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.021,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Chungju_chujeomtunnel(yangpyeong)_20201020_0730_TUE_15m_NH_highway_OW2_fog_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.865,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Chungju_chujeomtunnel(yangpyeong)_20201020_1230_TUE_15m_RH_highway_OW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.939,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Chungju_chujeomtunnel(yangpyeong)_20201020_1730_TUE_15m_NH_highway_OW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.942,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Chungju_chujeomtunnel(yangpyeong)_20201021_1130_WED_15m_NH_highway_OW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.073,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Chungju_chujeomtunnel(yangpyeong)_20201021_1630_WED_15m_NH_highway_OW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.041,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Chungju_danpyeong1brdg_20201020_1100_TUE_15m_RH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.076,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.812,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Chungju_danpyeong1brdg_20201020_1600_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.048,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.85,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Chungju_danpyeong1brdg_20201021_1030_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.969,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.062,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Chungju_danpyeong1brdg_20201021_1530_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.458,
+   "cnn": "away",
+   "confident": false,
+   "geo": null,
+   "final": null
+  }
+ },
+ "Chungju_jogogli_20201020_0800_TUE_15m_NH_highway_TW2_fog_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.954,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.022,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Chungju_jogogli_20201020_1300_TUE_15m_RH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.072,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.964,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Chungju_jogogli_20201021_0700_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.064,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.997,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Chungju_jogogli_20201021_1200_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.964,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.046,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Chungju_jogogli_20201021_1700_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.036,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.977,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Chungju_sangwoo1brdg_20201019_2030_MON_15m_NH_highway_TW2_sunny_HD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.974,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.048,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Chungju_sangwoo1brdg_20201020_1130_TUE_15m_RH_highway_TW2_sunny_HD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.86,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.092,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Chungju_sangwoo1brdg_20201020_1630_TUE_15m_NH_highway_TW2_sunny_HD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.952,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.077,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Chungju_sangwoo1brdg_20201021_1030_WED_15m_NH_highway_TW2_sunny_HD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.033,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.91,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Chungju_sangwoo1brdg_20201021_1530_WED_15m_NH_highway_TW2_sunny_HD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.058,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.923,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Gangneung_gangdong2brdg_20201019_1730_MON_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.034,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.958,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Gangneung_gangdong2brdg_20201020_1130_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.977,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.04,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Gangneung_gangdong2brdg_20201020_1630_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.945,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.058,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Gangneung_gangdong2brdg_20201021_1030_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.964,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.032,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Gangneung_gangdong2brdg_20201021_1530_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.969,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.045,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Gangneung_hyangho1brdg_20201020_0730_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 28,
+   "p_front": 0.949,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 31,
+   "p_front": 0.017,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Gangneung_hyangho1brdg_20201020_1230_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.986,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 55,
+   "p_front": 0.033,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Gangneung_hyangho1brdg_20201020_1730_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 55,
+   "p_front": 0.022,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.976,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Gangneung_hyangho1brdg_20201021_1130_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.985,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 55,
+   "p_front": 0.041,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Gangneung_hyangho1brdg_20201021_1630_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.957,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 54,
+   "p_front": 0.037,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Gangneung_hyangho2brdg_20201020_0830_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 30,
+   "p_front": 0.001,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 48,
+   "p_front": 0.998,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Gangneung_hyangho2brdg_20201020_1330_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.976,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.057,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Gangneung_hyangho2brdg_20201021_0730_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 54,
+   "p_front": 0.05,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 48,
+   "p_front": 0.971,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Gangneung_hyangho2brdg_20201021_1230_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.984,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.031,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Gangneung_hyangho2brdg_20201021_1730_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 37,
+   "p_front": 0.969,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 44,
+   "p_front": 0.042,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Gangneung_nodong1brdg_20201019_1630_MON_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.228,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.961,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Gangneung_nodong1brdg_20201020_1030_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.975,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.148,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Gangneung_nodong1brdg_20201020_1530_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.228,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.955,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Gangneung_nodong1brdg_20201021_0930_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 6,
+   "p_front": 0.991,
+   "cnn": "toward",
+   "confident": false,
+   "geo": null,
+   "final": null
+  }
+ },
+ "Gangneung_nodong1brdg_20201021_1430_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.967,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.04,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Gangneung_nodong_20201020_0930_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.945,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.19,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Gangneung_nodong_20201020_1430_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.978,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.235,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Gangneung_nodong_20201021_0830_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.989,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.085,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Gangneung_nodong_20201021_1330_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.113,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.991,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Gangneung_wichon2brdg_20201019_1730_MON_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.116,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.944,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Gangneung_wichon2brdg_20201020_0830_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.914,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.27,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Gangneung_wichon2brdg_20201020_1400_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.937,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.226,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Gangneung_wichon2brdg_20201020_1900_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 40,
+   "p_front": 0.303,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 42,
+   "p_front": 0.885,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Gangneung_wichon2brdg_20201021_0930_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.063,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.927,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Gangneung_wichon2brdg_20201021_1430_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.946,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.06,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Gangneung_wichon2brdg_20201021_1930_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 32,
+   "p_front": 0.126,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 24,
+   "p_front": 0.979,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Hongcheon_guljitunnel_20201020_1030_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.894,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.049,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Hongcheon_guljitunnel_20201020_1530_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.97,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.017,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Hongcheon_guljitunnel_20201021_0930_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.027,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.984,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "2": {
+   "n": 0,
+   "p_front": null,
+   "cnn": null,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Hongcheon_guljitunnel_20201021_1430_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "2": {
+   "n": 33,
+   "p_front": 0.123,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.015,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.991,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Hongcheon_gwanggyeog1brdg_20201019_1730_MON_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.837,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.02,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Hongcheon_gwanggyeog1brdg_20201020_1130_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.993,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.031,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Hongcheon_gwanggyeog1brdg_20201020_1630_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.013,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.99,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Hongcheon_gwanggyeog1brdg_20201021_1030_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.947,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.045,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Hongcheon_gwanggyeog1brdg_20201021_1530_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.957,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.034,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Hongcheon_seomgangbrdg_20201019_1900_MON_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 10,
+   "p_front": 0.238,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 15,
+   "p_front": 0.729,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Hongcheon_seomgangbrdg_20201020_0900_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.951,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.107,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Hongcheon_seomgangbrdg_20201020_1400_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.139,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.971,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Hongcheon_seomgangbrdg_20201021_0800_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.031,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.857,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Hongcheon_seomgangbrdg_20201021_1300_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.941,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.038,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Hongcheon_wonchang4brdg_20201019_1600_MON_15m_NH_highway_OW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.896,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Hongcheon_wonchang4brdg_20201021_1000_WED_15m_NH_highway_OW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.039,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Hongcheon_wonchang4brdg_20201021_1500_WED_15m_NH_highway_OW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.071,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Inje_injetunnel2_20201210_0956_THU_4.8m_NH_highway_OW2_tunnel_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.014,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Jeonju_deungcheon_20201019_1800_MON_10m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.109,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 1,
+   "p_front": 0.99,
+   "cnn": "toward",
+   "confident": false,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Jeonju_deungcheon_20201020_0800_TUE_10m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.054,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.867,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Jeonju_deungcheon_20201020_1300_TUE_10m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.951,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.029,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Jeonju_deungcheon_20201020_1800_TUE_10m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.946,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 58,
+   "p_front": 0.065,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Jeonju_deungcheon_20201021_0800_WED_10m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.073,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 38,
+   "p_front": 0.912,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Jeonju_deungcheon_20201021_1300_WED_10m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.07,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 26,
+   "p_front": 0.955,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Jeonju_deungcheon_20201021_1800_WED_10m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.182,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.836,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Jeonju_gudeog_20201019_2000_MON_15m_NH_highway_TW3_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.299,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Jeonju_gudeog_20201020_1000_TUE_15m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.61,
+   "cnn": "toward",
+   "confident": false,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.121,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Jeonju_gudeog_20201020_1500_TUE_15m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.907,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.14,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Jeonju_gudeog_20201020_2000_TUE_15m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 7,
+   "p_front": 0.936,
+   "cnn": "toward",
+   "confident": false,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 59,
+   "p_front": 0.18,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Jeonju_gudeog_20201021_1000_WED_15m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.964,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.069,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Jeonju_gudeog_20201021_1500_WED_15m_NH_highway_TW3_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.88,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.055,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Jeonju_jeongeub_20201019_1700_MON_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.907,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.106,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Jeonju_jeongeub_20201020_0830_TUE_15m_NH_highway_TW2_fog_FHD": {
+  "1": {
+   "n": 26,
+   "p_front": 0.117,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 22,
+   "p_front": 0.753,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Jeonju_jeongeub_20201020_1330_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 58,
+   "p_front": 0.108,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.745,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Jeonju_jeongeub_20201021_0700_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.786,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.078,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Jeonju_jeongeub_20201021_1200_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.145,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.795,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Jeonju_jeongeub_20201021_1700_WED_15m_NH_highway_TW2_rainy_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.062,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.897,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Jeonju_sangpyeongoverpass_20201020_1030_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 26,
+   "p_front": 0.015,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.934,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Jeonju_sangpyeongoverpass_20201020_1530_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 33,
+   "p_front": 0.631,
+   "cnn": "toward",
+   "confident": false,
+   "geo": null,
+   "final": null
+  }
+ },
+ "Jeonju_sangpyeongoverpass_20201021_0930_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.05,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.909,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Jeonju_sangpyeongoverpass_20201021_1430_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.956,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.154,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Jeonju_taeinshelter(seoul)_20201019_1730_MON_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.028,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.905,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Jeonju_taeinshelter(seoul)_20201020_0900_TUE_15m_NH_highway_TW2_fog_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.248,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.82,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Jeonju_taeinshelter(seoul)_20201020_1400_TUE_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.139,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.865,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "2": {
+   "n": 0,
+   "p_front": null,
+   "cnn": null,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Jeonju_taeinshelter(seoul)_20201021_0730_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.03,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.57,
+   "cnn": "toward",
+   "confident": false,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "2": {
+   "n": 0,
+   "p_front": null,
+   "cnn": null,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Jeonju_taeinshelter(seoul)_20201021_1300_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.574,
+   "cnn": "toward",
+   "confident": false,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.775,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Jincheon_jangam_20201021_0830_WED_15m_NH_highway_TW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.106,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.954,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Jincheon_namioverpass_20201019_1900_MON_15m_NH_highway_OW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.118,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 14,
+   "p_front": 0.799,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Jincheon_namioverpass_20201020_0900_TUE_15m_NH_highway_OW2_fog_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.585,
+   "cnn": "toward",
+   "confident": false,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.119,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Jincheon_namioverpass_20201020_1400_TUE_15m_NH_highway_OW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.095,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.846,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Jincheon_namioverpass_20201020_1900_TUE_15m_NH_highway_OW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.088,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 8,
+   "p_front": 0.869,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Jincheon_namioverpass_20201021_0900_WED_15m_NH_highway_OW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.028,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.786,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Jincheon_namioverpass_20201021_1400_WED_15m_NH_highway_OW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.053,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.852,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Jincheon_namioverpass_20201021_1900_WED_15m_NH_highway_OW2_sunny_FHD": {
+  "1": {
+   "n": 60,
+   "p_front": 0.168,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 6,
+   "p_front": 0.872,
+   "cnn": "toward",
+   "confident": false,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Suwon_CH01_20200720_1830_MON_9m_RH_highway_TW5_sunny_FHD__view0": {
+  "2": {
+   "n": 60,
+   "p_front": 0.088,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.93,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "0": {
+   "n": 42,
+   "p_front": 0.955,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Suwon_CH01_20200720_1830_MON_9m_RH_highway_TW5_sunny_FHD__view1": {
+  "2": {
+   "n": 60,
+   "p_front": 0.142,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 23,
+   "p_front": 0.733,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Suwon_CH01_20200721_1700_TUE_9m_RH_highway_TW5_sunny_FHD": {
+  "2": {
+   "n": 60,
+   "p_front": 0.111,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.913,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "0": {
+   "n": 16,
+   "p_front": 0.867,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Suwon_CH01_20200722_1500_WED_9m_NH_highway_TW5_rainy_FHD": {
+  "2": {
+   "n": 60,
+   "p_front": 0.04,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "1": {
+   "n": 44,
+   "p_front": 0.517,
+   "cnn": "toward",
+   "confident": false,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Suwon_CH01_20201010_1930_SAT_9m_NH_highway_TW5_sunny_FHD__view0": {
+  "2": {
+   "n": 60,
+   "p_front": 0.13,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.951,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "0": {
+   "n": 6,
+   "p_front": 0.91,
+   "cnn": "toward",
+   "confident": false,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Suwon_CH01_20201010_1930_SAT_9m_NH_highway_TW5_sunny_FHD__view1": {
+  "1": {
+   "n": 60,
+   "p_front": 0.212,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  },
+  "0": {
+   "n": 53,
+   "p_front": 0.885,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH01_20201012_2023_MON_9m_NH_highway_TW5_sunny_FHD__view0": {
+  "1": {
+   "n": 60,
+   "p_front": 0.141,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  },
+  "0": {
+   "n": 41,
+   "p_front": 0.802,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH01_20201012_2023_MON_9m_NH_highway_TW5_sunny_FHD__view1": {
+  "2": {
+   "n": 60,
+   "p_front": 0.199,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.922,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "0": {
+   "n": 12,
+   "p_front": 0.922,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Suwon_CH02_20200720_1830_MON_9m_NH_highway_TW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.931,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.046,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Suwon_CH02_20200720_1830_MON_9m_NH_highway_TW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.894,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.042,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Suwon_CH02_20200721_1800_TUE_9m_RH_highway_TW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.826,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.039,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Suwon_CH02_20200721_1800_TUE_9m_RH_highway_TW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.762,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.045,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Suwon_CH02_20200722_1530_WED_9m_NH_highway_TW5_rainy_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.719,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.083,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Suwon_CH02_20200722_1530_WED_9m_NH_highway_TW5_rainy_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.839,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 31,
+   "p_front": 0.047,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Suwon_CH02_20201010_2038_SAT_9m_NH_highway_TW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.407,
+   "cnn": "away",
+   "confident": false,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 9,
+   "p_front": 0.038,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Suwon_CH02_20201010_2038_SAT_9m_NH_highway_TW5_sunny_FHD__view1": {
+  "0": {
+   "n": 59,
+   "p_front": 0.88,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 5,
+   "p_front": 0.213,
+   "cnn": "away",
+   "confident": false,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Suwon_CH02_20201010_2038_SAT_9m_NH_highway_TW5_sunny_FHD__view2": {
+  "0": {
+   "n": 60,
+   "p_front": 0.558,
+   "cnn": "toward",
+   "confident": false,
+   "geo": null,
+   "final": null
+  }
+ },
+ "Suwon_CH02_20201012_2059_MON_9m_NH_highway_TW5_sunny_FHD__view0": {
+  "0": {
+   "n": 34,
+   "p_front": 0.93,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 26,
+   "p_front": 0.117,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Suwon_CH02_20201012_2059_MON_9m_NH_highway_TW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.286,
+   "cnn": "away",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 23,
+   "p_front": 0.091,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  }
+ },
+ "Suwon_CH02_20201012_2059_MON_9m_NH_highway_TW5_sunny_FHD__view2": {
+  "0": {
+   "n": 60,
+   "p_front": 0.54,
+   "cnn": "toward",
+   "confident": false,
+   "geo": null,
+   "final": null
+  }
+ },
+ "Suwon_CH03_20200720_2030_MON_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.1,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH03_20200720_2030_MON_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.108,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH03_20200721_2000_TUE_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.078,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH03_20200721_2000_TUE_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.085,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH03_20200722_1700_WED_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.07,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH03_20200722_1700_WED_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.061,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH03_20201010_2145_SAT_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.165,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH03_20201010_2145_SAT_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.126,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH04_20200720_1600_MON_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.861,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH04_20200720_1600_MON_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.946,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH04_20200721_1500_TUE_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.872,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH04_20200721_1500_TUE_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.863,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH04_20200721_2030_TUE_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.769,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH04_20200721_2030_TUE_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.825,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH04_20200722_1800_WED_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.858,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH04_20200722_1800_WED_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.84,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH04_20201011_2020_SUN_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.932,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH04_20201011_2020_SUN_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.659,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH05_20200720_1700_MON_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.016,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH05_20200720_1700_MON_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.029,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH05_20200720_1700_MON_9m_NH_highway_OW5_sunny_FHD__view2": {
+  "0": {
+   "n": 60,
+   "p_front": 0.044,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH05_20200721_1530_TUE_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.059,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH05_20200721_1530_TUE_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.055,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH05_20200721_1530_TUE_9m_NH_highway_OW5_sunny_FHD__view2": {
+  "0": {
+   "n": 60,
+   "p_front": 0.063,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH05_20200721_2130_TUE_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.135,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH05_20200721_2130_TUE_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.165,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH05_20200721_2130_TUE_9m_NH_highway_OW5_sunny_FHD__view2": {
+  "0": {
+   "n": 60,
+   "p_front": 0.082,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH05_20200722_1900_WED_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.042,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH05_20200722_1900_WED_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.031,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH05_20200722_1900_WED_9m_NH_highway_OW5_sunny_FHD__view2": {
+  "0": {
+   "n": 60,
+   "p_front": 0.109,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH05_20201011_2058_SUN_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.712,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH05_20201011_2058_SUN_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.895,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH06_20200720_1800_MON_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.772,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH06_20200720_1800_MON_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.929,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH06_20200721_1630_TUE_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.914,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH06_20200721_1630_TUE_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.915,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH06_20200722_1430_WED_9m_NH_highway_OW5_rainy_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.91,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH06_20200722_1430_WED_9m_NH_highway_OW5_rainy_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.77,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH06_20201010_1932_SAT_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "1": {
+   "n": 60,
+   "p_front": 0.076,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.191,
+   "cnn": "away",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Suwon_CH06_20201010_1932_SAT_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.071,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH06_20201010_1932_SAT_9m_NH_highway_OW5_sunny_FHD__view2": {
+  "1": {
+   "n": 60,
+   "p_front": 0.042,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.288,
+   "cnn": "away",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Suwon_CH06_20201012_2012_MON_9m_NH_highway_OW5_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.182,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH07_20200720_1800_MON_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.09,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH07_20200720_1800_MON_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.029,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH07_20200720_1800_MON_9m_NH_highway_OW5_sunny_FHD__view2": {
+  "0": {
+   "n": 60,
+   "p_front": 0.106,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH07_20200721_1730_TUE_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.108,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH07_20200721_1730_TUE_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.146,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH07_20200721_1730_TUE_9m_NH_highway_OW5_sunny_FHD__view2": {
+  "0": {
+   "n": 60,
+   "p_front": 0.027,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH07_20200722_1500_WED_9m_NH_highway_OW5_rainy_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.065,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH07_20200722_1500_WED_9m_NH_highway_OW5_rainy_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.063,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH07_20200722_1500_WED_9m_NH_highway_OW5_rainy_FHD__view2": {
+  "0": {
+   "n": 60,
+   "p_front": 0.062,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH07_20201010_1938_SAT_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.161,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH07_20201010_1938_SAT_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.123,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH07_20201010_1938_SAT_9m_NH_highway_OW5_sunny_FHD__view2": {
+  "0": {
+   "n": 60,
+   "p_front": 0.109,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH07_20201012_1955_MON_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.195,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH07_20201012_1955_MON_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.182,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH07_20201012_1955_MON_9m_NH_highway_OW5_sunny_FHD__view2": {
+  "0": {
+   "n": 60,
+   "p_front": 0.127,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH08_20200720_1830_MON_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.846,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH08_20200720_1830_MON_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.942,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH08_20200721_1730_TUE_9m_NH_highway_OW5_sunny_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.888,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH08_20200722_1500_WED_9m_NH_highway_OW5_rainy_FHD": {
+  "0": {
+   "n": 60,
+   "p_front": 0.666,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH08_20201010_1945_SAT_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 43,
+   "p_front": 0.946,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH08_20201010_1945_SAT_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 51,
+   "p_front": 0.559,
+   "cnn": "toward",
+   "confident": false,
+   "geo": null,
+   "final": null
+  }
+ },
+ "Suwon_CH08_20201011_2149_SUN_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 11,
+   "p_front": 0.748,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH08_20201011_2149_SUN_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 27,
+   "p_front": 0.934,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ },
+ "Suwon_CH09_20200720_1900_MON_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.113,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH09_20200720_1900_MON_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "1": {
+   "n": 60,
+   "p_front": 0.106,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 44,
+   "p_front": 0.018,
+   "cnn": "away",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Suwon_CH09_20200721_1730_TUE_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.14,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH09_20200721_1730_TUE_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "1": {
+   "n": 60,
+   "p_front": 0.121,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.058,
+   "cnn": "away",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Suwon_CH09_20200722_1600_WED_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.103,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH09_20200722_1600_WED_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "1": {
+   "n": 60,
+   "p_front": 0.07,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 56,
+   "p_front": 0.088,
+   "cnn": "away",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Suwon_CH09_20201010_2022_SAT_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.157,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH09_20201010_2022_SAT_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "1": {
+   "n": 60,
+   "p_front": 0.064,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 9,
+   "p_front": 0.186,
+   "cnn": "away",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Suwon_CH09_20201012_2140_MON_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.141,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH09_20201012_2140_MON_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "1": {
+   "n": 60,
+   "p_front": 0.109,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 6,
+   "p_front": 0.012,
+   "cnn": "away",
+   "confident": false,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Suwon_CH10_20200720_2030_MON_9m_NH_highway_TW5_sunny_FHD__view0": {
+  "1": {
+   "n": 60,
+   "p_front": 0.138,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.452,
+   "cnn": "away",
+   "confident": false,
+   "geo": null,
+   "final": null
+  }
+ },
+ "Suwon_CH10_20200720_2030_MON_9m_NH_highway_TW5_sunny_FHD__view1": {
+  "1": {
+   "n": 60,
+   "p_front": 0.909,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "2": {
+   "n": 23,
+   "p_front": 0.218,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 7,
+   "p_front": 0.248,
+   "cnn": "away",
+   "confident": false,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Suwon_CH10_20200721_1930_TUE_9m_NH_highway_TW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.393,
+   "cnn": "away",
+   "confident": false,
+   "geo": null,
+   "final": null
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.028,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH10_20200721_1930_TUE_9m_NH_highway_TW5_sunny_FHD__view1": {
+  "1": {
+   "n": 60,
+   "p_front": 0.906,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "2": {
+   "n": 60,
+   "p_front": 0.077,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 16,
+   "p_front": 0.146,
+   "cnn": "away",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Suwon_CH10_20200722_1800_WED_9m_NH_highway_TW5_sunny_FHD__view0": {
+  "0": {
+   "n": 60,
+   "p_front": 0.483,
+   "cnn": "away",
+   "confident": false,
+   "geo": null,
+   "final": null
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.084,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  }
+ },
+ "Suwon_CH10_20200722_1800_WED_9m_NH_highway_TW5_sunny_FHD__view1": {
+  "2": {
+   "n": 52,
+   "p_front": 0.124,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 15,
+   "p_front": 0.392,
+   "cnn": "away",
+   "confident": false,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "1": {
+   "n": 60,
+   "p_front": 0.896,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Suwon_CH10_20201011_1957_SUN_9m_NH_highway_OW5_sunny_FHD__view0": {
+  "1": {
+   "n": 60,
+   "p_front": 0.915,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "2": {
+   "n": 2,
+   "p_front": 0.142,
+   "cnn": "away",
+   "confident": false,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 0,
+   "p_front": null,
+   "cnn": null,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Suwon_CH10_20201011_1957_SUN_9m_NH_highway_OW5_sunny_FHD__view1": {
+  "0": {
+   "n": 60,
+   "p_front": 0.456,
+   "cnn": "away",
+   "confident": false,
+   "geo": null,
+   "final": null
+  },
+  "1": {
+   "n": 2,
+   "p_front": 0.008,
+   "cnn": "away",
+   "confident": false,
+   "geo": null,
+   "final": null
+  }
+ },
+ "Suwon_CH10_20201213_0958_SUN_9m_NH_highway_OW5_snow_FHD__view0": {
+  "1": {
+   "n": 60,
+   "p_front": 0.86,
+   "cnn": "toward",
+   "confident": true,
+   "geo": "toward",
+   "final": "toward"
+  },
+  "2": {
+   "n": 60,
+   "p_front": 0.134,
+   "cnn": "away",
+   "confident": true,
+   "geo": "away",
+   "final": "away"
+  },
+  "0": {
+   "n": 11,
+   "p_front": 0.51,
+   "cnn": "toward",
+   "confident": false,
+   "geo": "toward",
+   "final": "toward"
+  }
+ },
+ "Suwon_CH10_20201213_0958_SUN_9m_NH_highway_OW5_snow_FHD__view1": {
+  "1": {
+   "n": 60,
+   "p_front": 0.101,
+   "cnn": "away",
+   "confident": true,
+   "geo": null,
+   "final": "away"
+  },
+  "0": {
+   "n": 60,
+   "p_front": 0.692,
+   "cnn": "toward",
+   "confident": true,
+   "geo": null,
+   "final": "toward"
+  }
+ }
+}

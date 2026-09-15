@@ -1,0 +1,105 @@
+Buan_daemog_20201019_1730_MON_15m_NH_highway_TW2_sunny_FHD crops=240
+Buan_daemog_20201020_1130_TUE_15m_NH_highway_TW2_sunny_FHD crops=235
+Buan_daemog_20201020_1630_TUE_15m_NH_highway_TW2_sunny_FHD__view0 crops=233
+Buan_daemog_20201020_1630_TUE_15m_NH_highway_TW2_sunny_FHD__view1 crops=202
+Buan_dongjisan_20201021_0800_WED_15m_NH_highway_TW2_sunny_FHD crops=107
+Buan_dongjisan_20201021_1300_WED_15m_NH_highway_TW2_sunny_FHD crops=196
+Buan_jongsin_20201019_1600_MON_15m_NH_highway_TW2_sunny_FHD crops=240
+Buan_jongsin_20201020_1130_TUE_15m_NH_highway_TW2_sunny_FHD crops=240
+Buan_jongsin_20201020_1630_TUE_15m_NH_highway_TW2_sunny_FHD__view0 crops=240
+Buan_jongsin_20201020_1630_TUE_15m_NH_highway_TW2_sunny_FHD__view1 crops=144
+Buan_jongsin_20201021_1030_WED_15m_NH_highway_TW2_sunny_FHD crops=240
+Buan_jongsin_20201021_1530_WED_15m_NH_highway_TW2_rainy_FHD crops=240
+Buan_soju2brdg_20201020_0800_TUE_15m_NH_highway_TW2_fog_FHD crops=99
+Buan_soju2brdg_20201020_1300_TUE_15m_NH_highway_TW2_sunny_FHD crops=240
+Buan_soju2brdg_20201021_0830_WED_15m_NH_highway_TW2_sunny_FHD__view0 crops=240
+Buan_soju2brdg_20201021_0830_WED_15m_NH_highway_TW2_sunny_FHD__view1 crops=31
+Buan_soju2brdg_20201021_1330_WED_15m_NH_highway_TW2_sunny_FHD crops=240
+Buan_yeji_20201019_1600_MON_15m_NH_highway_TW2_sunny_FHD crops=98
+Buan_yeji_20201020_1100_TUE_15m_NH_highway_TW2_sunny_FHD crops=72
+Buan_yeji_20201021_0730_WED_15m_NH_highway_TW2_sunny_FHD crops=60
+Buan_yeji_20201021_1230_WED_15m_NH_highway_TW2_sunny_FHD__view0 crops=71
+Buan_yeji_20201021_1230_WED_15m_NH_highway_TW2_sunny_FHD__view1 crops=48
+Buan_yeji_20201021_1730_WED_15m_NH_highway_TW2_rainy_FHD crops=58
+Buan_yulchon_20201020_1100_TUE_15m_NH_highway_TW2_sunny_FHD__view0 crops=66
+Buan_yulchon_20201020_1100_TUE_15m_NH_highway_TW2_sunny_FHD__view1 crops=37
+Buan_yulchon_20201020_1600_TUE_15m_NH_highway_TW2_sunny_FHD crops=128
+Buan_yulchon_20201021_1000_WED_15m_NH_highway_TW2_sunny_FHD crops=114
+Buan_yulchon_20201021_1500_WED_15m_NH_highway_TW2_sunny_FHD crops=91
+Busan_busanportbrdg1_20201027_1430_TUE_8m_NH_highway_TW2_sunny_FHD crops=140
+Busan_busanportbrdg1_20201028_1300_TUE_8m_NH_highway_TW2_sunny_FHD crops=103
+Busan_busanportbrdg1_20201029_1330_THU_8m_NH_highway_TW2_sunny_FHD crops=148
+Busan_busanportbrdg1_20201119_1230_THU_8m_NH_highway_TW2_rainy_FHD crops=186
+Busan_busanportbrdg2_20201027_1630_TUE_8m_NH_highway_TW3_sunny_FHD crops=222
+Busan_busanportbrdg2_20201028_1400_TUE_8m_NH_highway_TW3_sunny_FHD crops=240
+Busan_busanportbrdg2_20201029_1130_THU_8m_NH_highway_TW3_sunny_FHD crops=240
+Busan_busanportbrdg2_20201029_1630_THU_8m_NH_highway_TW3_sunny_FHD crops=225
+Busan_busanportbrdg3_20201027_1300_TUE_8m_NH_highway_TW3_sunny_FHD crops=240
+Busan_busanportbrdg3_20201028_1100_TUE_8m_NH_highway_TW3_sunny_FHD crops=240
+Busan_busanportbrdg3_20201028_1600_TUE_8m_NH_highway_TW3_sunny_FHD crops=209
+Busan_busanportbrdg3_20201029_1330_THU_8m_NH_highway_TW3_sunny_FHD crops=240
+Busan_busanportbrdg3_20201119_1030_THU_8m_NH_highway_TW3_rainy_FHD crops=240
+Busan_busanportbrdg4_20201027_1530_TUE_8m_NH_highway_TW3_sunny_FHD crops=240
+Busan_busanportbrdg4_20201028_1300_TUE_8m_NH_highway_TW3_sunny_FHD crops=240
+Busan_busanportbrdg4_20201029_0930_THU_8m_NH_highway_TW3_sunny_FHD crops=240
+Busan_busanportbrdg4_20201029_1430_THU_8m_NH_highway_TW3_sunny_FHD crops=240
+Busan_busanportbrdg5_20201027_1530_TUE_8m_NH_highway_TW3_sunny_FHD crops=240
+Busan_busanportbrdg5_20201029_0930_THU_8m_NH_highway_TW3_sunny_FHD crops=240
+Busan_busanportbrdg5_20201029_1430_THU_8m_NH_highway_TW3_sunny_FHD crops=240
+Busan_busanportbrdg5_20201119_1100_THU_8m_NH_highway_TW3_rainy_FHD crops=202
+Busan_busanportbrdg6_20201027_1500_TUE_8m_NH_highway_TW3_sunny_FHD crops=240
+Busan_busanportbrdg6_20201028_1330_TUE_8m_NH_highway_TW3_sunny_FHD crops=331
+Busan_busanportbrdg6_20201029_1000_THU_8m_NH_highway_TW3_sunny_FHD crops=238
+Busan_busanportbrdg6_20201029_1500_THU_8m_NH_highway_TW3_sunny_FHD crops=240
+Busan_busanportbrdg6_20201119_1230_THU_8m_NH_highway_TW3_rainy_FHD crops=210
+Cheonan_gangjeong_20201021_1330_WED_15m_NH_highway_TW3_sunny_FHD crops=240
+Cheonan_ogsan_20201019_1630_MON_15m_RH_highway_TW3_sunny_FHD crops=355
+Cheonan_ogsan_20201020_1100_TUE_15m_RH_highway_TW3_sunny_FHD crops=360
+Cheonan_ogsan_20201020_1600_TUE_15m_RH_highway_TW3_sunny_FHD crops=307
+Cheonan_ogsan_20201021_1000_WED_15m_RH_highway_TW3_sunny_FHD crops=419
+Cheonan_ogsan_20201021_1500_WED_15m_NH_highway_TW3_sunny_FHD crops=342
+Cheonan_sajeong_20201019_1730_MON_15m_NH_highway_TW3_sunny_FHD crops=240
+Cheonan_sajeong_20201020_1330_TUE_15m_NH_highway_TW3_sunny_FHD crops=240
+Cheonan_sajeong_20201021_0730_WED_15m_NH_highway_TW3_sunny_FHD crops=240
+Cheonan_sajeong_20201021_1330_WED_15m_NH_highway_TW3_sunny_FHD crops=240
+Cheonan_seongnam2_20201019_1630_MON_10m_RH_highway_TW3_sunny_FHD crops=240
+Cheonan_seongnam2_20201020_1030_TUE_10m_RH_highway_TW3_sunny_FHD crops=240
+Cheonan_seongnam2_20201020_1530_TUE_10m_NH_highway_TW3_sunny_FHD crops=240
+자동 라벨 사진 13767장
+          n  cameras     front
+split                         
+test   2049        3  0.544656
+train  8975       11  0.501616
+val    2743        2  0.606271
+Downloading: "https://download.pytorch.org/models/resnet18-f37072fd.pth" to /Users/wooseokhan/.cache/torch/hub/checkpoints/resnet18-f37072fd.pth
+  0%|          | 0.00/44.7M [00:00<?, ?B/s]  6%|▌         | 2.62M/44.7M [00:00<00:01, 27.1MB/s] 16%|█▌        | 7.25M/44.7M [00:00<00:01, 39.1MB/s] 25%|██▍       | 11.0M/44.7M [00:00<00:00, 38.8MB/s] 34%|███▍      | 15.1M/44.7M [00:00<00:00, 37.8MB/s] 42%|████▏     | 18.8M/44.7M [00:00<00:00, 36.6MB/s] 50%|████▉     | 22.2M/44.7M [00:00<00:00, 32.0MB/s] 60%|█████▉    | 26.8M/44.7M [00:00<00:00, 36.2MB/s] 69%|██████▊   | 30.6M/44.7M [00:00<00:00, 37.4MB/s] 77%|███████▋  | 34.5M/44.7M [00:00<00:00, 38.1MB/s] 86%|████████▌ | 38.2M/44.7M [00:01<00:00, 38.3MB/s] 95%|█████████▍| 42.2M/44.7M [00:01<00:00, 39.3MB/s]100%|██████████| 44.7M/44.7M [00:01<00:00, 37.7MB/s]
+head epoch 1/2 loss=0.6656 val_acc=0.572
+head epoch 2/2 loss=0.5548 val_acc=0.567
+full epoch 1/4 loss=0.2901 val_acc=0.694
+full epoch 2/4 loss=0.1335 val_acc=0.716
+full epoch 3/4 loss=0.0942 val_acc=0.723
+full epoch 4/4 loss=0.0753 val_acc=0.726
+{
+ "test_cameras": [
+  "Buan_dongjisan",
+  "Busan_busanportbrdg1",
+  "Busan_busanportbrdg3"
+ ],
+ "n_test": 2049,
+ "resnet18_finetuned": {
+  "vehicle_acc": 0.7643,
+  "vehicle_f1": 0.7581,
+  "auc": 0.8714,
+  "carriageway_vote_acc": 0.9091,
+  "night_vehicle_acc": null,
+  "day_vehicle_acc": 0.7643
+ },
+ "clip_zero_shot": {
+  "vehicle_acc": 0.4866,
+  "vehicle_f1": 0.1277,
+  "auc": 0.831,
+  "carriageway_vote_acc": 0.5,
+  "night_vehicle_acc": null,
+  "day_vehicle_acc": 0.4866
+ }
+}

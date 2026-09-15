@@ -1,0 +1,27 @@
+{
+ "test_cameras": [
+  "Busan_busanportbrdg5",
+  "Busan_busanportbrdg6",
+  "Chungju_danpyeong1brdg",
+  "Gangneung_nodong",
+  "Jeonju_jeongeub",
+  "Jeonju_sangpyeongoverpass"
+ ],
+ "n_test": 4633,
+ "resnet18_finetuned": {
+  "vehicle_acc": 0.8463,
+  "vehicle_f1": 0.8589,
+  "auc": 0.8937,
+  "carriageway_vote_acc": 0.9535,
+  "night_vehicle_acc": null,
+  "day_vehicle_acc": 0.8463
+ },
+ "clip_zero_shot": {
+  "vehicle_acc": 0.4975,
+  "vehicle_f1": 0.1222,
+  "auc": 0.6746,
+  "carriageway_vote_acc": 0.4884,
+  "night_vehicle_acc": null,
+  "day_vehicle_acc": 0.4975
+ }
+}

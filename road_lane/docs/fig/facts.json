@@ -1,0 +1,102 @@
+{
+ "segmentation": {
+  "scene": "Buan_daemog_20201020_1130_TUE_15m_NH_highway_TW2_sunny_FHD",
+  "vp": [
+   842,
+   97
+  ],
+  "vp_support": 0.94,
+  "carriageways": [
+   {
+    "id": 0,
+    "geo_direction": "toward",
+    "theta": [
+     -71.0,
+     -63.75
+    ],
+    "n_lanes": 2,
+    "boundaries": [
+     {
+      "theta": -66.62,
+      "paint_cov": 0.45,
+      "runs": 10,
+      "solid": false
+     }
+    ],
+    "lane_source": "markings"
+   },
+   {
+    "id": 1,
+    "geo_direction": "away",
+    "theta": [
+     -55.5,
+     -3.5
+    ],
+    "n_lanes": 2,
+    "boundaries": [
+     {
+      "theta": -43.12,
+      "paint_cov": 0.54,
+      "runs": 7,
+      "solid": false
+     },
+     {
+      "theta": -24.62,
+      "paint_cov": 1.0,
+      "runs": 1,
+      "solid": true
+     }
+    ],
+    "lane_source": "markings"
+   }
+  ],
+  "lanes": [
+   {
+    "id": 1,
+    "carriageway": 0,
+    "n_points": 93,
+    "shoulder": false
+   },
+   {
+    "id": 2,
+    "carriageway": 0,
+    "n_points": 94,
+    "shoulder": false
+   },
+   {
+    "id": 3,
+    "carriageway": 1,
+    "n_points": 105,
+    "shoulder": false
+   },
+   {
+    "id": 4,
+    "carriageway": 1,
+    "n_points": 171,
+    "shoulder": false
+   },
+   {
+    "id": 5,
+    "carriageway": 1,
+    "n_points": 11,
+    "shoulder": true
+   }
+  ]
+ },
+ "camera_groups": {
+  "fixed": 43,
+  "broke": 23,
+  "groups": 106,
+  "multi_groups": 69,
+  "grouped_scenes": 250
+ },
+ "occupancy": {
+  "example_lane_means": {
+   "2": 0.183,
+   "4": 0.094,
+   "3": 0.055,
+   "1": 0.006
+  },
+  "hidden_share": 0.1631
+ }
+}

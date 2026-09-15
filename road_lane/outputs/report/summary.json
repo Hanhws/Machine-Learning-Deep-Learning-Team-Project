@@ -1,0 +1,116 @@
+{
+ "lane_count": {
+  "scenes": 287,
+  "extracted": 287,
+  "exact": 0.477,
+  "within1": 0.822,
+  "by_region": [
+   {
+    "region": "Buan",
+    "scenes": 28,
+    "exact": 0.5,
+    "within1": 1.0
+   },
+   {
+    "region": "Busan",
+    "scenes": 27,
+    "exact": 0.37,
+    "within1": 0.926
+   },
+   {
+    "region": "Cheonan",
+    "scenes": 18,
+    "exact": 0.444,
+    "within1": 1.0
+   },
+   {
+    "region": "Chungju",
+    "scenes": 24,
+    "exact": 0.708,
+    "within1": 0.958
+   },
+   {
+    "region": "Gangneung",
+    "scenes": 31,
+    "exact": 0.581,
+    "within1": 0.742
+   },
+   {
+    "region": "Hongcheon",
+    "scenes": 17,
+    "exact": 0.647,
+    "within1": 0.941
+   },
+   {
+    "region": "Inje",
+    "scenes": 1,
+    "exact": 1.0,
+    "within1": 1.0
+   },
+   {
+    "region": "Jeonju",
+    "scenes": 28,
+    "exact": 0.643,
+    "within1": 0.893
+   },
+   {
+    "region": "Jincheon",
+    "scenes": 8,
+    "exact": 1.0,
+    "within1": 1.0
+   },
+   {
+    "region": "Suwon",
+    "scenes": 105,
+    "exact": 0.305,
+    "within1": 0.657
+   }
+  ],
+  "note": "정답은 파일명 차로 수(OW/TW+숫자). 한방향(OW) 파일인데 반대편 도로가 보이는 화면도 있어 완전한 정답은 아님"
+ },
+ "direction": {
+  "test_cameras": [
+   "Busan_busanportbrdg5",
+   "Busan_busanportbrdg6",
+   "Chungju_danpyeong1brdg",
+   "Gangneung_nodong",
+   "Jeonju_jeongeub",
+   "Jeonju_sangpyeongoverpass"
+  ],
+  "n_test": 4633,
+  "resnet18_finetuned": {
+   "vehicle_acc": 0.8463,
+   "vehicle_f1": 0.8589,
+   "auc": 0.8937,
+   "carriageway_vote_acc": 0.9535,
+   "night_vehicle_acc": null,
+   "day_vehicle_acc": 0.8463
+  },
+  "clip_zero_shot": {
+   "vehicle_acc": 0.4975,
+   "vehicle_f1": 0.1222,
+   "auc": 0.6746,
+   "carriageway_vote_acc": 0.4884,
+   "night_vehicle_acc": null,
+   "day_vehicle_acc": 0.4975
+  },
+  "apply": {
+   "carriageways": 508,
+   "decided": 497,
+   "decided_by_cnn_only": 96,
+   "geo_cnn_agreement": 0.979
+  }
+ },
+ "hidden_congestion": {
+  "frames": 20691,
+  "road_free_but_some_lane_slow_or_jam": 0.1631,
+  "scenes_with_hidden_frames": 160,
+  "median_gap_pp": 3.1,
+  "note": "도로 전체로 평균 내면 '원활'인데 어느 한 차로는 '서행' 이하인 프레임 비율 (속도는 점유율로 추정, 미검증)"
+ },
+ "examples": [
+  "Suwon_CH05_20200721_2130_TUE_9m_NH_highway_OW5_sunny_FHD__view1",
+  "Suwon_CH06_20201010_1932_SAT_9m_NH_highway_OW5_sunny_FHD__view0",
+  "Suwon_CH03_20201010_2145_SAT_9m_NH_highway_OW5_sunny_FHD__view0"
+ ]
+}
