@@ -9,12 +9,12 @@
  ],
  "n_test": 4633,
  "resnet18_finetuned": {
-  "vehicle_acc": 0.8463,
-  "vehicle_f1": 0.8589,
-  "auc": 0.8937,
+  "vehicle_acc": 0.8433,
+  "vehicle_f1": 0.8571,
+  "auc": 0.8969,
   "carriageway_vote_acc": 0.9535,
   "night_vehicle_acc": null,
-  "day_vehicle_acc": 0.8463
+  "day_vehicle_acc": 0.8433
  },
  "clip_zero_shot": {
   "vehicle_acc": 0.4975,

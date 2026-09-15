@@ -1,0 +1,18 @@
+# 기준 결과(outputs/)를 만든 환경: macOS · Apple M5 (mps) · Python 3.13.9
+# 버전이 다르면 결과가 달라질 수 있다 → check_env.py 로 확인
+# NVIDIA GPU: torch·torchvision 은 https://pytorch.org 안내대로 "같은 버전"의 CUDA 빌드를 먼저 설치한 뒤 나머지를 설치
+torch==2.14.0
+torchvision==0.29.0
+ultralytics==8.4.152
+transformers==5.17.0
+huggingface_hub==1.31.0
+safetensors==0.8.0
+tokenizers==0.23.2
+opencv-python==5.0.0.93
+numpy==2.5.3
+scipy==1.18.1
+scikit-learn==1.9.1
+pandas==3.0.5
+matplotlib==3.11.2
+pillow==12.3.0
+PyYAML==6.0.3

@@ -11,6 +11,9 @@ __pycache__/
 road_lane/weights/
 road_lane/outputs/**/*.pt
 
+# 실험 결과 폴더 (ROAD_LANE_OUT=runs/이름)
+road_lane/runs/
+
 # road_lane 장면별 중간 산출물 (run_all.sh 로 다시 만듦)
 road_lane/outputs/s1/
 road_lane/outputs/s2/

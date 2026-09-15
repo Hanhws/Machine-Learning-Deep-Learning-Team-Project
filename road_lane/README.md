@@ -17,23 +17,80 @@
 | 파일명 `TW2`·`OW5` = 양방향/한방향 + 차로 수 | 차로 수 채점 기준으로 쓸 수 있음 | `s2_summary.csv` 의 `lane_exact` |
 | 카메라가 train/val/test 에 섞여 있음 | 같은 카메라로 학습·평가하면 과대평가 | 방향 CNN 은 카메라 단위로 분리 |
 
-## 실행
+## 실행 (팀원용: 기준과 같은 조건으로 돌리기)
+
+`outputs/` 의 요약 파일(차로 수·방향·점유율·지체 수치, PDF 수치의 출처)이 **기준 결과**다.
+장면별 중간 결과·이미지·가중치는 용량과 AI-Hub 재배포 제한 때문에 저장소에 없고, 아래 순서로 직접 만든다.
+
+### 1. 기준 환경 맞추기
+
+| 항목 | 기준 | 맞추는 방법 |
+|---|---|---|
+| 이미지 | 20,691장 · 226클립 | Google Drive 의 `images-*.zip` 6개를 `팀프로젝트/` 에 풀기 → `팀프로젝트/images/{train,val,test}` |
+| Python | 3.13.9 | `팀프로젝트/.venv` 가상환경 |
+| 라이브러리 | `requirements.txt` (버전 고정) | `pip install -r road_lane/requirements.txt` |
+| 차량 모델 | `yolo26m-seg.pt` (SHA-256 `common.YOLO_SHA256`) | 첫 실행 때 자동 다운로드 (ultralytics assets v8.4.0) |
+| 도로·차선 / CLIP | Hugging Face 커밋 고정 (`common.M2F_REVISION`, `CLIP_REVISION`) | 첫 실행 때 자동 다운로드 (약 0.8GB·1.6GB) |
+| 시드 | 0 (`common.SEED`) | 코드에 고정 |
+| 장치 | Apple M5 (mps) | 자동 선택 mps → cuda → cpu. **장치가 다르면 소수점 계산이 달라 결과가 조금 달라진다** |
 
 ```bash
 cd 팀프로젝트
-/opt/anaconda3/bin/python3.13 -m venv .venv      # Python 3.13
-.venv/bin/pip install torch torchvision ultralytics transformers opencv-python scikit-learn scipy matplotlib pillow pandas
+python3.13 -m venv .venv
+.venv/bin/pip install -r road_lane/requirements.txt   # NVIDIA 는 torch·torchvision 을 같은 버전 CUDA 빌드로 먼저 설치
 cd road_lane
-./run_all.sh          # 전체 (Apple M5 기준 약 2시간, 대부분 1단계)
-../.venv/bin/python report.py   # 발표용 수치·그림
+../.venv/bin/python check_env.py                      # 버전·장치·이미지 수·모델 파일이 기준과 같은지
 ```
 
-각 단계는 끝난 클립·장면을 건너뛰므로 멈춰도 다시 실행하면 이어서 한다.
+Windows 는 `.venv\Scripts\python.exe` 이고, `run_all.sh` 는 Git Bash 에서 `PY=../.venv/Scripts/python.exe` 를 붙여 실행한다.
+
+### 2. 전체 실행 → 기준과 비교
+
+```bash
+ROAD_LANE_OUT=runs/내이름 ./run_all.sh                  # 결과는 runs/내이름/ (기준 outputs/ 를 덮어쓰지 않음)
+../.venv/bin/python compare_runs.py outputs runs/내이름   # 기준과 지표·장면별 일치율 비교
+```
+
+- 시간: Apple M5 기준 약 2시간 (1단계 차량 검출이 약 1시간). GPU 가 없으면 훨씬 오래 걸린다.
+- 끝난 클립·장면·파일은 건너뛰므로 멈춰도 같은 명령으로 이어서 한다.
+- `run_all.sh` 순서는 기준 결과를 만든 순서와 같다. 방향 CNN 자동 라벨은 카메라 지도·곡선 보정 **전** 차로 지도로 만들고, 방향 적용은 최종 차로 지도에 한다.
+
+### 3. 파인튜닝 실험
+
+실험마다 결과 폴더를 새로 정하고, 끝나면 `compare_runs.py outputs runs/실험이름` 으로 기준과 비교한다.
+개선 폭이 아래 **재실행 차이**보다 커야 모델이 좋아진 것이다.
+
+| 바꿀 것 | 방법 | 다시 도는 단계 |
+|---|---|---|
+| 차량 모델 (팀 AI-Hub 폴리곤 YOLO, `car_seg_finetune.ipynb` 의 `best.pt`) | `ROAD_LANE_OUT=runs/yolo_best YOLO_WEIGHTS=/경로/best.pt ./run_all.sh` | 전부. 차량 클래스는 이름(car·bus·truck·motorcycle)으로 골라서 클래스 번호가 달라도 된다. 한 결과 폴더에 다른 가중치를 섞으면 1단계가 멈춘다 |
+| 방향 CNN 학습 설정 | `cp -R runs/내이름 runs/cnn_ep8` 후 `ROAD_LANE_OUT=runs/cnn_ep8` 로 `s2b_direction.py train eval apply --redo --epochs-full 8` → `s3_occupancy.py` → `s4_delay.py` → `report.py` | 2b 학습부터. 자동 라벨·test 카메라 분할은 시드 0 고정이라 실험끼리 같은 test 카메라로 비교된다 |
+| 도로·차로 기하 규칙 (`s2_road_lanes.py` 상수) | 새 결과 폴더에 이전 실험의 `s1/` 과 `s2/*/seg.png` 만 복사해 두고 `run_all.sh` (차량 검출·Mask2Former 는 건너뜀) | 2단계 기하 계산부터 |
+| 도로·차로 분할 모델 학습 (다음 단계 후보 1) | 아직 코드 없음. `s2/<장면>/lanes.npz` 의 `lane_map` 을 정답 마스크로 쓰면 된다 | — |
+
+같은 결과 폴더에서 설정만 바꿔 다시 돌리면 `lanes_single.*`·`lanes_straight.*` 백업이 옛 결과로 남아 2c·2d 가 새 결과를 무시한다. **설정을 바꾸면 결과 폴더도 새로** 정한다.
+
+### 재실행 차이 (2026-09-15, 기준 환경에서 확인)
+
+바뀐 코드로 기준 환경(Apple M5, `requirements.txt` 버전)에서 다시 돌려 `outputs/` 와 비교했다.
+
+| 확인한 것 | 결과 |
+|---|---|
+| 차량 검출·배경 사진·화면 분리 (진천·수원 2클립, 차량 4,817대) | 완전히 같음 (좌표·확률 차이 0) |
+| Mask2Former 도로 분할 (4장면) | 픽셀 100% 같음 |
+| 카메라 지도·곡선 보정 전 차로 지도 (287장면) | 차로 수·픽셀 100% 같음 |
+| 방향 CNN 자동 라벨 27,288장 · 카메라 분할 | 같음 |
+| 같은 시드로 방향 CNN 두 번 학습 | 가중치 완전히 같음 |
+| 최종 차로 수 · 방향 · 소통 등급 · 점유율 (287장면) | 모두 같음 |
+
+- 같은 환경이면 `compare_runs.py outputs runs/내이름` 의 차이가 모두 0 이어야 정상이다.
+- NVIDIA·CPU 등 다른 장치에서의 차이는 확인하지 못했다. 파인튜닝 전에 **설정을 바꾸지 않고 한 번 돌려** 자기 환경의 차이를 먼저 보고, 실험 결과는 그 폴더와 비교한다.
+- 기준 방향 CNN 은 시드를 고정하기 전에 학습한 모델이라, 시드 0 으로 다시 학습한 모델로 바꿨다. 시험 카메라 정확도 84.6→84.3%, AUC 0.894→0.897, 규칙·CNN 이 둘 다 판정한 도로 376→377개(98% 일치). 최종 방향과 3·4단계 결과는 달라지지 않았다.
 
 ## 단계
 
 | 파일 | 하는 일 | 주요 출력 |
 |---|---|---|
+| `check_env.py` | Python·라이브러리 버전, 장치, 이미지 수, 차량 모델 파일이 기준과 같은지 확인 (다르면 경고만) | 화면 출력 |
 | `s1_vehicles.py` | 차량 세그멘테이션, 차량을 지운 **배경 사진**(중앙값) | `outputs/s1/<clip>/` |
 | `s1b_views.py` | 화면 전환 감지(사진 위쪽 특징 KMeans) → 윤곽선 유사도 0.7 이상이면 같은 구도로 합침 | `views.json` |
 | `s2_road_lanes.py` | 배경 사진에 Mask2Former(1920 입력) → 소실점 → 각도(θ) 공간에서 분리대로 방향별 도로, 차선 도색 봉우리로 차로, 실선/점선·차량 이용률로 갓길 | `outputs/s2/<scene>/lanes_vis.jpg`, `s2_summary.csv` |
@@ -43,6 +100,7 @@ cd road_lane
 | `s3_occupancy.py` | 차량을 바닥점으로 차로에 배정 → 차로·방향·도로 전체 점유율 (원근 보정: 가까운 구간에서 1/차로폭² 가중) | `outputs/s3/lane_frames.csv`, `peak.jpg`, `timeseries.png` |
 | `s4_delay.py` | Greenshields: 속도 = 100·(1 − 점유율/정체점유율) → 1km 당 지체 → 원활/서행/정체 | `outputs/s4/scene_status.csv` |
 | `report.py` | 차로 수 정확도, 방향 성능, **숨은 정체**(도로 전체는 원활인데 한 차로는 서행 이하) 비율 | `outputs/report/` |
+| `compare_runs.py` | 두 결과 폴더(기준 `outputs` 와 실험)의 핵심 지표와 장면별 일치율 비교 | 화면 출력 |
 
 ## 한계 (발표 때 밝힐 것)
 

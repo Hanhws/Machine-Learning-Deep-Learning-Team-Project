@@ -30,9 +30,8 @@ import numpy as np
 from scipy.ndimage import distance_transform_edt, gaussian_filter1d
 from scipy.signal import find_peaks
 
-from common import OUT, Clip, list_clips
+from common import M2F_ID, M2F_REVISION, OUT, Clip, list_clips, pick_device
 
-M2F_ID = "facebook/mask2former-swin-large-mapillary-vistas-semantic"
 # Road, 차선 도색, 횡단보도 도색, Service Lane, Bike Lane, 맨홀, 배수구, 포트홀
 ROAD_IDS = [13, 24, 23, 14, 7, 41, 36, 43]
 MARKING_ID = 24
@@ -54,8 +53,9 @@ class Segmenter:
         from transformers import AutoImageProcessor, Mask2FormerForUniversalSegmentation
 
         self.torch = torch
-        self.proc = AutoImageProcessor.from_pretrained(M2F_ID)
-        self.model = Mask2FormerForUniversalSegmentation.from_pretrained(M2F_ID).to("mps").eval()
+        self.device = pick_device()
+        self.proc = AutoImageProcessor.from_pretrained(M2F_ID, revision=M2F_REVISION)
+        self.model = Mask2FormerForUniversalSegmentation.from_pretrained(M2F_ID, revision=M2F_REVISION).to(self.device).eval()
 
     def __call__(self, bgr: np.ndarray) -> np.ndarray:
         from PIL import Image
@@ -63,7 +63,7 @@ class Segmenter:
         h, w = bgr.shape[:2]
         img = Image.fromarray(cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB))
         # 기본 384×384 는 가는 점선이 끊긴다 → 원본 해상도(작업 해상도 2배)로 넣는다
-        inp = self.proc(images=img, return_tensors="pt", size={"height": h * 2, "width": w * 2}).to("mps")
+        inp = self.proc(images=img, return_tensors="pt", size={"height": h * 2, "width": w * 2}).to(self.device)
         with self.torch.no_grad():
             out = self.model(**inp)
         seg = self.proc.post_process_semantic_segmentation(out, target_sizes=[(h, w)])[0]

@@ -15,6 +15,10 @@
   eval.json                test 카메라 정확도 (차량 단위, 도로 단위 다수결, 주/야간, CLIP 비교)
   test_grid.jpg            test 사진 예측 확인용
   directions.json          장면·방향별 도로의 최종 방향
+
+build·train·eval 은 결과 파일이 이미 있으면 건너뛴다(--redo 로 다시). apply 는 매번 다시 한다.
+파인튜닝 실험: --epochs-head, --epochs-full, --seed 로 학습만 바꾼다. 자동 라벨 뽑기·카메라 분할은
+항상 SEED 로 고정해서 실험끼리 같은 test 카메라로 비교된다.
 """
 from __future__ import annotations
 
@@ -37,7 +41,7 @@ from torch import nn
 from torch.utils.data import DataLoader, Dataset
 from torchvision import models, transforms
 
-from common import OUT, Clip, frame_index, list_clips
+from common import CLIP_ID, CLIP_REVISION, OUT, SEED, Clip, frame_index, list_clips, pick_device, seed_everything
 
 CROP = 112
 MIN_BOX_PX = 28  # 원본 해상도 기준 짧은 변
@@ -45,7 +49,7 @@ MAX_PER_CARRIAGEWAY = 120
 ASSIGN_RADIUS_PX = 15
 CONFIDENT = 0.15  # |평균 확률 − 0.5| 가 이보다 크고
 MIN_VOTES = 8  # 차량이 이만큼 있어야 방향을 확정한다
-DEVICE = "mps" if torch.backends.mps.is_available() else "cpu"
+DEVICE = pick_device()
 OUT2 = OUT / "s2b"
 
 
@@ -87,7 +91,7 @@ def scenes(clips: dict[str, Clip]):
             yield sd, clips[clip_id]
 
 
-def build_crops(seed: int = 0) -> None:
+def build_crops(seed: int = SEED) -> None:
     clips = {c.clip_id: c for c in list_clips()}
     summary = pd.read_csv(OUT / "s2_summary.csv").set_index("scene_id")
     rng = np.random.default_rng(seed)
@@ -148,7 +152,7 @@ class Crops(Dataset):
         return self.tf(img), int(r["label"])
 
 
-def split(df: pd.DataFrame, seed: int = 0) -> pd.DataFrame:
+def split(df: pd.DataFrame, seed: int = SEED) -> pd.DataFrame:
     df = df.copy()
     g1 = GroupShuffleSplit(1, test_size=0.3, random_state=seed)
     tr, rest = next(g1.split(df, groups=df["camera"]))
@@ -176,12 +180,15 @@ def predict(model: nn.Module, df: pd.DataFrame) -> np.ndarray:
     return np.concatenate(probs) if probs else np.array([])
 
 
-def train(epochs_head: int = 2, epochs_full: int = 4) -> None:
+def train(epochs_head: int = 2, epochs_full: int = 4, seed: int = SEED) -> None:
     df = split(pd.read_csv(OUT2 / "crops.csv"))
     df.to_csv(OUT2 / "crops.csv", index=False)
     print(df.groupby("split").agg(n=("file", "size"), cameras=("camera", "nunique"), front=("label", "mean")))
+    # 출력층 초기값 · 섞는 순서 · 증강을 고정해 다시 학습했을 때의 차이를 줄인다
+    seed_everything(seed)
     model = make_model().to(DEVICE)
-    loader = DataLoader(Crops(df[df.split == "train"], train=True), batch_size=128, shuffle=True, num_workers=0)
+    loader = DataLoader(Crops(df[df.split == "train"], train=True), batch_size=128, shuffle=True, num_workers=0,
+                        generator=torch.Generator().manual_seed(seed))
     loss_fn = nn.CrossEntropyLoss()
     best, best_state = -1.0, None
     # 1단계: 사전학습 특징은 두고 출력층만, 2단계: 전체를 작은 학습률로
@@ -214,9 +221,8 @@ def train(epochs_head: int = 2, epochs_full: int = 4) -> None:
 def clip_probs(df: pd.DataFrame) -> np.ndarray:
     from transformers import CLIPModel, CLIPProcessor
 
-    mid = "openai/clip-vit-large-patch14"
-    model = CLIPModel.from_pretrained(mid).to(DEVICE).eval()
-    proc = CLIPProcessor.from_pretrained(mid)
+    model = CLIPModel.from_pretrained(CLIP_ID, revision=CLIP_REVISION).to(DEVICE).eval()
+    proc = CLIPProcessor.from_pretrained(CLIP_ID, revision=CLIP_REVISION)
     prompts = ["a photo of the front of a vehicle with headlights and windshield, driving toward the camera",
                "a photo of the rear of a vehicle with taillights and license plate, driving away from the camera"]
     out = []
@@ -320,10 +326,27 @@ def apply_all() -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("steps", nargs="*", default=["build", "train", "eval", "apply"])
+    ap.add_argument("steps", nargs="*", default=["build", "train", "eval", "apply"], help="build train eval apply")
+    ap.add_argument("--redo", action="store_true", help="결과 파일이 있어도 build·train·eval 을 다시 한다")
+    ap.add_argument("--epochs-head", type=int, default=2)
+    ap.add_argument("--epochs-full", type=int, default=4)
+    ap.add_argument("--seed", type=int, default=SEED, help="학습 시드 (자동 라벨·카메라 분할은 SEED 고정)")
     args = ap.parse_args()
+    if unknown := set(args.steps) - {"build", "train", "eval", "apply"}:
+        ap.error(f"모르는 단계: {sorted(unknown)}")
+    done = {"build": OUT2 / "crops.csv", "train": OUT2 / "resnet18_direction.pt", "eval": OUT2 / "eval.json"}
     for step in args.steps:
-        {"build": build_crops, "train": train, "eval": evaluate, "apply": apply_all}[step]()
+        if step in done and done[step].exists() and not args.redo:
+            print(f"{step}: {done[step].name} 이 있어 건너뜀 (다시 하려면 --redo)", flush=True)
+            continue
+        if step == "build":
+            build_crops()
+        elif step == "train":
+            train(args.epochs_head, args.epochs_full, args.seed)
+        elif step == "eval":
+            evaluate()
+        else:
+            apply_all()
 
 
 if __name__ == "__main__":
