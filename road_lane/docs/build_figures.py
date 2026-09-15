@@ -430,9 +430,20 @@ def fig_curves() -> None:
     save_img(sheet, "f24_random_check.jpg")
 
 
+OVERCOUNT_SCENES = ["Gangneung_wichon2brdg_20201021_1430_WED_15m_NH_highway_TW2_sunny_FHD",
+                    "Hongcheon_seomgangbrdg_20201021_0800_WED_15m_NH_highway_TW2_sunny_FHD"]
+
+
+def fig_overcount() -> None:
+    """다음 단계(7장): 수원 밖에서 가장 흔한 오류인 '차로를 많이 센' 사례."""
+    save_img(hstack([cv2.imread(str(OUT / "s2" / s / "lanes_vis.jpg")) for s in OVERCOUNT_SCENES], 300),
+             "f25_overcount.jpg")
+
+
 def main() -> None:
     FIG.mkdir(parents=True, exist_ok=True)
     fig_curves()
+    fig_overcount()
     setup_matplotlib()
     clips = {c.clip_id: c for c in list_clips()}
     fig_data(clips)

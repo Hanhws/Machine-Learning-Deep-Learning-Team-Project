@@ -75,6 +75,22 @@
   .src a { color: var(--ink2); text-decoration: none; }
   table.tight { margin: 1.5mm 0 3mm; }
   table.tight th, table.tight td { padding: 1.1mm 2mm; }
+
+  pre.cmd { font-family: "SF Mono", Menlo, monospace; font-size: 7.8pt; line-height: 1.5; background: var(--plane); border-radius: 4px; padding: 2mm 3mm; margin: 1.5mm 0 3mm; white-space: pre-wrap; word-break: normal; overflow-wrap: anywhere; break-inside: avoid; }
+  pre.cmd .c { color: var(--muted); }
+  pre.cmd .add { color: #0a7a0a; }
+  pre.cmd .del { color: #b3261e; }
+  pre.cmd.long { break-inside: auto; }
+  .todo { border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 6px; padding: 3mm 4mm 1mm; margin: 4mm 0; }
+  .todo h4 { font-size: 10.6pt; margin: 0 0 2mm; break-after: avoid; }
+  .todo h4 .n { display: inline-block; min-width: 5mm; color: var(--accent); }
+  .tag { display: inline-block; font-size: 7.8pt; font-weight: 600; color: var(--ink2); background: var(--plane); border-radius: 3px; padding: 0 1.8mm; margin-left: 1.5mm; vertical-align: 1.5px; }
+  .tag.rec { color: #fff; background: var(--accent); }
+  .todo table.part th { width: 14mm; }
+  ol.steps > li, ul.check > li { margin-bottom: 1.6mm; }
+  ul.check { list-style: none; padding-left: 0; }
+  ul.check > li { padding-left: 5mm; position: relative; }
+  ul.check > li::before { content: "☐"; position: absolute; left: 0; color: var(--accent); }
 </style>
 </head>
 <body>
@@ -609,9 +625,9 @@
     <div>
       <h3 style="margin-top:0">다음 단계 후보</h3>
       <ol>
-        <li><b>차로 지도 품질 올리기</b>: 2-11의 세 방향 중 선택 (추천: 화면마다 한 번 검수 + 모델 학습)</li>
-        <li><b>카메라 단위 지도에서 나빠진 23개 장면 줄이기</b>: 장면 자신의 결과가 그룹 결과보다 믿을 만하면 자기 결과 유지</li>
-        <li><b>사진 한 장으로 도로·차로 찾는 모델</b>: 자동 추출 결과 중 파일명과 차로 수가 맞는 장면만 정답으로 삼아 SegFormer 학습</li>
+        <li><b>차로 지도 품질 올리기</b>: 2-11의 세 방향 중 선택 (추천: 화면마다 한 번 검수 + 모델 학습) → <b>7장에 해야 할 일로 풀어 썼어요</b></li>
+        <li><b>카메라 단위 지도에서 나빠진 23개 장면 줄이기</b>: 장면 자신의 결과가 그룹 결과보다 믿을 만하면 자기 결과 유지 (7-3 할 일 4)</li>
+        <li><b>사진 한 장으로 도로·차로 찾는 모델</b>: 자동 추출 결과 중 파일명과 차로 수가 맞는 장면만 정답으로 삼아 SegFormer 학습 (7-3 할 일 6)</li>
         <li><b>대수 기준 vs 면적 기준 비교</b>: 트럭이 점유율을 얼마나 부풀리는지 확인 (원래 주제의 전제 검증)</li>
         <li><b>VDS로 검증·예측</b>: 속도 식 보정, 15~60분 예측 모델</li>
         <li><b>팀 차량 모델로 교체</b>: AI-Hub 폴리곤으로 파인튜닝한 1단계 모델 연결</li>
@@ -620,12 +636,236 @@
   </div>
 </section>
 
+<!-- ================================================================ 다음 단계: 도로·차로 더 잘 찾기 -->
+<section>
+  <h2>7. 다음 단계 — 도로·차로를 더 잘 찾으려면</h2>
+  <p class="lead">6장 다음 단계 후보 1~3을 <b>바로 손댈 수 있게</b> 풀어 쓴 장이에요. <b>① 어디서 틀렸는지 찾고(7-1) → ② 정해진 절차로 실험하고(7-2) → ③ 할 일 목록에서 하나 골라요(7-3)</b>. 줄 번호는 2026-09-15 코드 기준이에요.</p>
+
+  <h3><span class="no">7-1</span>어디서 틀렸는지 찾기 — 차로 지도는 관문 7개를 지나요</h3>
+  <p>앞 관문이 틀리면 뒤는 전부 틀려요. 그래서 틀린 장면은 <b>①부터 순서대로</b> 확인해요. 그림과 파일은 모두 <code>결과폴더/s2/장면이름/</code> 안에 있어요.</p>
+  <table class="tight">
+    <thead><tr><th style="width:14%">관문</th><th style="width:26%">어디서 보나</th><th style="width:27%">틀리면 이렇게 보여요</th><th>건드릴 곳 (따로 적지 않으면 <code>s2_road_lanes.py</code> 줄)</th></tr></thead>
+    <tbody>
+      <tr><td><b>① 도로 분할</b><br><span class="note">Mask2Former</span></td><td><code>lanes_vis.jpg</code>의 색칠 범위</td><td>도로 일부가 안 칠해지거나, 흙·풀밭·진입로까지 칠해짐</td><td>36줄 <code>ROAD_IDS</code>(도로로 볼 클래스), 39줄 <code>SEPARATOR_IDS</code>(분리대로 볼 클래스)</td></tr>
+      <tr><td><b>② 소실점</b></td><td>흰 경계선이 모이는 빨간 원, <code>lanes.json</code>의 <code>vp_support</code>(1에 가까울수록 확실)</td><td>흰 선이 실제 차선과 다른 각도로 뻗음. <code>vp_support</code> 하위 1/3 장면은 정확 22%</td><td>111줄 직선 허용 각도 1.5°, 106줄 화면 아래쪽 가중치, 148줄 "도로 가장자리 선까지 쓸지" 기준 400</td></tr>
+      <tr><td><b>③ 방향별 도로</b></td><td>붉은 계열(다가옴)·푸른 계열(멀어짐) 색</td><td>양쪽 도로가 한 색 계열로 붙거나, 한 도로가 둘로 끊김</td><td>42줄 <code>ROAD_COVER_MIN</code> 0.3, 43줄 <code>SEP_COVER_CUT</code> 0.1</td></tr>
+      <tr><td><b>④ 차로 경계</b></td><td>흰 경계선, <code>lanes.json</code>의 <code>boundaries</code> (<code>paint_cov</code> = 선을 따라 도색이 보이는 비율)</td><td>얇은 띠로 쪼개짐(많이 셈) / 두 차로가 한 칸(적게 셈)</td><td>326줄 봉우리 찾기, 208줄 좁은 칸 기준 0.4, 46줄 <code>PAINT_MIN_COV</code> 0.15, 166줄 길쭉함 2.5, 333~338줄 차량 대안</td></tr>
+      <tr><td><b>⑤ 갓길 빼기</b></td><td>회색 칸, <code>lanes.json</code>의 <code>shoulder</code></td><td>갓길·빗금 구역·합류 차로가 색칠됨 / 차가 다니는 칸이 회색</td><td>356줄 이용률 한도, 47줄 <code>SOLID_COV</code> 0.85(실선 판정)</td></tr>
+      <tr><td><b>⑥ 카메라 단위 지도</b><br><span class="note">2c</span></td><td><code>lanes_single_vis.jpg</code>(적용 전)와 <code>lanes_vis.jpg</code> 비교</td><td>적용 전엔 맞았는데 적용 후 틀림 (23장면)</td><td><code>s2c_camera_groups.py</code> 151줄 <code>group_geometry</code>, 251줄 <code>apply</code></td></tr>
+      <tr><td><b>⑦ 곡선 보정</b><br><span class="note">2d</span></td><td><code>lanes_straight_vis.jpg</code>(보정 전)와 비교</td><td>경계가 차선을 따라가다 튐</td><td><code>s2d_curves.py</code>. 차로 <b>모양</b>만 바꾸므로 차로 수 문제면 건드리지 않아요</td></tr>
+    </tbody>
+  </table>
+
+  <div class="grid-65">
+    <div>
+      <table class="tight">
+        <thead><tr><th>방향별 도로 (최종 결과)</th><th class="num">개수</th><th class="num">정확</th><th class="num">많이 셈</th><th class="num">적게 셈</th></tr></thead>
+        <tbody>
+          <tr><td>수원 제외</td><td class="num">340</td><td class="num">73%</td><td class="num"><b>17%</b></td><td class="num">10%</td></tr>
+          <tr><td>수원</td><td class="num">129</td><td class="num">29%</td><td class="num">7%</td><td class="num"><b>64%</b></td></tr>
+        </tbody>
+      </table>
+      <p class="note">파일 이름 차로 수와 비교했고, 방향별 도로 하나를 한 개로 셌어요 (장면 단위 48%와 세는 기준이 달라요).</p>
+    </div>
+    <div class="box">
+      <h4>틀린 모습이 둘로 갈려요</h4>
+      <ul class="note">
+        <li><b>수원 밖은 많이 세요.</b> 많이 센 59개 중 39개는 갓길을 하나도 안 뺀 도로예요. 절반(31개)이 강릉 위촌2교·부안 예지·홍천 섬강교·부산 4교·충주 상우1교에 몰려 있어요 → <b>할 일 2·3</b></li>
+        <li><b>수원은 적게 세요.</b> 여러 차로가 큰 칸 하나로 합쳐지고(2개 이상 적게 35%), 소실점 강도 중앙값이 0.65(맞은 도로 0.98)라 관문 ②부터 흔들려요 → <b>할 일 5</b></li>
+        <li>수원 밖에서 적게 센 33개 중 15개는 차로가 <b>1개</b>로 나와요 → <b>할 일 1</b></li>
+      </ul>
+    </div>
+  </div>
+  <figure>
+    <img src="fig/f25_overcount.jpg" alt="차로를 많이 센 두 장면">
+    <figcaption>많이 센 예 (둘 다 파일 이름은 방향마다 2차로). 왼쪽 강릉 위촌2교: 두 도로가 3개·4개로 나뉘었어요. 오른쪽 홍천 섬강교: 멀어지는 도로 오른쪽 초록 칸 안에 빗금 도색이 보이는데(합류 구간으로 보여요) 차로로 셌어요.</figcaption>
+  </figure>
+</section>
+
+<section class="cont">
+  <h3><span class="no">7-2</span>실험하는 법 — 모든 할 일에 공통</h3>
+  <p>차량 검출(약 1시간)과 Mask2Former(장면당 약 5초)는 차로 코드를 고쳐도 결과가 같아서 다시 돌리지 않아요. 그 결과만 새 폴더에 복사하면 <b>도로·차로 단계(2 → 2c → 2d)가 약 4분</b>, 방향 적용·3·4단계까지 합쳐 약 7분(Apple M5)이면 끝나요.</p>
+  <ol class="steps">
+    <li><b>기준 폴더 준비</b>: README대로 <code>ROAD_LANE_OUT=runs/내이름 ./run_all.sh</code>를 한 번 끝까지 돌린 폴더예요. 이미 있으면 건너뛰어요.</li>
+    <li><b>실험 폴더 만들기</b>: 실험마다 <b>새 이름</b>을 써요. 같은 폴더에서 다시 돌리면 2c·2d가 옛 백업(<code>lanes_single.*</code>, <code>lanes_straight.*</code>)을 읽어서 고친 결과가 무시돼요.
+<pre class="cmd">cd 팀프로젝트/road_lane
+BASE=runs/내이름  EXP=runs/실험이름
+mkdir -p $EXP &amp;&amp; cp -R $BASE/s1 $BASE/s2b $EXP/
+for d in $BASE/s2/*/; do n=$(basename $d); mkdir -p $EXP/s2/$n; cp $d/seg.png $EXP/s2/$n/; done</pre></li>
+    <li><b>코드 고치기</b>: 7-3 할 일 중 <b>하나만</b> 고쳐요.</li>
+    <li><b>다시 돌리고 기준과 비교</b> (Windows는 <code>PY=../.venv/Scripts/python.exe</code>)
+<pre class="cmd">export ROAD_LANE_OUT=$EXP  PY=../.venv/bin/python
+$PY s2_road_lanes.py                  <span class="c"># 2   끝에 2c 적용 전 정확도가 나와요</span>
+$PY s2c_camera_groups.py --apply G    <span class="c"># 2c  카메라 단위 지도</span>
+$PY s2d_curves.py apply               <span class="c"># 2d  곡선 보정</span>
+$PY s2b_direction.py apply            <span class="c"># 방향 적용 (학습은 다시 안 해요)</span>
+$PY s3_occupancy.py &amp;&amp; $PY s4_delay.py &amp;&amp; $PY report.py
+$PY compare_runs.py $BASE $EXP        <span class="c"># 차로 수·방향·혼잡도 지표 비교</span></pre></li>
+    <li><b>바뀐 장면 그림 보기</b>: 차로 수가 바뀐 장면 목록을 뽑아서, <b>좋아진 것과 나빠진 것을 5개 이상씩</b> <code>$EXP/s2/장면이름/lanes_vis.jpg</code>로 열어 봐요.
+<pre class="cmd">$PY -c "import pandas as pd,sys; a,b=[pd.read_csv(f+'/s2_summary.csv').set_index('scene_id') for f in sys.argv[1:]]; d=a.main_lanes.astype(str)!=b.main_lanes.reindex(a.index).astype(str); print(pd.DataFrame({'token':a.token,'before':a.main_lanes,'after':b.main_lanes.reindex(a.index)})[d].to_string())" $BASE $EXP</pre></li>
+  </ol>
+  <div class="box accent">
+    <h4>채택 기준</h4>
+    <ul class="note">
+      <li><b>정확과 ±1 이내가 둘 다 떨어지지 않아야</b> 채택해요. 하나만 오르면 다른 쪽을 망친 거예요. 2-6의 "같은 높이 차로 폭은 같다" 규칙은 ±1을 96% → 83%로 떨어뜨려서 되돌렸어요.</li>
+      <li><b>수원 제외 수치를 따로</b> 봐요. 수원이 105장면이라 전체 수치를 좌우해요 (<code>s2_summary.csv</code>의 <code>camera</code>가 <code>Suwon</code>으로 시작).</li>
+      <li>파일 이름 차로 수에 맞춰 상수를 여러 번 조정하면 이 데이터에만 맞는 규칙이 돼요 → <b>할 일 0의 채점표</b>로 한 번 더 확인해요.</li>
+      <li>이 Mac에서는 같은 설정으로 다시 돌리면 차이가 0이었어요(README "재실행 차이"). 같은 컴퓨터라면 <b>한 장면이라도 바뀐 건 코드 때문</b>이에요.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cont">
+  <h3><span class="no">7-3</span>해야 할 일 — 위에서부터</h3>
+  <table class="tight">
+    <thead><tr><th style="width:4%">#</th><th style="width:32%">할 일</th><th style="width:25%">고치는 오류</th><th style="width:13%">시간</th><th>효과</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td><b>채점표 만들기</b> (사람이 센 정답)</td><td>파일 이름 정답의 오류, 과적합</td><td>사람 약 30분</td><td>모든 실험의 기준</td></tr>
+      <tr><td>1</td><td><b>흐린 경계 삭제 순서 바꾸기</b></td><td>차로가 1개로 나옴</td><td>코드 5분</td><td><b>확인함</b>: ±1 82.2 → 84.0%, 나빠진 장면 0</td></tr>
+      <tr><td>2</td><td><b>갓길·빗금·합류 칸 빼기</b></td><td>많이 셈 (수원 밖 1위)</td><td>반나절</td><td>미확인</td></tr>
+      <tr><td>3</td><td><b>가짜 경계 줄이기</b></td><td>얇은 띠로 쪼개짐</td><td>반나절</td><td>미확인</td></tr>
+      <tr><td>4</td><td><b>2c에서 자기 결과 지키기</b></td><td>2c로 나빠진 23장면</td><td>반나절</td><td>미확인</td></tr>
+      <tr><td>5</td><td><b>수원은 따로 다루기</b></td><td>적게 셈 (수원)</td><td>1~2시간</td><td>—</td></tr>
+      <tr><td>6</td><td><b>사람 검수 + 분할 모델 학습</b></td><td>전부</td><td>1~2일</td><td>가장 확실</td></tr>
+    </tbody>
+  </table>
+  <p class="note">발표(9/22) 전이라면 <b>0 → 1 → 2나 3 중 하나 → 5</b>, 발표 뒤에 4·6을 추천해요. 할 일 0은 6명이 나누면 한 사람당 5분이에요.</p>
+
+  <div class="todo">
+    <h4><span class="n">0</span>채점표 만들기 — 파일 이름 대신 사람이 센 정답<span class="tag">사람 30분</span></h4>
+    <table class="part">
+      <tr><th>왜</th><td>파일 이름 차로 수는 불완전한 정답이에요(OW인데 반대편 도로가 보이는 화면 등). 파일 이름 기준 정확도는 48%인데, 2-11에서 무작위 24장면을 눈으로 보니 제대로 된 건 약 6개(25%)였어요. 같은 정답에 맞춰 여러 번 고치면 점수만 올라가기도 해요.</td></tr>
+      <tr><th>얼마나</th><td>화면이 서로 다른 장면은 <b>106개</b>뿐이에요(2c가 묶은 그룹 수). 그룹마다 기준 장면 하나만 세면 같은 그룹의 287장면 모두에 적용돼요.</td></tr>
+    </table>
+    <ul class="check">
+      <li><code>$BASE/s2c_groups.json</code>에서 그룹마다 <code>"ref"</code> 장면 이름을 모아요 (106개).</li>
+      <li>그 장면의 <b>차 없는 배경 사진</b>을 열어요: <code>$BASE/s1/클립이름/background.jpg</code>. 장면 이름 끝에 <code>__view0</code>이 붙어 있으면 <code>view0/background.jpg</code>예요. 색칠된 결과 그림을 보면 판단이 흔들리니 보지 않아요.</li>
+      <li><code>road_lane/truth.csv</code>에 한 줄씩 적어요. <b>본선만</b>, <b>갓길 빼고</b>, <b>화면 왼쪽 도로부터</b> <code>/</code>로 이어서 적고, 헷갈리면 <code>?</code>를 적어요.
+<pre class="cmd">scene_id,lanes
+Buan_daemog_20201019_1730_MON_15m_NH_highway_TW2_sunny_FHD,2/2
+Busan_busanportbrdg4_20201027_1530_TUE_8m_NH_highway_TW3_sunny_FHD,?</pre></li>
+      <li>아래를 <code>road_lane/score_truth.py</code>로 저장하고 <code>$PY score_truth.py $BASE $EXP</code>로 채점해요.
+<pre class="cmd long">"""사람이 센 채점표로 채점:  python score_truth.py runs/내이름 runs/실험이름"""
+import json, sys
+from pathlib import Path
+import pandas as pd
+
+truth = pd.read_csv("truth.csv", dtype=str)       # scene_id,lanes (예: 2/2, 모르면 ?)
+truth = truth[truth.lanes != "?"].set_index("scene_id").lanes
+groups = json.loads((Path(sys.argv[1]) / "s2c_groups.json").read_text())
+want = {m["scene_id"]: truth[g["ref"]]            # 기준 장면 정답을 그룹 전체에
+        for g in groups if g["ref"] in truth for m in g["members"]}
+
+for out in sys.argv[1:]:
+    hit = {True: [], False: []}                   # 수원이면 True 쪽에
+    for sid, lanes in want.items():
+        geo = json.loads((Path(out) / "s2" / sid / "lanes.json").read_text())
+        k = lanes.count("/") + 1                  # 정답에 적은 도로 수
+        cws = sorted(geo.get("carriageways", []), key=lambda c: -c["n_points"])[:k]
+        cws = sorted(cws, key=lambda c: c["theta"][0])   # 화면 왼쪽부터
+        got = "/".join(str(c["n_lanes"]) for c in cws)
+        hit[sid.startswith("Suwon")].append(got == lanes)
+    a, s = hit[True] + hit[False], hit[False]
+    print(f"{out}: 정확 {sum(a)}/{len(a)} ({sum(a)/len(a):.0%}), "
+          f"수원 제외 {sum(s)}/{len(s)}")</pre></li>
+    </ul>
+  </div>
+
+  <div class="todo">
+    <h4><span class="n">1</span>흐린 경계 삭제를 차량 대안보다 먼저 하기<span class="tag rec">바로 적용 가능</span><span class="tag">코드 5분</span></h4>
+    <table class="part">
+      <tr><th>문제</th><td>지금 코드는 ⓐ 차선 봉우리가 <b>하나도 없을 때만</b> 차량 바닥점으로 차로를 나누고(333줄), ⓑ 그다음에 배경 사진에서 도색이 안 보이는 가짜 경계를 지워요(340~343줄). 봉우리는 있었지만 전부 가짜여서 ⓑ에서 다 지워지면, 차량 대안을 써 보지도 못하고 <b>차로 1개</b>로 끝나요.</td></tr>
+      <tr><th>고치기</th><td>ⓑ를 ⓐ 앞으로 옮겨요. <code>s2_road_lanes.py</code> 329~343줄 (초록 줄 추가, 빨간 줄 삭제):</td></tr>
+    </table>
+<pre class="cmd">        bounds = drop_narrow(bounds, strength)
+        c["lane_source"] = "markings"
+<span class="add">+       bounds = [bounds[0]] + [
++           t for t in bounds[1:-1]
++           if boundary_paint(t, theta, radius, road_zone, gray, asphalt)[0] &gt;= PAINT_MIN_COV
++       ] + [bounds[-1]]</span>
+        cpts = pt_theta[pt_ok &amp; (pt_theta &gt;= tmin) &amp; (pt_theta &lt; tmax)]
+        if len(bounds) == 2 and len(cpts) &gt;= 30:
+            ...                                        <span class="c"># 차량 대안은 그대로</span>
+<span class="del">-       if c["lane_source"] == "markings":          # 340~343줄 네 줄 모두
+-           # 배경 사진에서 도색이 거의 안 보이는 경계(…)는 없앤다
+-           bounds = [bounds[0]] + [t for t in bounds[1:-1]
+-                                   if boundary_paint(…)[0] &gt;= PAINT_MIN_COV] + [bounds[-1]]</span></pre>
+    <table class="tight">
+      <thead><tr><th>이 문서를 쓰며 해 본 결과 (파일 이름 기준, 287장면)</th><th class="num">정확</th><th class="num">±1 이내</th><th>바뀐 장면</th></tr></thead>
+      <tbody>
+        <tr><td>2c 적용 전 (2단계만)</td><td class="num">40.8 → <b>43.6%</b></td><td class="num">76.7 → <b>79.8%</b></td><td>22개: 새로 정확 8, 정확하던 장면이 틀린 경우 0</td></tr>
+        <tr><td>최종 (2c·2d까지)</td><td class="num">47.7 → <b>48.1%</b></td><td class="num">82.2 → <b>84.0%</b></td><td>9개: 새로 정확 1, 새로 ±1 5, 나빠진 장면 0</td></tr>
+      </tbody>
+    </table>
+    <p class="note">최종에서 효과가 작아지는 건 2c가 그룹 기준 장면의 지도를 함께 쓰기 때문이에요. 바뀐 9장면 중 8개가 수원이에요(수원 ±1 65.7 → 70.5%). 방향·혼잡도까지 돌려 <code>compare_runs.py</code>로 보면 방향이 정해진 도로 97.8 → 97.6%, 숨은 정체 프레임 16.3 → 16.7%이고 소통 등급이 같은 장면·그룹이 99.5%라 뒤 단계는 거의 그대로예요. <b>남은 일</b>: 실제 코드에 반영 → 자기 컴퓨터에서 7-2 절차로 한 번 더 확인 → 기준 <code>outputs/</code>와 README 수치 갱신.</p>
+  </div>
+
+  <div class="todo">
+    <h4><span class="n">2</span>갓길·빗금 구역·합류 칸을 차로에서 빼기<span class="tag">반나절</span></h4>
+    <p>수원 밖에서 가장 흔한 오류예요(7-1 그림). 원인이 카메라마다 달라서, 먼저 <b>위촌2교·예지·섬강교·부산 4교·상우1교의 <code>lanes_vis.jpg</code></b>를 열고 아래 표에서 맞는 줄을 찾아요.</p>
+    <table class="tight">
+      <thead><tr><th style="width:33%">그림에서 보이는 것</th><th>건드릴 곳 (<code>s2_road_lanes.py</code>)</th></tr></thead>
+      <tbody>
+        <tr><td>가장자리 칸이 갓길인데 흰 점(차량 바닥점)이 조금 찍혀 있음</td><td>356줄 <code>outer_lim, median_lim = (0.6, 0.2), (0.4, 0.1)</code>. 가장 붐비는 차로 대비 차가 이 비율보다 적으면 갓길이에요. <code>outer_lim</code>은 바깥쪽(운전자 오른쪽), <code>median_lim</code>은 중앙분리대 쪽이고, 괄호 앞은 안쪽 경계가 실선일 때, 뒤는 점선일 때예요. 점선 쪽 0.2·0.1이 느슨해요 → 0.3·0.2로 올려 봐요. <b>주의</b>: 추월차로는 원래 덜 붐벼서 진짜 차로가 빠질 수 있어요</td></tr>
+        <tr><td>갓길과 차로 사이가 실선인데 <code>lanes.json</code>의 <code>solid</code>가 <code>false</code></td><td>47줄 <code>SOLID_COV</code> 0.85 → 0.75. 실선으로 인정되면 한도가 0.6으로 넉넉해져 갓길로 빠지기 쉬워요. 흐린 날 도색을 못 잡으면 229줄 밝기 기준 <code>asphalt * 1.25 + 8</code>을 낮춰요</td></tr>
+        <tr><td>가장자리 칸 안에 <b>빗금(사선) 도색</b></td><td><b>새 단서 추가</b>: 칸 안 도색 중 소실점 방향이 아닌 조각의 비율. 166줄 <code>elongated_markings</code>가 버리는 조각(<code>keep</code>이 False)을 칸별로 세서, 많으면 갓길로 봐요. 넣을 곳은 360~369줄 갓길 반복문의 조건이에요</td></tr>
+        <tr><td>본선 옆에 붙었다가 사라지는 <b>합류·진출 차로</b></td><td>규칙으로 빼기 어려워요. 채점표(할 일 0)에서 본선만 세고, 이런 카메라는 할 일 6(사람 검수)으로 고치는 게 빨라요</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="todo">
+    <h4><span class="n">3</span>가짜 경계 줄이기 (얇은 띠로 쪼개짐)<span class="tag">반나절</span></h4>
+    <p><b>먼저 근거를 봐요.</b> 쪼개진 장면의 <code>lanes.json</code> → <code>carriageways[].boundaries</code>에서 가짜 경계의 <code>paint_cov</code>(도색이 보이는 비율)와 <code>runs</code>(끊긴 토막 수)를 적고, 그 도로의 <code>lane_source</code>도 봐요. 조사해 보니 <b>수원 밖에서 도색이 거의 없는(<code>paint_cov</code> 0.15 미만) 경계 37개가 전부 차량 대안(<code>lane_source</code> = <code>vehicles</code>)에서</b> 나왔고, 그중 27개가 많이 센 도로에 있었어요(부산 1·4·6교에 30개).</p>
+    <table class="tight">
+      <thead><tr><th style="width:31%">상수 (<code>s2_road_lanes.py</code>)</th><th style="width:33%">뜻</th><th>이렇게 바꿔 보기</th></tr></thead>
+      <tbody>
+        <tr><td>333~338줄 차량 대안</td><td>도색 경계가 없으면 차량이 몰린 각도의 봉우리 사이를 경계로 씀. <b>도색 검사를 안 거쳐요</b></td><td>335줄 봉우리 기준 0.15 → 0.3, 또는 새로 만든 경계도 <code>boundary_paint</code>로 도색이 조금(예: 0.1 이상)은 있어야 인정. <b>할 일 1을 하면 차량 대안이 더 자주 동작</b>하니 같이 봐요</td></tr>
+        <tr><td>46줄 <code>PAINT_MIN_COV = 0.15</code></td><td>경계선을 따라 도색이 이 비율보다 적게 보이면 삭제</td><td>가짜 경계 값 바로 위로 (예: 0.2~0.25). 진짜 흐린 점선도 지워질 수 있어요</td></tr>
+        <tr><td>326줄 <code>peak_positions(…, 1.5, 0.12, …/12)</code></td><td>1.5 = 스무딩 폭, 0.12 = 가장 높은 봉우리 대비 이보다 낮으면 무시, /12 = 봉우리 사이 최소 간격(도로 폭의 1/12)</td><td>0.12 → 0.2 (약한 봉우리 무시), /12 → /8 (가까이 붙은 봉우리 무시)</td></tr>
+        <tr><td>208줄 <code>0.4 * np.median(widths)</code></td><td>중앙값 폭의 40%보다 좁은 칸의 경계를 없앰</td><td>0.5~0.6. 단 폭을 <b>각도</b>로 재서 화면 옆쪽 칸은 원래 좁게 나와요 → 같은 행의 픽셀 폭(tan 차이)으로 재면 더 공정해요</td></tr>
+        <tr><td>166줄 <code>&gt;= 2.5</code></td><td>소실점 방향으로 길이 ÷ 폭이 이 이상인 도색만 경계 후보</td><td>노면 글씨·화면 자막이 경계로 잡히면 3~4</td></tr>
+      </tbody>
+    </table>
+    <p class="note"><b>한 번에 하나만</b> 바꾸고 7-2 채택 기준으로 확인해요. 쪼개짐을 줄이는 변경은 진짜 흐린 점선도 지울 수 있어서, 적게 세는 오류가 늘었는지 꼭 봐요.</p>
+  </div>
+
+  <div class="todo">
+    <h4><span class="n">4</span>카메라 단위 지도(2c)에서 자기 결과 지키기<span class="tag">반나절</span></h4>
+    <table class="part">
+      <tr><th>문제</th><td>2c는 그룹 기준 장면의 지도를 그룹 전체에 씌워서, 기준 장면이 틀리면 그룹 전체가 틀려요(부안 예지 2/2 → 3/1). 나빠진 장면은 <code>s2c_compare.csv</code>에서 <code>exact_single</code>이 True이고 <code>exact_G</code>가 False인 줄이에요.</td></tr>
+      <tr><th>고치기</th><td><code>s2c_camera_groups.py</code> 251줄 <code>apply()</code>에서 장면마다 그룹 결과(<code>geo</code>)를 저장하기 직전에 판단해요. 3장면 이상 그룹이면 각 장면의 <b>자체 결과</b>(2단계 <code>lanes.json</code>, 백업 뒤엔 <code>lanes_single.json</code>)의 방향별 차로 수로 다수결을 내요. 그룹 결과가 다수결과 다르고 이 장면 자체 결과가 다수결과 같으면 자체 결과를 그대로 둬요.</td></tr>
+      <tr><th>금지</th><td><b>파일 이름 차로 수로 고르면 안 돼요.</b> 채점 기준을 답으로 쓰는 거라 점수만 올라가요. 소실점 강도·밤 여부·그룹 다수결처럼 정답을 보지 않는 단서만 써요.</td></tr>
+    </table>
+  </div>
+
+  <div class="todo">
+    <h4><span class="n">5</span>수원은 규칙으로 억지로 맞추지 않기<span class="tag">1~2시간</span></h4>
+    <table class="part">
+      <tr><th>왜</th><td>수원은 세로 화면·회전형 카메라에 도로가 휘고 진출로가 갈라져서 "소실점 하나" 가정 자체가 안 맞아요(소실점 강도 중앙값 0.65). 규칙을 수원에 맞추면 다른 지역이 나빠지기 쉬워요.</td></tr>
+      <tr><th>할 일</th><td>① 발표 수치는 지금처럼 <b>전체와 수원 제외를 같이</b> 보여줘요. ② 수원은 화면이 <b>26개</b>(105장면)뿐이라, 할 일 6의 사람 검수로 경계를 직접 그리는 게 가장 빨라요(화면당 1~2분). ③ 규칙으로 해 보고 싶다면 <code>lane_geometry(…, row_min=…)</code>(234줄, 화면 아래쪽만 사용)를 <b>수원에만</b> 켜 봐요. 전체에 켰을 때는 정확 41 → 28%로 나빠졌어요(2-8 시도 1).</td></tr>
+    </table>
+  </div>
+
+  <div class="todo">
+    <h4><span class="n">6</span>사람 검수 + 사진 한 장으로 찾는 분할 모델<span class="tag rec">가장 확실</span><span class="tag">1~2일</span></h4>
+    <p>2-11 보강 방향 3과 6장 다음 단계 후보 3을 합친 거예요. 고정 카메라라서 <b>화면 106개만 고치면 287장면(사진 2만 장) 전체</b>에 적용돼요.</p>
+    <ol class="steps">
+      <li><b>틀린 화면 추리기</b>: 할 일 0의 채점표에서 틀린 그룹만 골라요(지금 수준이면 절반 이상).</li>
+      <li><b>경계 그리기 도구</b>(반나절): 배경 사진을 띄우고 실제 차선마다 선 위의 점을 몇 개 클릭 → 선과 선 사이를 차로로, 가장자리 칸은 갓길로 표시해요. OpenCV <code>setMouseCallback</code>이나 Jupyter 위젯이면 충분해요. 결과를 지금과 같은 형식(<code>lanes.npz</code>의 <code>lane_map</code>: 0 = 차로 아님, k = 차로 번호 / <code>lanes.json</code>)으로 저장하면 뒤 단계를 그대로 쓸 수 있어요.</li>
+      <li><b>그룹 전체에 복사</b>: <code>s2c_groups.json</code>의 <code>dx</code>·<code>dy</code>만큼 옮겨서 같은 그룹 장면에 저장해요(2c의 <code>for_member</code> 함수, 175줄이 같은 일을 해요) → 방향 적용·3·4단계를 다시 돌려요.</li>
+      <li><b>모델 학습</b>(1~2일, 새 카메라에도 쓰고 싶을 때): 입력은 배경 사진, 정답은 픽셀마다 [도로 아님 / 차로 / 갓길 / 차로 경계선(5px)]. <b>SegFormer-B0</b>(<code>nvidia/mit-b0</code>, HuggingFace, D08)나 U-Net을 써요. 화면 106장은 적으니 좌우 뒤집기·밝기·자르기 증강을 쓰고, 방향 CNN처럼 <b>카메라 단위로</b> 학습·시험을 나눠요.</li>
+    </ol>
+    <p class="note">자동 결과만으로 학습하는 방법(6장 후보 3)은 자동 결과의 틀린 경계까지 배워요. 사람이 고친 정답을 쓰면 그 문제가 없어요.</p>
+  </div>
+</section>
+
 <!-- ================================================================ 국내 서비스 비교 -->
 <section>
-  <h2>7. 국내 서비스와 비교</h2>
+  <h2>8. 국내 서비스와 비교</h2>
   <p class="lead">교통 혼잡·소요시간 예측은 국내에서 이미 여러 곳이 쓰고 있어요. 모델을 공개한 곳은 없고, <b>앱·웹 화면, 결과 데이터 API, 지자체 조달</b>로만 쓸 수 있어요.</p>
 
-  <h3><span class="no">7-1</span>국내에서 쓰이는 것</h3>
+  <h3><span class="no">8-1</span>국내에서 쓰이는 것</h3>
   <table class="tight">
     <thead><tr><th style="width:12%">종류</th><th style="width:16%">대표</th><th style="width:44%">방식과 수준 (각 회사·기관 발표)</th><th>쓰는 방법</th></tr></thead>
     <tbody>
@@ -635,7 +875,7 @@
     </tbody>
   </table>
 
-  <h3><span class="no">7-2</span>수준 비교</h3>
+  <h3><span class="no">8-2</span>수준 비교</h3>
   <table class="tight">
     <thead><tr><th style="width:16%">항목</th><th style="width:44%">기존 서비스</th><th>우리</th></tr></thead>
     <tbody>
