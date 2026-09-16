@@ -1,6 +1,16 @@
 # 원본 데이터 (AI-Hub 데이터는 재배포 금지, 용량도 GitHub 한도 초과 → Google Drive 로 공유)
-/images/
+/images
 /*.zip
+/*.tar
+# 차량 세그 학습셋 (car_seg_split.tar 를 풀어서 씀. data.yaml 의 path 는 각자 머신에 맞게 고칠 것)
+/car_seg_split/
+# SAM3 실험 (sam3.pt 3.2GB 는 HF 게이트 모델이라 재배포 금지 → 각자 승인받아 받을 것)
+/lane_sam3/sam3.pt
+/lane_sam3/inputs/
+/lane_sam3/masks/
+/lane_sam3/barriers/
+/lane_sam3/lanes/
+/lane_sam3/vis*/
 
 # 개발 환경
 .venv/

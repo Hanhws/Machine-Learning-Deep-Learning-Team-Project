@@ -16,3 +16,8 @@ pandas==3.0.5
 matplotlib==3.11.2
 pillow==12.3.0
 PyYAML==6.0.3
+# SAM3 실험용 (ultralytics 가 SAM3 로드 시 자동 설치함). road_lane 기준 파이프라인에는 불필요.
+timm==1.0.29
+ftfy==6.3.1
+wcwidth==0.8.3
+# clip 은 PyPI 가 아니라 git 설치: pip install git+https://github.com/ultralytics/CLIP.git

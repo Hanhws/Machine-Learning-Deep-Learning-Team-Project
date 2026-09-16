@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAM3 차선 파이프라인</title>
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1a1c1e; --muted: #5b6168; --line: #e3e6ea;
+    --card: #f7f8fa; --accent: #1668c4; --good: #0f7b3e; --bad: #b3261e;
+    --code-bg: #f2f4f7; --mark: #fff3c4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14161a; --fg: #e6e8eb; --muted: #9aa2ab; --line: #2b2f36;
+      --card: #1b1e24; --accent: #6aa9f0; --good: #58c98a; --bad: #f07a72;
+      --code-bg: #1f232a; --mark: #4a3f14;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14161a; --fg: #e6e8eb; --muted: #9aa2ab; --line: #2b2f36;
+    --card: #1b1e24; --accent: #6aa9f0; --good: #58c98a; --bad: #f07a72;
+    --code-bg: #1f232a; --mark: #4a3f14;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 16px/1.75 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+          "Pretendard", "Noto Sans KR", sans-serif;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 48px 16px 120px; }
+  h1 { font-size: 30px; line-height: 1.3; margin: 0 0 8px; letter-spacing: -.02em; }
+  h2 {
+    font-size: 22px; margin: 56px 0 14px; padding-top: 22px;
+    border-top: 1px solid var(--line); letter-spacing: -.01em;
+  }
+  h3 { font-size: 17px; margin: 30px 0 10px; }
+  p, li { color: var(--fg); }
+  .sub { color: var(--muted); font-size: 15px; margin: 0 0 4px; }
+  code {
+    background: var(--code-bg); padding: 2px 6px; border-radius: 4px;
+    font: 13.5px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
+    word-break: break-word;
+  }
+  pre {
+    background: var(--code-bg); padding: 14px 16px; border-radius: 8px;
+    overflow-x: auto; border: 1px solid var(--line);
+  }
+  pre code { background: none; padding: 0; font-size: 13px; }
+  table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 14.5px; }
+  th, td { border-bottom: 1px solid var(--line); padding: 9px 10px; text-align: left; vertical-align: top; }
+  th { font-weight: 600; color: var(--muted); font-size: 13px; letter-spacing: .02em; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .up { color: var(--good); font-weight: 600; }
+  .down { color: var(--bad); font-weight: 600; }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 10px; padding: 16px 18px; margin: 18px 0;
+  }
+  .warn { border-left: 3px solid var(--bad); }
+  .note { border-left: 3px solid var(--accent); }
+  .tag {
+    display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 20px;
+    background: var(--code-bg); color: var(--muted); border: 1px solid var(--line);
+    margin-right: 6px; white-space: nowrap;
+  }
+  .scroll { overflow-x: auto; }
+  ol li, ul li { margin: 5px 0; }
+  a { color: var(--accent); }
+  .lede { font-size: 17px; color: var(--muted); margin: 14px 0 0; }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 40px 0; }
+  .kv { display: grid; grid-template-columns: 150px 1fr; gap: 4px 14px; font-size: 14.5px; }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; }
+  @media (max-width: 560px) { .kv { grid-template-columns: 1fr; } .kv dt { margin-top: 8px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>SAM3 차선 파이프라인</h1>
+<p class="sub">2026-09-16 · 기존 <code>road_lane</code> 2~4단계에 SAM3 를 붙인 실험 기록</p>
+<p class="lede">
+Mask2Former 가 그리던 <b>차선 도색만</b> SAM3 로 바꿨다. 나머지(도로·분리대·소실점·차로 기하)는
+기존 코드 그대로다. 차로 수 정확도가 0.357 → 0.409 로 올랐고, 수원을 빼면 ±1 이 0.893 → 0.964 다.
+</p>
+
+<div class="card note">
+<b>한 줄 요약</b><br>
+SAM3 는 <i>차선처럼 생긴 것</i>을 찾는 데 강하고, <i>도로 면 같은 영역</i>에는 약하다.
+그래서 전부 갈아엎지 않고 차선만 교체하는 하이브리드가 가장 좋았다.
+</div>
+
+
+<h2>0. 무엇을 왜 했나</h2>
+
+<p>
+기존 파이프라인의 약점은 <b>차로 수를 잘 못 센다</b>는 것이었다(정확 0.357). 원인을 추적하면
+2단계 관문 ①(도로 분할)·④(차로 경계)에서 <b>차선 도색을 제대로 못 찾는 것</b>이 컸다.
+Mask2Former 는 Mapillary Vistas 의 고정 클래스로 학습돼 있어 차선을 놓치는 장면이 있다.
+</p>
+<p>
+SAM3 는 2025-11 에 Meta 가 공개한 <b>개방어휘 분할 모델</b>이다. <code>"lane marking"</code>
+같은 짧은 명사구를 주면 그 개념의 모든 인스턴스를 찾는다. 고정 클래스 집합에 묶이지 않는 게 핵심이다.
+</p>
+
+
+<h2>1. 쓴 모델</h2>
+
+<div class="scroll">
+<table>
+<thead><tr><th>단계</th><th>모델</th><th>출처·버전</th><th>역할</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>YOLO26m-seg</td><td><code>yolo26m-seg.pt</code> (COCO 사전학습)</td><td>차량 세그멘테이션 → 차 없는 배경 만들기</td></tr>
+<tr><td>2</td><td>Mask2Former Swin-L</td><td><code>facebook/mask2former-swin-large-mapillary-vistas-semantic</code></td><td>도로·분리대·연석·울타리</td></tr>
+<tr><td><b>2</b></td><td><b>SAM 3</b></td><td><code>facebook/sam3</code> · <code>sam3.pt</code> 3.45GB</td><td><b>차선 도색 (이번에 교체한 부분)</b></td></tr>
+<tr><td>2b</td><td>ResNet18</td><td>ImageNet 사전학습 → 자동 라벨로 파인튜닝</td><td>차량 앞뒤 구분 → 도로 방향</td></tr>
+<tr><td>2b</td><td>CLIP ViT-L/14</td><td><code>openai/clip-vit-large-patch14</code></td><td>zero-shot 비교 대조군</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="card warn">
+<b>SAM3 가중치는 게이트돼 있다.</b> 자동 다운로드가 안 된다.
+<ol style="margin:8px 0 0">
+  <li><a href="https://huggingface.co/facebook/sam3">huggingface.co/facebook/sam3</a> 에서 access 요청 (HF 계정 필요, 수동 승인)</li>
+  <li>승인 후 토큰 발급 → <code>hf auth login</code></li>
+  <li><code>hf download facebook/sam3 sam3.pt --local-dir lane_sam3</code></li>
+</ol>
+<p style="margin:8px 0 0">
+라이선스는 Apache/MIT 가 아니라 Meta <b>SAM License</b> 다. 수업·연구 용도는 문제없지만
+상업적 사용 전에는 약관을 봐야 한다. 실행은 전부 로컬이라 API 요금은 없다.
+</p>
+</div>
+
+
+<h2>2. 처음엔 "완전히 새로" 만들어봤고, 실패했다</h2>
+
+<p>
+SAM3 로 차선을 찾아 <b>직접</b> 차로를 세는 독립 파이프라인을 먼저 만들었다
+(<code>lane_sam3/run_sam3.py</code> → <code>group_lanes.py</code>). 소실점을 최소제곱으로 구하고,
+조각을 기준선 x 위치로 묶고, 중앙분리대로 도로를 나누는 방식이다.
+</p>
+
+<div class="scroll">
+<table>
+<thead><tr><th>방식</th><th class="num">정확</th><th class="num">±1</th></tr></thead>
+<tbody>
+<tr><td>기존 road_lane s2</td><td class="num">0.384</td><td class="num">0.727</td></tr>
+<tr><td>SAM3 독립 (차선수−1)</td><td class="num">0.283</td><td class="num">0.707</td></tr>
+<tr><td>SAM3 독립 (점선수+1)</td><td class="num">0.303</td><td class="num">0.687</td></tr>
+</tbody>
+</table>
+</div>
+<p class="sub">화면 전체 차로 수 기준, 공통 99장면. 숫자가 위 본문과 다른 건 잣대가 달라서다(방향별이 아니라 화면 합계).</p>
+
+<p>
+<b>기존보다 나빴다.</b> 몇 시간짜리 기하 로직이 관문 7개로 다듬어진 s2 를 못 이긴다.
+교훈은 분명했다 — <b>병목은 차선 검출이 아니라, 찾은 차선을 차로로 해석하는 기하였다.</b>
+SAM3 는 앞쪽만 해결한다. 이 코드는 참고용으로 남겨뒀다.
+</p>
+
+
+<h2>3. 채택한 방식 — 하이브리드</h2>
+
+<p>
+두 모델의 출력을 비교해보니 갈리는 지점이 뚜렷했다.
+</p>
+
+<div class="scroll">
+<table>
+<thead><tr><th>같은 카메라 3장면</th><th class="num">도로 면적 (M2F)</th><th class="num">도로 면적 (SAM3)</th><th class="num">차선 (M2F)</th><th class="num">차선 (SAM3)</th></tr></thead>
+<tbody>
+<tr><td>Buan_daemog 17:30</td><td class="num">41.3%</td><td class="num">27.1%</td><td class="num">3.2%</td><td class="num">3.1%</td></tr>
+<tr><td>Buan_daemog 11:30</td><td class="num">38.6%</td><td class="num"><span class="down">12.6%</span></td><td class="num">4.6%</td><td class="num">2.7%</td></tr>
+<tr><td>Buan_daemog 16:30</td><td class="num">19.6%</td><td class="num">35.9%</td><td class="num"><span class="down">0.5%</span></td><td class="num"><span class="up">5.3%</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<p>
+SAM3 의 도로 면적이 38.6% → 12.6% 로 튄다. SAM3 는 <b>인스턴스</b> 분할 모델이라
+"도로" 같은 <b>stuff</b> 개념에 불안정하다. 반대로 3번 장면에서는 Mask2Former 가 차선을
+0.5% 밖에 못 찾은 걸 SAM3 가 5.3% 찾아냈다.
+</p>
+
+<p><b>그래서 각자 잘하는 것만 쓴다:</b></p>
+<div class="card">
+<span class="tag">Mask2Former</span> 도로(13) · 분리대(4,5,2,6,3) · 그 밖 모든 클래스<br>
+<span class="tag">SAM3</span> 차선 도색(24) <b>← 이것만 교체</b>
+</div>
+
+<p>
+구현은 <code>lane_sam3/make_sam3_seg.py</code> 이고, 실제로 하는 일은 두 줄이다.
+기존 <code>seg.png</code> 에서 Mask2Former 차선을 지워 도로로 되돌린 뒤, SAM3 차선을 다시 그린다.
+</p>
+<pre><code>seg = cv2.imread(base_seg, cv2.IMREAD_UNCHANGED).copy()
+seg[seg == 24] = 13          # 기존 차선 → 도로
+...
+seg[sam3_mask] = 24          # SAM3 차선을 도로 위에 덮어 그림</code></pre>
+
+<p>
+<b>차선을 도로 위에 덮어 그리는 순서가 중요하다.</b> s2 는
+<code>asphalt = median(gray[seg == 13])</code> 으로 도색 판정 기준 밝기를 잡는데,
+차선이 13 에 섞이면 그 기준이 흐려진다.
+</p>
+
+
+<h2>4. 결과</h2>
+
+<h3>2단계 — 차로 수와 방향</h3>
+<div class="scroll">
+<table>
+<thead>
+<tr><th rowspan="2">구간</th><th class="num" rowspan="2">장면</th>
+    <th class="num" colspan="2">정확</th><th class="num" colspan="2">±1</th><th class="num" colspan="2">양방향 판정</th></tr>
+<tr><th class="num">기준</th><th class="num">SAM3</th><th class="num">기준</th><th class="num">SAM3</th><th class="num">기준</th><th class="num">SAM3</th></tr>
+</thead>
+<tbody>
+<tr><td><b>전체</b></td><td class="num">236</td>
+    <td class="num">0.357</td><td class="num"><span class="up">0.409</span></td>
+    <td class="num">0.770</td><td class="num"><span class="up">0.783</span></td>
+    <td class="num">0.851</td><td class="num"><span class="up">0.889</span></td></tr>
+<tr><td>수원 제외</td><td class="num">168</td>
+    <td class="num">0.476</td><td class="num"><span class="up">0.533</span></td>
+    <td class="num">0.893</td><td class="num"><span class="up">0.964</span></td>
+    <td class="num">0.905</td><td class="num"><span class="up">0.952</span></td></tr>
+<tr><td>수원</td><td class="num">68</td>
+    <td class="num">0.060</td><td class="num"><span class="up">0.103</span></td>
+    <td class="num">0.463</td><td class="num"><span class="down">0.338</span></td>
+    <td class="num">0.716</td><td class="num"><span class="up">0.735</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<p>문서의 채택 기준("정확과 ±1 이 <b>둘 다</b> 떨어지지 않아야")을 전체 기준으로 충족한다. 바뀐 93장면을 뜯어보면:</p>
+<div class="scroll">
+<table>
+<thead><tr><th>구간</th><th class="num">±1 좋아짐</th><th class="num">±1 나빠짐</th></tr></thead>
+<tbody>
+<tr><td>수원 제외</td><td class="num"><span class="up">11</span></td><td class="num"><b>0</b></td></tr>
+<tr><td>수원</td><td class="num">4</td><td class="num"><span class="down">12</span></td></tr>
+</tbody>
+</table>
+</div>
+<p><b>수원 밖에서는 나빠진 장면이 한 개도 없다.</b> 손해는 전부 수원에서 났다.</p>
+
+<h3>앞뒤(방향) 구분 — 두 가지를 겹쳐 쓴다</h3>
+<p>도로 검출 하나로 되는 게 아니라, 서로 독립인 두 근거를 교차 검증한다.</p>
+<ol>
+  <li><b>기하 규칙</b> — 우측통행이므로 화면 왼쪽 도로는 다가오고 오른쪽은 멀어진다.
+      <u>양쪽 도로가 다 보일 때만</u> 쓸 수 있다.</li>
+  <li><b>ResNet18</b> — 차량 크롭을 앞모습/뒷모습으로 분류. 한쪽 도로만 보이는 화면에서도 쓴다.</li>
+</ol>
+<div class="scroll">
+<table>
+<thead><tr><th>지표</th><th class="num">값</th></tr></thead>
+<tbody>
+<tr><td>ResNet18 차량 단위 정확도 (시험 카메라 6대, 3,006장)</td><td class="num">0.856</td></tr>
+<tr><td>ResNet18 도로 단위 투표 정확도</td><td class="num"><b>0.976</b></td></tr>
+<tr><td>CLIP zero-shot (대조군)</td><td class="num">0.492</td></tr>
+<tr><td><b>기하 규칙과 CNN 일치율</b> (확신한 도로 326개)</td><td class="num"><b>0.982</b></td></tr>
+<tr><td>방향을 정한 도로</td><td class="num">418 / 420</td></tr>
+</tbody>
+</table>
+</div>
+<p>
+차량 한 대씩 보면 85.6% 지만, 한 도로의 차량들을 <b>투표</b>로 모으면 97.6% 가 된다.
+CLIP 은 49.2% 로 사실상 동전 던지기라, 이 문제는 파인튜닝이 필요하다는 근거가 된다.
+</p>
+
+<h3>3·4단계 — 점유율과 지체</h3>
+<div class="kv">
+  <dt>차로-프레임 행</dt><dd>46,202 (236장면)</dd>
+  <dt>장면·방향</dt><dd>407개 — 등급 중앙값 원활 351 · 서행 56 · 우회 검토 0</dd>
+  <dt>추정 파라미터</dt><dd><code>occ_jam = 0.600</code>, <code>v_free = 100 km/h</code></dd>
+  <dt>숨은 혼잡</dt><dd><b>18.61%</b> (8,494 프레임 중) — 107장면에서 발생</dd>
+</div>
+<p>
+<b>숨은 혼잡</b>이 이 프로젝트의 핵심 주장이다. 도로 전체로 평균 내면 '원활'인데
+<b>어느 한 차로는 '서행' 이하</b>인 프레임이 18.61% 다. 차로별로 안 보면 놓치는 혼잡이
+5프레임 중 1프레임꼴로 있다는 뜻이다. 차로 단위로 볼 이유가 여기 있다.
+</p>
+
+
+<h2>5. 그대로 따라 하기</h2>
+
+<p>기존 <code>outputs/</code> 기준 결과가 있다는 전제다. 1단계(차량 검출)와 Mask2Former 는 다시 돌리지 않는다.</p>
+
+<pre><code># 0) SAM3 가중치 (위 2절 참고, 최초 1회)
+cd 팀프로젝트
+./.venv/bin/hf auth login
+./.venv/bin/hf download facebook/sam3 sam3.pt --local-dir lane_sam3
+
+# 1) 실험 폴더 준비 — s1(차량)·s2b(방향 모델)은 기준에서 복사
+cd road_lane
+EXP=runs/sam3
+mkdir -p $EXP &amp;&amp; cp -R outputs/s1 outputs/s2b $EXP/
+
+# 2) SAM3 차선으로 seg.png 만들기 (236장면, 약 30분)
+cd ../lane_sam3
+../.venv/bin/python make_sam3_seg.py --out ../road_lane/$EXP
+
+# 3) 2~4단계 (약 40분, 대부분 3단계)
+cd ../road_lane
+export ROAD_LANE_OUT=runs/sam3  PY=../.venv/bin/python
+$PY s2_road_lanes.py            # 도로·차선  (끝에 2c 적용 전 정확도 출력)
+$PY s2c_camera_groups.py --apply G
+$PY s2d_curves.py apply
+$PY s2b_direction.py apply      # 방향 적용 (학습은 다시 안 함)
+$PY s3_occupancy.py
+$PY s4_delay.py
+$PY report.py
+
+# 4) 색칠해서 눈으로 보기
+cd ../lane_sam3
+../.venv/bin/python vis_seg.py --run ../road_lane/runs/sam3 --sheet 6</code></pre>
+
+<div class="card note">
+<b>실험 폴더를 재사용하지 말 것.</b> 같은 폴더에서 다시 돌리면 2c·2d 가 옛 백업
+(<code>lanes_single.*</code>, <code>lanes_straight.*</code>)을 읽어서 고친 결과가 무시된다.
+실험마다 새 이름을 쓴다.
+</div>
+
+
+<h2>6. 결과물이 어디 있나</h2>
+<div class="scroll">
+<table>
+<thead><tr><th>경로</th><th>내용</th></tr></thead>
+<tbody>
+<tr><td><code>runs/sam3/compare/01_좋아진_수원외.jpg</code></td><td>좋아진 11장면 BEFORE/AFTER</td></tr>
+<tr><td><code>runs/sam3/compare/02_나빠진_수원.jpg</code></td><td>나빠진 12장면</td></tr>
+<tr><td><code>runs/sam3/compare/03_seg_전후.jpg</code></td><td>합쳐진 seg 전후 (파랑=도로 M2F, 빨강=분리대 M2F, 노랑=차선 SAM3)</td></tr>
+<tr><td><code>runs/sam3/compare/scene_by_scene.csv</code></td><td>236장면 전후 대조표</td></tr>
+<tr><td><code>runs/sam3/vis_seg/</code></td><td>합쳐진 seg 색칠 236장</td></tr>
+<tr><td><code>runs/sam3/s2/&lt;장면&gt;/lanes_vis.jpg</code></td><td>최종 차로 지도</td></tr>
+<tr><td><code>runs/sam3/report/summary.json</code></td><td>전 단계 요약 수치</td></tr>
+<tr><td><code>lane_sam3/vis/</code>, <code>vis_barriers/</code></td><td>SAM3 원본 마스크 (차선 / 중앙분리대)</td></tr>
+</tbody>
+</table>
+</div>
+
+
+<h2>7. 한계 — 공유 전에 반드시 읽을 것</h2>
+
+<div class="card warn">
+<h3 style="margin-top:0">① 정답 자체가 못 미덥다</h3>
+<p style="margin:0">
+여기 모든 정확도는 <b>파일명 차로 수</b>(OW/TW+숫자)를 정답으로 잰 것이다. 그런데
+<code>pipeline_guide.html</code> 7-3 할 일 0 에 적힌 대로, 무작위 24장면을 눈으로 확인하니
+<b>파일명이 제대로인 건 약 25%</b> 였다. 즉 <b>0.409 와 0.357 의 차이가 진짜인지 확정할 수 없다.</b>
+사람이 센 채점표(할 일 0)가 있어야 결론이 난다. <code>lane_sam3/manifest.csv</code> 에
+<code>lanes_true</code> 빈 칸과 배경 102장이 준비돼 있다 — 6명이 나누면 1인당 17장.
+</p>
+</div>
+
+<div class="card warn">
+<h3 style="margin-top:0">② 수원은 오히려 나빠졌다</h3>
+<p style="margin:0">
+±1 이 0.463 → 0.338. 수원은 소실점이 약해서(강도 중앙값 0.65) 관문 ② 부터 흔들리는데,
+SAM3 가 차선을 더 많이 찾아내면서 오히려 흔들림이 커진 것으로 보인다.
+수원이 68장면(29%)이라 전체 수치를 좌우한다. <b>다음 실험 1순위: 수원만 Mask2Former 차선 유지.</b>
+</p>
+</div>
+
+<div class="card warn">
+<h3 style="margin-top:0">③ 데이터가 바뀌었다 — 옛 수치와 섞지 말 것</h3>
+<p style="margin:0">
+2026-09-16 에 원본 <code>images/</code>(20,691장·226클립)를 지우고
+<code>car_seg_split</code>(8,500장·207클립)으로 교체했다. 지금 <code>outputs/</code> 기준선은
+<b>새 데이터로 다시 만든 것</b>이다. 발표 자료에 옛 수치(±1 82.2%)가 있다면 그대로 쓰면 안 된다.
+</p>
+</div>
+
+<div class="card warn">
+<h3 style="margin-top:0">④ 4단계 속도·지체는 미검증</h3>
+<p style="margin:0">
+점유율 → Greenshields 속도 → 지체 추정인데, <b>실측 속도가 없어 검증하지 못했다</b>.
+<code>occ_jam=0.6</code>, <code>v_free=100km/h</code> 는 가정값이다. 등급('원활'·'서행')은
+상대 비교로만 읽어야 한다.
+</p>
+</div>
+
+<div class="card warn">
+<h3 style="margin-top:0">⑤ 프레임이 연속이 아니다</h3>
+<p style="margin:0">
+<code>car_seg_split</code> 은 학습용으로 골라낸 데이터라 207클립 중 168개에 구멍이 있고
+최장 연속 구간 중앙값이 8장이다. 3·4단계는 <b>프레임 단위 집계</b>라 정상 동작하지만,
+시계열 그래프(<code>__timeseries.png</code>)는 구간이 끊겨 보인다. 연속 시계열이 필요하면
+원본 <code>images-*.zip</code> 6개를 다시 받아야 한다.
+</p>
+</div>
+
+<div class="card warn">
+<h3 style="margin-top:0">⑥ 재현 환경 변경</h3>
+<p style="margin:0">
+SAM3 로드 시 <code>timm</code>·<code>ftfy</code>·<code>wcwidth</code>·<code>clip</code> 이 자동 설치된다.
+<code>requirements.txt</code> 에 기록해뒀다(<code>clip</code> 은 PyPI 가 아니라 git 설치).
+기존 고정 버전은 하나도 바뀌지 않았고 <code>check_env.py</code> 18개 항목 전부 기준과 일치한다.
+다만 SAM3 는 <b>MPS 가 아니라 CPU 로 돈다</b> — 장면당 7초.
+</p>
+</div>
+
+
+<h2>8. 다음에 할 일</h2>
+<ol>
+  <li><b>수원만 기존 차선 유지</b> — 수원 밖 손해가 0이므로 전체 수치가 더 오를 가능성이 크다. 코드 몇 줄, 재실행 약 40분</li>
+  <li><b>채점표(할 일 0)</b> — 어느 방식을 쓰든 결국 필요하다. 준비는 끝나 있다</li>
+  <li><b>할 일 1</b> (흐린 경계 삭제 순서) — scratch 에서 ±1 82.2 → 84.0% 확인됐지만 아직 코드 미반영</li>
+  <li>SAM3 프롬프트 튜닝 — 지금은 <code>"lane marking"</code> 하나. <code>"dashed lane line"</code> 등 분리 시도</li>
+</ol>
+
+<hr>
+<p class="sub">
+생성 코드: <code>lane_sam3/{prepare_inputs,run_sam3,group_lanes,make_sam3_seg,vis_seg}.py</code> ·
+기준 문서: <code>road_lane/docs/pipeline_guide.html</code> ·
+<code>sam3.pt</code>(3.2GB)는 <code>.gitignore</code> 처리 필요
+</p>
+
+</div>
+</body>
+</html>
