@@ -14,13 +14,9 @@ road_lane/outputs/**/*.pt
 # 실험 결과 폴더 (ROAD_LANE_OUT=runs/이름)
 road_lane/runs/
 
-# road_lane 장면별 중간 산출물 (run_all.sh 로 다시 만듦)
-road_lane/outputs/s1/
-road_lane/outputs/s2/
-road_lane/outputs/s2b/crops/
-road_lane/outputs/s2b/crops.csv
-road_lane/outputs/s3/*/
-road_lane/outputs/s3/lane_frames.csv
-road_lane/outputs/s3/group_frames.csv
-road_lane/outputs/s4/lane_delay.csv
-road_lane/outputs/s4/group_delay.csv
+# road_lane 실행 결과 전체 (run_all.sh 로 다시 만듦)
+# 기준 결과가 필요하면 정리 직전 커밋에서: git checkout 206e23c -- road_lane/outputs
+road_lane/outputs/
+
+# 설명용 그림 (docs/build_figures.py 로 다시 만듦)
+road_lane/docs/fig/

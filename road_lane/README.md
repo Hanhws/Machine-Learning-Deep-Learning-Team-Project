@@ -19,8 +19,8 @@
 
 ## 실행 (팀원용: 기준과 같은 조건으로 돌리기)
 
-`outputs/` 의 요약 파일(차로 수·방향·점유율·지체 수치, PDF 수치의 출처)이 **기준 결과**다.
-장면별 중간 결과·이미지·가중치는 용량과 AI-Hub 재배포 제한 때문에 저장소에 없고, 아래 순서로 직접 만든다.
+기준 결과(`outputs/`)·장면별 중간 결과·이미지·가중치는 용량과 AI-Hub 재배포 제한 때문에 저장소에 없고,
+아래 순서로 직접 만든다. PDF 수치의 출처인 기준 요약 파일은 정리 직전 커밋 `206e23c` 에 남아 있다.
 
 ### 1. 기준 환경 맞추기
 
@@ -48,6 +48,7 @@ Windows 는 `.venv\Scripts\python.exe` 이고, `run_all.sh` 는 Git Bash 에서 
 
 ```bash
 ROAD_LANE_OUT=runs/내이름 ./run_all.sh                  # 결과는 runs/내이름/ (기준 outputs/ 를 덮어쓰지 않음)
+git checkout 206e23c -- road_lane/outputs              # 기준 결과 꺼내기 (약 3.8MB, 다시 커밋하지 않는다)
 ../.venv/bin/python compare_runs.py outputs runs/내이름   # 기준과 지표·장면별 일치율 비교
 ```
 
