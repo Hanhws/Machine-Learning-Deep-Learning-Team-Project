@@ -1,215 +1,203 @@
-# 도로 CCTV 혼잡도 모니터 — 노트북 배포 키트
+# 도로 CCTV 혼잡도 모니터
 
-[hantaeho123/traffic_project](https://github.com/hantaeho123/traffic_project) 를 **Windows 노트북(WSL2 + NVIDIA GPU)** 에 올려
-심사 기간 내내 무중단으로 돌리기 위한 설정과 메모.
+**Segmentation 기반 도로 대비 차량 면적비를 활용한 교통 혼잡도 측정 시스템**
 
-상류 저장소를 고치지 않고 올리는 것이 원칙이고, 그 과정에서 실제로 막혔던 것들과 해결책을 남겨 둔다.
+전국 CCTV 영상에서 도로와 차량을 각각 픽셀 단위로 분할하고, 그 면적비로 혼잡도를 정량화하는 웹 서비스.
 
 ```
-공개 주소:  https://<내-도메인>.ngrok-free.dev      (ngrok 고정 도메인)
-로컬 주소:  http://localhost:8000                   (WSL 우분투 안에서)
+점유율(occupancy)_d  =  | vehicle ∩ road_d |  /  | road_d |
 ```
+
+`road_d` 는 도로 라벨맵에서 방향 `d` 인 픽셀, `d=0` 은 모든 방향의 합집합이다.
 
 ---
 
-## 이 저장소에 있는 것
+## 왜 면적비인가
+
+차량 **대수**를 세는 방식은 정체가 심해질수록 포화된다. 차가 빽빽하게 서 있으면 겹침·가림 때문에
+검출 수가 실제보다 적게 나오고, 한 프레임에 들어오는 대수는 화면 크기에 갇혀 상한이 생긴다.
+
+**노면이 얼마나 덮였는지**를 직접 재면 이 문제가 없다. 차가 멈춰 서 있어도 면적은 그대로 잡히고,
+값이 0~1 로 정규화되어 있어 카메라 화각이 달라도 같은 척도로 비교할 수 있다.
+
+---
+
+## 두 모델, 서로 다른 시점
+
+카메라가 고정되어 있다는 점을 이용해 무거운 쪽을 **등록 시점 1회**로 밀어냈다.
+
+| 모델 | 역할 | 실행 시점 |
+|---|---|---|
+| **YOLO-seg** (파인튜닝) | 차량 인스턴스 분할 — `car` / `bus` / `truck` | **매 프레임** |
+| **SAM 3** | 도로 영역 분할. 텍스트 프롬프트 `"road"` + 점·박스 프롬프트 | **등록 시 1회** |
+
+도로 마스크는 한 번 확정하면 `road_mask.png`(0=도로 아님, 1~8=방향)로 저장되어 계속 재사용된다.
+그래서 실시간 경로에서는 YOLO 만 돌고, SAM 은 관여하지 않는다.
+
+> SAM3 가중치가 없으면 SAM 2.1 로 자동 대체된다. 이때는 텍스트 프롬프트만 빠지고
+> 점·박스·브러시로 칠하는 것은 그대로 동작한다.
+
+### 추론 설정
 
 | | |
 |---|---|
-| `traffic_project/` | 프로그램 본체 — FastAPI 백엔드 + React 프론트엔드 + 추론 파이프라인 |
+| 입력 해상도 | `imgsz 960` · `retina_masks` |
+| 신뢰도 임계값 | YOLO `0.25` · SAM `0.30` |
+| 추론 주기 | 기본 10초/장 · 실시간 모드 2 FPS · 카메라별 1초~10분 조절 |
+| DB 기록 | 5초 평균 집계 |
+| 실행 장치 | CUDA / MPS / CPU 자동 선택 |
+
+---
+
+## 처리 파이프라인
+
+```
+① 영상 수집      ITS Open API 실시간 HLS · 업로드 영상 · 임의 스트림 URL
+       ↓
+② 도로 마스크    SAM3 제안 → 사람이 픽셀 단위로 확정 → 방향별 분할 → 파일로 저장
+       ↓
+③ ROI 크롭      도로 마스크 바운딩 박스(+32px)만 잘라 YOLO 입력
+       ↓
+④ 점유율 계산    방향 × 차종을 하나의 히스토그램으로 집계
+       ↓
+⑤ 적재·시각화    5초 평균을 PostgreSQL 에 · 지도/통계/리포트 · MJPEG 오버레이
+```
+
+### 혼잡 단계
+
+면적비 기준 4단계. `.env` 의 `CONGESTION_THRESHOLDS` 로 조정한다.
+
+| 원활 | 서행 | 지체 | 정체 |
+|---|---|---|---|
+| ~ 8% | 8 ~ 15% | 15 ~ 25% | 25% ~ |
+
+---
+
+## 화면
+
+| 경로 | 내용 |
+|---|---|
+| `/overview` | 전국 지도에 지점별 점유율을 혼잡 단계 색으로. 실시간 / 15분·1시간·24시간 평균, 노선·지역 묶음, 순위 |
+| `/` | 지도 관제. KPI, 단계별 색 마커, 필터, **타임라인 재생**(최근 1~24시간 되감기), 선택 카메라의 실시간 세그멘테이션 |
+| `/register` | CCTV 등록 3단계. ITS 자동 검색 → **마스크 편집기** → 정보 입력 |
+| `/cameras` | 격자 뷰(실시간 MJPEG) · 표 뷰(일괄 제어). 상세에서 추이 차트, 캡처, **요일×시간 히트맵**, 영상 전체 분석 |
+| `/stats` | 노선·지역·구간·카메라별 평균, 스파크라인, 지체 경보, CSV |
+| `/apps` | 그룹 리포트 (**한강 대교 26개** 프리셋). 일별 리포트, **통행 분산 정책 시나리오**, 자동 인사이트, PDF |
+| `/system` | 모델·ITS·임계값·워커 상태 |
+
+### 마스크 편집기 (등록 2단계)
+
+- **도로 자동 제안** — SAM3 텍스트 프롬프트 `"road"` 로 초기 마스크 생성
+- **SAM 점**(클릭 포함 / Shift·우클릭 제외) · **SAM 박스** · **브러시/지우개** · **다각형**
+- **분할선** — 중앙분리대를 따라 선을 그으면 도로 픽셀이 양쪽 방향으로 나뉜다. 양방향 도로를 나누는 가장 빠른 방법
+- 휠 확대, Space+드래그 이동, 실행취소, 구멍 메우기, 단축키
+- 도로 비율이 너무 작거나 픽셀이 없는 방향이 있으면 경고
+
+---
+
+## 기술 스택
+
+| 영역 | |
+|---|---|
+| 모델·추론 | PyTorch · Ultralytics (YOLO-seg, SAM 3 / SAM 2.1) · OpenCV · NumPy · Shapely |
+| 백엔드 | FastAPI · Uvicorn · Pydantic v2 · SQLAlchemy 2.0 · psycopg 3 · httpx |
+| DB | PostgreSQL — 카메라 · 방향 · 점유율 시계열 · 응용 그룹 · 분석 작업 |
+| 프론트엔드 | React 19 · TypeScript · Vite · React Router 7 |
+| 지도·차트·영상 | Leaflet / react-leaflet · Recharts · hls.js · Canvas 마스크 편집기 |
+| 외부 연동 | 국가교통정보센터(ITS) CCTV Open API · Hugging Face Hub |
+| 테스트 | pytest (점유율 계산·ITS 파싱·임계값·렌더링) · Puppeteer E2E |
+
+---
+
+## 엔지니어링 세부
+
+정확도와 처리량을 위해 따로 설계한 부분들.
+
+**ROI 크롭 추론** — 도로 마스크 바운딩 박스만 잘라 추론한 뒤 원본 좌표로 되돌린다.
+마스크에 절반 이상 걸치지 않은 인스턴스는 버려서, 화면에 같이 잡히는 다른 도로나 주차장의
+차량이 분모를 오염시키지 않는다. 입력이 작아져 추론도 빨라진다.
+
+**히스토그램 기반 면적 집계** — 방향마다 마스크를 따로 만들면 프레임을 20번 넘게 훑게 된다.
+방향과 차종을 `d × stride + c` 하나의 값으로 합쳐 `calcHist` 한 번으로 모든 조합의 픽셀 수를 센다.
+
+**GPU 단일 스레드 직렬화** — 카메라마다 워커 스레드가 하나씩 뜨는 구조라, 모델 로딩·추론·
+텐서→numpy 변환을 전부 GPU 전용 스레드 하나에서만 실행한다. macOS MPS 에서 여러 스레드가
+Metal 커맨드 버퍼를 만지면 프로세스가 통째로 죽는 문제를 막기 위한 설계다.
+
+**HLS 프레임 개수 기준 샘플링** — ITS HLS 는 2초 세그먼트 단위로 프레임이 한꺼번에 도착한다.
+시간 기준으로 거르면 세그먼트당 1번밖에 추론하지 못해, `src_fps / INFER_FPS` 프레임 개수
+기준으로 추론 프레임을 고른다.
+
+**ITS 스트림 URL 자동 갱신** — 발급 URL 이 24시간만 유효하므로 워커가 23시간 시점에 스스로
+재조회한다. CDN 이 접속을 거부하면 재시도 간격을 지수적으로 늘리고, 카메라들이 동시에 몰리지
+않도록 대기 시간에 지터를 준다.
+
+**적응형 스트림 모드** — 추론 주기가 60초 미만이면 연결을 유지한 채 프레임만 흘려보내고,
+60초 이상이면 주기마다 새로 접속해 한 장만 받고 끊는다. ITS CDN 의 동시 세션·재접속 제한을
+피하기 위한 절충이다.
+
+**도로 축 자동 제안** — 같은 노선의 이웃 CCTV 좌표를 ITS 에서 받아 **주성분 분석**으로 도로가
+뻗은 축을 구하고, 그 축과 반대 방향을 방향 1·2 의 진행 각도로 제안한다.
+
+---
+
+## 한계
+
+- **원근** 때문에 화면 아래쪽 차량의 픽셀 면적이 과대평가된다. 따라서 지점 간 절대 비교보다
+  **같은 지점의 시간·방향 비교**가 신뢰도가 높다.
+- 차종(`car`/`bus`/`truck`) 분류 정확도가 상대적으로 낮아, UI 에서 차종 구분 모드를 끌 수 있게 했다.
+  점유율 자체는 차종과 무관하게 계산된다.
+- 분모가 되는 도로 영역은 차량이 덮을 수 있는 **노면 전체**여야 하므로, 등록 시 갓길·중앙분리대는
+  제외하고 칠하는 것을 전제로 한다.
+
+---
+
+## 저장소 구조
+
+| | |
+|---|---|
+| `traffic_project/` | **프로그램 본체.** 백엔드·프론트엔드·ML 파이프라인. 자세한 내용은 [traffic_project/README.md](traffic_project/README.md) |
 | `traffic-deploy/` | 설치 스크립트 (`install.sh`, `windows-setup.ps1`, 클라우드용 `provision.sh`) |
-| `README.md` | 이 문서 — 운영·복구·함정 정리 |
-| `키입력.example.txt` | 키 입력 템플릿. 복사해서 `키입력.txt` 로 쓴다 (gitignore 됨) |
-| `setup/windows-power-setup.bat` | 절전·화면끄기·덮개닫기 해제 + 로그온 시 WSL 자동 시작 (관리자 권한) |
-| `setup/wsl-keepalive.vbs` | WSL 유휴 종료 방지. 시작 프로그램에 넣어 둔다 |
+| `setup/` | 윈도우 전원 설정 · WSL keepalive |
+| [`DEPLOY.md`](DEPLOY.md) | **노트북 배포 운영 메모** — 설치 절차, 복구 명령, 실제로 막혔던 문제 5가지 |
+| `키입력.example.txt` | 키 입력 템플릿 |
 
 ### 벤더링한 스냅샷의 출처
 
-`traffic_project/` 와 `traffic-deploy/` 는 별도 저장소를 **특정 시점 스냅샷으로 복사**한 것이다
-(`.git` 을 떼어 냈으므로 클론 한 번이면 전부 받아진다). 어디서 떠왔는지:
+`traffic_project/` 와 `traffic-deploy/` 는 별도 저장소를 특정 시점 스냅샷으로 복사한 것이다
+(`.git` 을 떼어 냈으므로 클론 한 번이면 전부 받아진다).
 
 | 폴더 | 상류 저장소 | 커밋 | 날짜 |
 |---|---|---|---|
 | `traffic_project/` | [hantaeho123/traffic_project](https://github.com/hantaeho123/traffic_project) | `4fc5d58` efficient logic | 2026-09-20 |
 | `traffic-deploy/` | [Hanhws/traffic-deploy](https://github.com/Hanhws/traffic-deploy) | `484ad98` 설치 키트 | 2026-09-20 |
 
-상류에 새 커밋이 올라오면 이 폴더는 자동으로 따라가지 않는다. 최신으로 맞추려면 위 저장소에서
-다시 받아 덮어쓰고, 이 표의 커밋 해시를 갱신하면 된다.
+### 저장소에 없는 것
 
-**저장소에 없는 것** (`.gitignore`):
-
-| | 왜 | 어떻게 구한다 |
-|---|---|---|
-| `키입력.txt` | ITS 인증키·HF 토큰·ngrok 토큰 | `키입력.example.txt` 복사해서 직접 채움 |
-| `models/*.pt` | AI-Hub 데이터로 학습한 산출물이라 재배포하지 않는다 | 학습 결과 `best.pt` 를 `models/` 에 직접 배치 |
-| `traffic_project/data/` `.venv/` `node_modules/` | 실행하면서 생기는 것 | `install.sh` 가 만든다 |
-
----
-
-## 처음부터 설치하기
-
-### 1. 윈도우 준비
-
-```powershell
-# 관리자 PowerShell
-irm https://raw.githubusercontent.com/Hanhws/traffic-deploy/main/windows-setup.ps1 | iex
-```
-
-WSL2 + Ubuntu 24.04 설치, `.wslconfig` RAM 할당, 절전 해제, 로그온 자동 시작을 한 번에 한다.
-관리자 권한이 막히면 `setup/windows-power-setup.bat` 을 **우클릭 → 관리자 권한으로 실행** 해도 된다.
-
-### 2. 우분투 설치
-
-```bash
-git clone https://github.com/Hanhws/traffic-deploy.git ~/deploy && bash ~/deploy/install.sh
-```
-
-ITS 키·HF 토큰·ngrok 토큰/도메인 4개를 물어본다. 20분쯤 걸린다.
-**터미널에 붙여넣기가 잘 안 되면** (숨김 입력이라 화면에 안 보여서 실수하기 쉽다)
-`~/.traffic-deploy.conf` 를 미리 만들어 두면 묻지 않고 넘어간다:
-
-```bash
-umask 077
-cat > ~/.traffic-deploy.conf <<'EOF'
-ITS_API_KEY='...'
-HF_TOKEN='...'
-NGROK_AUTHTOKEN='...'
-NGROK_DOMAIN='...'
-EOF
-```
-
-### 3. 유휴 종료 방지 (필수 — 아래 "함정 4" 참고)
-
-```powershell
-copy setup\wsl-keepalive.vbs "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\"
-wscript.exe "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\wsl-keepalive.vbs"
-```
-
-그리고 `%USERPROFILE%\.wslconfig` 에 `vmIdleTimeout=-1` 을 넣고 `wsl --shutdown`.
-
-### 4. 수동 작업
-
-- 설정 → Windows Update → **업데이트 일시 중지 최대(5주)**
-- 전원 어댑터 연결 유지 (배터리로는 전원 설정이 적용되지 않는다)
-- `/register` 에서 CCTV 5~10대 등록, 추론 주기 10초
-
----
-
-## 운영
-
-실제로 돌아가는 건 이 폴더가 아니라 **WSL 우분투 안의 `~/traffic`** 이다. 이 폴더는 설정과 메모.
-
-| 서비스 | 하는 일 |
+| | 왜 |
 |---|---|
-| `traffic` | FastAPI 백엔드 + 프론트 서빙 + 추론 워커 |
-| `ngrok` | 고정 도메인 터널 |
-
-```bash
-sudo systemctl status traffic ngrok     # 상태
-sudo journalctl -u traffic -f           # 실시간 로그
-sudo systemctl restart traffic ngrok    # 재시작 (둘 다 명시할 것)
-nvidia-smi                              # GPU 사용량
-```
-
-### 팀이 새 커밋을 올렸을 때
-
-```bash
-bash ~/deploy/install.sh
-```
-
-`origin/HEAD` 로 하드 리셋하고 다시 빌드한다. `.env`·DB·가중치·등록한 카메라·`.venv` 는 유지된다.
-
-### 마스크 백업 (카메라 재등록을 피하려면)
-
-```bash
-tar czf ~/traffic-data.tgz -C ~/traffic data
-```
+| `키입력.txt` | ITS 인증키·HF 토큰·ngrok 토큰. `키입력.example.txt` 를 복사해서 직접 채운다 |
+| `models/*.pt` | AI-Hub 데이터로 학습한 산출물이라 재배포하지 않는다 |
+| `data/` `.venv/` `node_modules/` | 실행하면서 생기는 것. `install.sh` 가 만든다 |
 
 ---
 
-## 실제로 막혔던 것 5가지
+## 실행
 
-### 1. torch 가 cu130 으로 깔려 GPU 가 죽는다
-
-`install.sh` 는 `pip install torch torchvision` 을 그냥 부른다. 그러면 **cu130** 빌드가 깔리는데,
-드라이버가 CUDA 12.9(576.x)면 못 쓴다:
-
-```
-RuntimeError: The NVIDIA driver on your system is too old (found version 12090)
-```
-
-문제는 이게 **조용히** 실패한다는 것이다. `.env` 의 `DEVICE=cuda` 는 `resolve_device()` 에서
-`auto` 일 때만 가용성을 검사하고, 그 외에는 그대로 통과시킨다. 그래서 CUDA 가 죽어 있어도
-앱은 멀쩡히 뜨고 **CCTV 를 등록하는 순간** 워커가 터진다.
+요구: Python ≥ 3.10, Node ≥ 18, PostgreSQL, NVIDIA GPU(선택, CPU 도 가능하지만 20~30배 느림)
 
 ```bash
-cd ~/traffic
-./.venv/bin/pip uninstall -y torch torchvision triton \
-  $(./.venv/bin/pip freeze | grep -oiE '^nvidia-[a-z0-9_-]+')
-./.venv/bin/pip install --index-url https://download.pytorch.org/whl/cu126 torch==2.14.0 torchvision
-./.venv/bin/pip install "nvidia-ml-py>=12.0.0"     # 위에서 같이 지워진다. ultralytics 가 필요로 함
-./.venv/bin/python -c "import torch; print(torch.cuda.is_available())"   # True 여야 함
-sudo systemctl restart traffic ngrok
+cd traffic_project
+bash scripts/setup.sh          # .venv + 패키지 + .env + DB + 프론트 패키지
+# .env 에 ITS_API_KEY 와 DATABASE_URL 을 채운다
+bash scripts/run_prod.sh       # http://localhost:8000
 ```
 
-드라이버를 580 이상으로 올리면 cu130 도 되지만, cu126 은 양쪽 다에서 돈다.
-`requirements.txt` 는 `torch>=2.4` 하한만 걸려 있어서 `install.sh` 를 다시 돌려도 되돌아가지 않는다.
-
-### 2. `start traffic` 만으로는 ngrok 이 안 올라온다
-
-`ngrok.service` 에 `Requires=traffic.service` 가 걸려 있다. traffic 을 멈추면 ngrok 도 연쇄로
-내려가지만, **반대 방향은 작동하지 않는다.** 앱은 살아 있는데 외부 링크만 404 가 되는 상황이 된다.
-
-항상 둘 다 명시할 것: `sudo systemctl restart traffic ngrok`
-
-### 3. SAM3 는 토큰보다 라이선스 동의가 먼저다
-
-토큰만 있으면 `401 GatedRepoError` 가 난다.
-[huggingface.co/facebook/sam3](https://huggingface.co/facebook/sam3) 에서 `Agree and access repository` 를 먼저 눌러야 한다.
-
-`sam3.pt` (3.3GB) 는 **등록할 때만** 쓰인다. `road_seg.py` 첫 줄에 "도로 영역 segmentation (등록 시 1회)"
-라고 적혀 있고, 실시간 워커는 `road_seg` 를 import 조차 하지 않는다. 실시간 경로는:
-
-```
-프레임 → (디스크에 저장된 도로 마스크) + YOLO 차량 세그멘테이션 → 방향별 점유율 → DB
-```
-
-즉 매 프레임에는 YOLO 만 돈다. 그래서 가중치를 한 번 받고 나면 **HF 토큰은 폐기해도 되지만
-`sam3.pt` 파일은 남겨둬야 한다** (카메라를 새로 등록하거나 마스크를 다시 그릴 때 필요).
-
-### 4. WSL2 가 유휴 시 VM 을 통째로 종료한다
-
-아무도 안 쓰면 **약 46초** 만에 내려간다. `traffic` 도 `ngrok` 도 같이 죽고 공개 주소는 404 가 된다.
-심사 기간 배포에서는 치명적이다.
-
-`windows-setup.ps1` 의 `traffic-wsl` 작업은 로그온 때 `/bin/true` 를 한 번 실행할 뿐이라
-부팅 직후에만 살리고 이후 유휴 종료는 못 막는다. 두 가지를 같이 걸어야 한다:
+모델 가중치는 `traffic_project/models/weights/` 에 둔다:
 
 | | |
 |---|---|
-| `%USERPROFILE%\.wslconfig` | `vmIdleTimeout=-1` |
-| 시작 프로그램 폴더 | `setup/wsl-keepalive.vbs` — `wsl.exe -u root -- sleep infinity` 를 숨김으로 상주 |
+| `yolov8s_seg_vehicle.pt` | 파인튜닝한 차량 YOLO-seg |
+| `sam3.pt` | `python scripts/download_sam3.py --token hf_xxx` — [facebook/sam3](https://huggingface.co/facebook/sam3) 라이선스 동의가 먼저 필요하다 |
 
-WSL 을 5분간 건드리지 않고 외부에서만 접속해 검증했다 (1·2·3·4·5분 모두 HTTP 200).
-
-### 5. 설치 중 우분투 창을 닫으면 dpkg 가 깨진다
-
-apt 가 중간에 끊긴 상태가 된다. 복구:
-
-```bash
-sudo dpkg --configure -a && sudo apt-get -f install -y
-```
-
----
-
-## 이 환경의 설정값
-
-| | |
-|---|---|
-| WSL | Ubuntu 24.04 LTS, systemd 활성, RAM 12GB + swap 8GB |
-| GPU | RTX 4070 Laptop 8GB · 드라이버 576.52 (CUDA 12.9) |
-| torch | 2.14.0+**cu126** (cu130 아님 — 함정 1 참고) |
-| 추론 | `DEVICE=cuda` · 기본 주기 10초 · `INFER_FPS=2.0` · `imgsz=960` |
-| sudo | 무인 설치를 위해 NOPASSWD. 되돌리려면 `sudo rm /etc/sudoers.d/90-traffic-nopasswd` |
-
-**RTX 4070 기준 여유**: 10초 주기 약 30대 / 5초 주기 약 15대 / 실시간(2 FPS) 약 3대.
+윈도우 노트북(WSL2 + GPU)에 무중단으로 올리는 방법은 [DEPLOY.md](DEPLOY.md) 를 참고.
