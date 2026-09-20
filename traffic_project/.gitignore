@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# Env / secrets
+.env
+
+# Runtime data (masks, snapshots, uploads)
+data/
+!data/.gitkeep
+
+# Model weights (large)
+models/weights/*.pt
+models/weights/*.pth
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.log
+.pytest_cache/

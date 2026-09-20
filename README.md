@@ -16,18 +16,33 @@
 
 | | |
 |---|---|
+| `traffic_project/` | 프로그램 본체 — FastAPI 백엔드 + React 프론트엔드 + 추론 파이프라인 |
+| `traffic-deploy/` | 설치 스크립트 (`install.sh`, `windows-setup.ps1`, 클라우드용 `provision.sh`) |
 | `README.md` | 이 문서 — 운영·복구·함정 정리 |
 | `키입력.example.txt` | 키 입력 템플릿. 복사해서 `키입력.txt` 로 쓴다 (gitignore 됨) |
 | `setup/windows-power-setup.bat` | 절전·화면끄기·덮개닫기 해제 + 로그온 시 WSL 자동 시작 (관리자 권한) |
 | `setup/wsl-keepalive.vbs` | WSL 유휴 종료 방지. 시작 프로그램에 넣어 둔다 |
+
+### 벤더링한 스냅샷의 출처
+
+`traffic_project/` 와 `traffic-deploy/` 는 별도 저장소를 **특정 시점 스냅샷으로 복사**한 것이다
+(`.git` 을 떼어 냈으므로 클론 한 번이면 전부 받아진다). 어디서 떠왔는지:
+
+| 폴더 | 상류 저장소 | 커밋 | 날짜 |
+|---|---|---|---|
+| `traffic_project/` | [hantaeho123/traffic_project](https://github.com/hantaeho123/traffic_project) | `4fc5d58` efficient logic | 2026-09-20 |
+| `traffic-deploy/` | [Hanhws/traffic-deploy](https://github.com/Hanhws/traffic-deploy) | `484ad98` 설치 키트 | 2026-09-20 |
+
+상류에 새 커밋이 올라오면 이 폴더는 자동으로 따라가지 않는다. 최신으로 맞추려면 위 저장소에서
+다시 받아 덮어쓰고, 이 표의 커밋 해시를 갱신하면 된다.
 
 **저장소에 없는 것** (`.gitignore`):
 
 | | 왜 | 어떻게 구한다 |
 |---|---|---|
 | `키입력.txt` | ITS 인증키·HF 토큰·ngrok 토큰 | `키입력.example.txt` 복사해서 직접 채움 |
-| `traffic_project/` `traffic-deploy/` | 각자 `.git` 을 가진 별도 저장소 | 아래 clone 명령 |
-| `models/*.pt` | AI-Hub 데이터로 학습한 가중치 (상류도 같은 정책) | 학습 결과 `best.pt` 를 직접 배치 |
+| `models/*.pt` | AI-Hub 데이터로 학습한 산출물이라 재배포하지 않는다 | 학습 결과 `best.pt` 를 `models/` 에 직접 배치 |
+| `traffic_project/data/` `.venv/` `node_modules/` | 실행하면서 생기는 것 | `install.sh` 가 만든다 |
 
 ---
 

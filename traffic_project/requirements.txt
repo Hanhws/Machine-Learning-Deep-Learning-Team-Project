@@ -1,0 +1,29 @@
+# ---- 딥러닝 ----
+torch>=2.4
+torchvision>=0.19
+ultralytics>=8.4.100          # SAM3 / YOLO-seg
+git+https://github.com/ultralytics/CLIP.git   # SAM3 텍스트 프롬프트용 CLIP 토크나이저
+opencv-python>=4.10
+numpy>=1.26
+pillow>=10
+shapely>=2.0
+
+# ---- 웹 서버 ----
+fastapi>=0.115
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9
+pydantic>=2.7
+pydantic-settings>=2.3
+python-dotenv>=1.0
+aiofiles>=23
+httpx>=0.27
+
+# ---- DB ----
+SQLAlchemy>=2.0
+psycopg[binary]>=3.1
+
+# ---- 기타 ----
+huggingface_hub>=0.24      # scripts/download_sam3.py
+
+# ---- 테스트 ----
+pytest>=8
