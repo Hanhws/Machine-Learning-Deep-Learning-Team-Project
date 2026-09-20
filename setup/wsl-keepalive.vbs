@@ -1,0 +1,6 @@
+' WSL ???? ?? ???. ??? 10? ? ?? ???.
+Set sh = CreateObject("WScript.Shell")
+Do
+  sh.Run "wsl.exe -d Ubuntu-24.04 -u root -- /bin/sleep infinity", 0, True
+  WScript.Sleep 10000
+Loop
