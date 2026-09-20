@@ -171,6 +171,7 @@ opposite are offered as the headings for directions 1 and 2.
 |---|---|
 | `traffic_project/` | **The application.** Backend, frontend and ML pipeline. See [traffic_project/README.md](traffic_project/README.md) |
 | `traffic-deploy/` | Install scripts (`install.sh`, `windows-setup.ps1`, `provision.sh` for cloud) |
+| [`docs/발표자료.pdf`](docs/발표자료.pdf) | **Presentation deck**, 35 slides (Korean). Slide script: [한국어](docs/presentation.ko.md) · [English](docs/presentation.en.md) |
 | `setup/` | Windows power settings · WSL keepalive |
 | [`DEPLOY.md`](DEPLOY.md) | **Laptop deployment notes** — install procedure, recovery commands, five problems actually hit along the way (Korean) |
 | `키입력.example.txt` | Credentials template |

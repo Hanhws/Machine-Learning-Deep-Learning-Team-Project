@@ -160,6 +160,7 @@ Metal 커맨드 버퍼를 만지면 프로세스가 통째로 죽는 문제를 �
 |---|---|
 | `traffic_project/` | **프로그램 본체.** 백엔드·프론트엔드·ML 파이프라인. 자세한 내용은 [traffic_project/README.md](traffic_project/README.md) |
 | `traffic-deploy/` | 설치 스크립트 (`install.sh`, `windows-setup.ps1`, 클라우드용 `provision.sh`) |
+| [`docs/발표자료.pdf`](docs/발표자료.pdf) | **발표 슬라이드** 35장. 슬라이드 원고는 [한국어](docs/presentation.ko.md) · [English](docs/presentation.en.md) |
 | `setup/` | 윈도우 전원 설정 · WSL keepalive |
 | [`DEPLOY.md`](DEPLOY.md) | **노트북 배포 운영 메모** — 설치 절차, 복구 명령, 실제로 막혔던 문제 5가지 |
 | `키입력.example.txt` | 키 입력 템플릿 |
