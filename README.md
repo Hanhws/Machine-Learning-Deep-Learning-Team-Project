@@ -1,3 +1,5 @@
+**한국어** · [English](README.en.md)
+
 # 도로 CCTV 혼잡도 모니터
 
 **Segmentation 기반 도로 대비 차량 면적비를 활용한 교통 혼잡도 측정 시스템**
