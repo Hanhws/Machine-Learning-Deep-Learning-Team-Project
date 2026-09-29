@@ -2,7 +2,7 @@
 
 # Presentation — Slide Script (English)
 
-Original deck: [`발표자료.pdf`](발표자료.pdf) · 35 slides · Canva (Korean)
+Original deck: [`발표자료.pdf`](발표자료.pdf) · 34 slides · Canva (Korean) · final version (2026-09-23)
 
 > This file carries the English text for every slide. To produce the English deck, duplicate the
 > Canva design and swap the text in — the layout and figures stay as they are.
@@ -24,7 +24,7 @@ SNU KDT Cohort 13, Team 6 — Seojin Kwon, Juhee Lee, Seoyoung Jeon, Uijin Jeong
 | 03 | Vehicle segmentation |
 | 04 | Demo |
 | 05 | Applications |
-| 06 | Pain points |
+| 06 | Future work |
 
 ---
 
@@ -79,14 +79,14 @@ Image input → count road pixels → count vehicle pixels → compute congestio
 
 Measuring traffic congestion from the vehicle-to-road area ratio in CCTV footage, using segmentation
 
+## 11. Approach
+
+- Vehicle segmentation = **YOLO-seg**
+- Road segmentation = **SAM 3 + manual refinement**
+
 ---
 
 # 02. Road Segmentation
-
-## 11. Approach
-
-- Road segmentation = **SAM 3 + manual refinement**
-- Vehicle segmentation = **YOLO-seg**
 
 ## 12. Problems we had to solve
 
@@ -94,17 +94,18 @@ Measuring traffic congestion from the vehicle-to-road area ratio in CCTV footage
 2. How to determine the **direction** of travel
 3. How to handle frames containing **multiple roads**
 
-## 13. Attempt 1 — automatic road detection
+## 13. The road itself
 
 Segment the road with Mask2Former or SAM 3, using lane markings
 
-## 14. Attempt 2 — direction from motion
+## 14. Direction of travel
 
-Use the median strip plus **eight consecutive frames** to infer direction
+Use the median strip plus **whether vehicles show their front or their rear** to infer direction
 
-## 15. Conclusion
+## 15. Multiple roads
 
-Neither worked reliably → but the road only has to be captured **once** → **SAM 3 + manual refinement**
+Could not be solved automatically → but the road only has to be captured **once** →
+**SAM 3 + manual refinement**
 
 > Because each camera is fixed, the expensive step can be pushed to registration time and done once.
 
@@ -112,11 +113,18 @@ Neither worked reliably → but the road only has to be captured **once** → **
 
 # 03. Vehicle Segmentation
 
-## 16. Dataset
+## 16. Model — why YOLO
+
+1. **Training cost**
+2. **Realtime capability**
+
+YOLO is CNN-based and therefore lightweight.
+
+## 17. EDA — dataset
 
 AI-Hub — CCTV traffic footage for solving transport problems (highway)
 
-## 17. Shrinking the data
+## 18. EDA — shrinking the data
 
 ```
 550 GB  →  60 GB  →  13 GB  →  4 GB
@@ -124,57 +132,56 @@ AI-Hub — CCTV traffic footage for solving transport problems (highway)
           only      to JPG
 ```
 
-## 18. Cleaning
+## 19. EDA — data cleansing
 
 - Removed **524** images with no labels
 - Removed **197** duplicate copies sharing a filename
 - **26,310 → 25,589** images
 
-## 19–20. (Figures)
+## 20–21. EDA (figures)
 
-## 21. Downsampling strategy
+## 22. EDA — dataset reduction
 
 Problem: the dataset was too large, and performance was poor in rain and at night
-→ downsample so that **hard images are over-represented**
+→ reduce the dataset so that **hard images are over-represented**
 
 | | train | val | test |
 |---|---|---|---|
 | Before | 20,000 | 2,500 | 2,500 |
 | After | 2,500 | 1,000 | 5,000 |
 
-## 22. easy / hard criteria
+## 23. EDA — easy / hard criteria
 
 - **easy** — daytime *and* clear weather, both satisfied
 - **hard** — either condition not met
 
-## 23. Why YOLO
-
-1. **Training cost**
-2. **Realtime capability**
-
-YOLO is CNN-based and therefore lightweight.
-
-## 24. How we ran experiments
+## 24. Results — how we ran experiments
 
 Each member trained a different YOLO variant with different hyperparameters, and results were
 shared in a common tracking sheet.
 
-## 25. Model selection
+> The spreadsheet linked on the slide is the team's experiment log.
+> Copy in this repository: [`training/results/결과테이블.csv`](../training/results/결과테이블.csv)
+
+## 25. Results — model selection
 
 Judged on **mAP and GFLOPs**; **YOLO26s-seg** selected as the final model.
 
-## 26. Segmentation output
+## 26. Results — segmentation output
 
 YOLO26s-seg segmentation results
 
-## 27. Training
+## 27. Results — training
 
-## 28. Final performance
+## 28. Results — final performance
 
 | Metric | Value |
 |---|---|
-| mAP50-95-seg (test) | **0.6452** |
+| mAP50-95-seg (test) | **0.6339** |
 | mAP50-seg (test) | **0.8414** |
+
+> The experiment log records mAP50-95-seg (test) as **0.6452** for the same run
+> (yolo26s-seg · imgsz 1280), which is also what the previous version of this slide (09-20) showed.
 
 ---
 
@@ -191,33 +198,23 @@ gateway for intelligent transport data.
 
 # 05. Applications
 
-# 30. Policy case
+## 30. Commercial ideas
 
-Congestion cost Korea roughly **KRW 81.3 trillion** in 2023.
+- A sharp rise in congestion on a given stretch gives **early warning of an accident or sudden jam**
+- Compare congestion across roads to **suggest detours**
+- Works on **existing CCTV infrastructure** — no new hardware to install
+
+## 31. Policy use
 
 - Transport infrastructure investment decisions
 - Analysing where road expansion is needed
 - Measuring the effect of transport policy
 
-## 31. Commercial ideas
-
-- A sharp rise in occupancy on a given stretch gives **early warning of an accident or sudden jam**
-- Compare congestion across roads to **suggest detours**
-- Works on **existing CCTV infrastructure** — no new hardware to install
-
-## 32. Comparable services
-
-| Rank | Service | Existing approach |
-|---|---|---|
-| 1 | Ministry of the Interior and Safety — AI CCTV traffic analysis | Existing CCTV plus AI to classify 12 vehicle types and count traffic per lane |
-| 2 | Nota · RaonRoad | CCTV AI analysis for traffic volume and congestion, feeding operations and signal control |
-| 3 | Korea Expressway Corporation VDS | Loop detectors measuring volume, mean speed, occupancy and other indicators |
-
 ---
 
-# 06. Pain Points
+# 06. Future Work
 
-## 33. Limitations
+## 32. Future work
 
 - Distant vehicles are often missed
 - Overall performance drops in low light and similar conditions
@@ -225,4 +222,18 @@ Congestion cost Korea roughly **KRW 81.3 trillion** in 2023.
 - Only the segmented road area is processed, so anything outside it is ignored
 - Incoming camera frames do not contain roads and vehicles alone
 
-## 34–35. (Closing slides)
+## 33–34. (Closing slides)
+
+Thank you · Q & A
+
+---
+
+## Changes from the previous version (2026-09-20, 35 slides)
+
+- Section 03 order: "Why YOLO" moved ahead of the EDA slides (now slide 16)
+- Slide 14: direction cue changed from "eight consecutive frames" to "front or rear view of vehicles"
+- Slide 19 titled "data cleansing"; slide 22 "downsampling" → "dataset reduction"
+- Slide 28: test mAP50-95-seg 0.6452 → 0.6339
+- Section 05: commercial ideas now come first; "policy case" became "policy use" (KRW 81.3 trillion
+  line dropped); the comparable-services slide was removed
+- Section 06: "pain points" → "future work"
