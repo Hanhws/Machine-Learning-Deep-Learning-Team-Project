@@ -33,6 +33,21 @@ traffic_project/frontend/node_modules/
 *.pyc
 
 # ─────────────────────────────────────────────
+#  학습 데이터 · 학습 산출물
+#  AI-Hub 원천 데이터와 그것으로 만든 데이터셋은 재배포할 수 없다.
+#  training/ 의 스크립트·노트북을 실행하면 그 옆에 아래 폴더가 생긴다.
+# ─────────────────────────────────────────────
+training/car_seg_dataset/
+training/car_seg_eda/
+training/car_seg_split/
+training/car_seg_finetune/
+*.zip.part*
+*.tar
+
+# 팀 제출본을 압축 푼 폴더 — 내용은 training/ · traffic_project/ · docs/ 로 옮겨 정리했다
+6조_DL프로젝트_segmentation 기반 혼잡도 측정/
+
+# ─────────────────────────────────────────────
 #  런타임 · 임시
 # ─────────────────────────────────────────────
 data/
