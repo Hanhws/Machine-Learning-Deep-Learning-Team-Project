@@ -30,22 +30,22 @@
 
 | 모델 | 역할 | 실행 시점 |
 |---|---|---|
-| **YOLO-seg** (파인튜닝) | 차량 인스턴스 분할 — `car` / `bus` / `truck` | **매 프레임** |
-| **SAM 3** | 도로 영역 분할. 텍스트 프롬프트 `"road"` + 점·박스 프롬프트 | **등록 시 1회** |
+| **YOLO26s-seg** (파인튜닝) | 차량 인스턴스 분할 — `car` / `bus` / `truck` | **매 프레임** |
+| **SAM 3** | 도로 영역 분할. 텍스트 프롬프트 `"road"` + 점·박스 프롬프트. 스냅샷 속 차량 자리까지 노면으로 채운다 | **등록 시 1회** |
 
 도로 마스크는 한 번 확정하면 `road_mask.png`(0=도로 아님, 1~8=방향)로 저장되어 계속 재사용된다.
 그래서 실시간 경로에서는 YOLO 만 돌고, SAM 은 관여하지 않는다.
 
-> SAM3 가중치가 없으면 SAM 2.1 로 자동 대체된다. 이때는 텍스트 프롬프트만 빠지고
+> SAM3 가중치가 없으면 SAM 2.1 로 자동 대체된다. 이때는 텍스트 프롬프트와 차량 자리 채우기만 빠지고
 > 점·박스·브러시로 칠하는 것은 그대로 동작한다.
 
 ### 추론 설정
 
 | | |
 |---|---|
-| 입력 해상도 | `imgsz 960` · `retina_masks` |
+| 입력 해상도 | `imgsz 1280`(최종 모델의 학습 해상도, `.env` 의 `YOLO_IMGSZ` — 코드 기본값은 960) · `retina_masks` |
 | 신뢰도 임계값 | YOLO `0.25` · SAM `0.30` |
-| 추론 주기 | 기본 10초/장 · 실시간 모드 2 FPS · 카메라별 1초~10분 조절 |
+| 추론 주기 | 기본 5초/장 · 실시간 모드 2 FPS · 카메라별 1초~10분 조절 |
 | DB 기록 | 5초 평균 집계 |
 | 실행 장치 | CUDA / MPS / CPU 자동 선택 |
 
@@ -75,13 +75,40 @@
 
 ---
 
+## 차량 모델 학습
+
+AI-Hub 「교통문제 해결을 위한 CCTV 교통 영상(고속도로)」 폴리곤 데이터로 YOLO-seg 를 파인튜닝했다.
+6명이 같은 노트북으로 모델 · 해상도 · 하이퍼파라미터를 나눠 맡아 21번 실험했다.
+전처리 · EDA · 분할 · 학습 코드와 전체 실험 기록은 [`training/`](training/README.md) 에 있다.
+
+| | |
+|---|---|
+| 데이터 | 정제 후 25,589장 · CCTV 49대 · `car` / `bus` / `truck` |
+| 분할 | train 2,500 / val 1,000 / test 5,000. CCTV · 클립 단위로 나눠 비슷한 프레임이 train 과 test 에 함께 들어가지 않게 하고, val · test 는 실제 분포 그대로, train 은 어려운 이미지(야간 · 악천후 · 터널 등) 위주로 줄였다 |
+| 최종 모델 | **YOLO26s-seg · imgsz 1280** — test mask mAP50-95 **0.645** · mAP50 **0.841** |
+
+| 모델 | imgsz | test mask mAP50-95 | 파라미터 |
+|---|---|---|---|
+| YOLO26m-seg | 1280 | 0.6549 | 27.0M |
+| YOLO11m-seg | 1280 | 0.6453 | 22.4M |
+| **YOLO26s-seg** | **1280** | **0.6452** | **11.4M** |
+| YOLO11s-seg | 1280 | 0.6376 | 10.1M |
+| YOLO26n-seg | 1280 | 0.6177 | 3.1M |
+| YOLO26n-seg | 640 | 0.4232 | 3.1M |
+
+- **해상도가 가장 큰 변수였다.** 다른 설정을 그대로 둔 YOLO26n 이 imgsz 640 → 1280 에서 0.423 → 0.618.
+  CCTV 속 차량 대부분이 작은 객체라 해상도의 영향이 크다.
+- **s 를 고른 이유** — mAP 와 연산량(GFLOPs)을 함께 봤다. YOLO26m 보다 0.010 낮지만 파라미터가 절반 이하다.
+
+---
+
 ## 화면
 
 | 경로 | 내용 |
 |---|---|
-| `/overview` | 전국 지도에 지점별 점유율을 혼잡 단계 색으로. 실시간 / 15분·1시간·24시간 평균, 노선·지역 묶음, 순위 |
+| `/overview` | 전국 지도에 지점별 점유율을 혼잡 단계 색으로. 실시간 / 15분·1시간·24시간 평균, 방면별 진행 방향 화살표, 노선·지역 묶음, 순위 |
 | `/` | 지도 관제. KPI, 단계별 색 마커, 필터, **타임라인 재생**(최근 1~24시간 되감기), 선택 카메라의 실시간 세그멘테이션 |
-| `/register` | CCTV 등록 3단계. ITS 자동 검색 → **마스크 편집기** → 정보 입력 |
+| `/register` | CCTV 등록 3단계. ITS 자동 검색 → **마스크 편집기** → 정보 · 방면 입력 (진행 방향 자동 계산) |
 | `/cameras` | 격자 뷰(실시간 MJPEG) · 표 뷰(일괄 제어). 상세에서 추이 차트, 캡처, **요일×시간 히트맵**, 영상 전체 분석 |
 | `/stats` | 노선·지역·구간·카메라별 평균, 스파크라인, 지체 경보, CSV |
 | `/apps` | 그룹 리포트 (**한강 대교 26개** 프리셋). 일별 리포트, **통행 분산 정책 시나리오**, 자동 인사이트, PDF |
@@ -89,7 +116,7 @@
 
 ### 마스크 편집기 (등록 2단계)
 
-- **도로 자동 제안** — SAM3 텍스트 프롬프트 `"road"` 로 초기 마스크 생성
+- **도로 자동 제안** — SAM3 텍스트 프롬프트 `"road"` 로 초기 마스크 생성. 도로에 닿은 차량 자리도 함께 채운다
 - **SAM 점**(클릭 포함 / Shift·우클릭 제외) · **SAM 박스** · **브러시/지우개** · **다각형**
 - **분할선** — 중앙분리대를 따라 선을 그으면 도로 픽셀이 양쪽 방향으로 나뉜다. 양방향 도로를 나누는 가장 빠른 방법
 - 휠 확대, Space+드래그 이동, 실행취소, 구멍 메우기, 단축키
@@ -102,12 +129,13 @@
 | 영역 | |
 |---|---|
 | 모델·추론 | PyTorch · Ultralytics (YOLO-seg, SAM 3 / SAM 2.1) · OpenCV · NumPy · Shapely |
+| 학습·분석 | Ultralytics 8.4 · pandas · matplotlib · Pillow |
 | 백엔드 | FastAPI · Uvicorn · Pydantic v2 · SQLAlchemy 2.0 · psycopg 3 · httpx |
 | DB | PostgreSQL — 카메라 · 방향 · 점유율 시계열 · 응용 그룹 · 분석 작업 |
 | 프론트엔드 | React 19 · TypeScript · Vite · React Router 7 |
 | 지도·차트·영상 | Leaflet / react-leaflet · Recharts · hls.js · Canvas 마스크 편집기 |
-| 외부 연동 | 국가교통정보센터(ITS) CCTV Open API · Hugging Face Hub |
-| 테스트 | pytest (점유율 계산·ITS 파싱·임계값·렌더링) · Puppeteer E2E |
+| 외부 연동 | 국가교통정보센터(ITS) CCTV Open API · OpenStreetMap Nominatim · Hugging Face Hub |
+| 테스트 | pytest (점유율 계산·ITS 파싱·임계값·렌더링·도로 채우기·노선 방향) · Puppeteer E2E |
 
 ---
 
@@ -138,8 +166,16 @@ Metal 커맨드 버퍼를 만지면 프로세스가 통째로 죽는 문제를 �
 60초 이상이면 주기마다 새로 접속해 한 장만 받고 끊는다. ITS CDN 의 동시 세션·재접속 제한을
 피하기 위한 절충이다.
 
-**도로 축 자동 제안** — 같은 노선의 이웃 CCTV 좌표를 ITS 에서 받아 **주성분 분석**으로 도로가
-뻗은 축을 구하고, 그 축과 반대 방향을 방향 1·2 의 진행 각도로 제안한다.
+**도로 마스크 = 노면 전체** — 점유율의 분모는 차량이 서 있는 자리까지 포함한 노면 전체여야 한다.
+SAM3 의 `"road"` 는 보이는 노면만 잡기 때문에 등록 스냅샷 속 차량 자리가 구멍으로 빠지고, 막힌 도로일수록
+분모가 작아져 점유율이 부풀려진다(광교방음터널 정체 스냅샷: 도로 32.1% → 차량 자리 포함 47.9%).
+그래서 SAM3 를 한 번 호출해 `road` 와 `car, truck, bus` 를 따로 받고, 도로에 닿은 차량만 도로에 합친 뒤
+도로로 둘러싸인 작은 구멍을 메운다. 주차장 · 측도의 차량과 중앙분리대 같은 큰 섬은 채우지 않는다.
+
+**방면으로 진행 방향 계산** — 방향은 화면 속 표지판의 목적지(방면, 예: 서울)로 정한다. ITS 에서 같은 노선
+CCTV 좌표를 받아 이어 노선 선을 만들고, 선 위에서 목적지(내장 표 → OpenStreetMap Nominatim, 캐시)가
+카메라의 앞쪽인지 뒤쪽인지로 진행 각도를 구한다. 한쪽 방면만 풀리면 나머지는 반대 방향으로 채운다.
+마스크를 칠하지 않은 방면은 0% 가 아니라 **미측정**으로 두고 DB 에도 쓰지 않는다.
 
 ---
 
@@ -147,6 +183,8 @@ Metal 커맨드 버퍼를 만지면 프로세스가 통째로 죽는 문제를 �
 
 - **원근** 때문에 화면 아래쪽 차량의 픽셀 면적이 과대평가된다. 따라서 지점 간 절대 비교보다
   **같은 지점의 시간·방향 비교**가 신뢰도가 높다.
+- 멀리 있는(작은) 차량을 놓치기 쉽고, **악천후**에서 성능이 크게 떨어진다
+  (최종 모델 test mask mAP50-95 — 전체 0.645, 악천후 0.407).
 - 차종(`car`/`bus`/`truck`) 분류 정확도가 상대적으로 낮아, UI 에서 차종 구분 모드를 끌 수 있게 했다.
   점유율 자체는 차종과 무관하게 계산된다.
 - 분모가 되는 도로 영역은 차량이 덮을 수 있는 **노면 전체**여야 하므로, 등록 시 갓길·중앙분리대는
@@ -159,8 +197,9 @@ Metal 커맨드 버퍼를 만지면 프로세스가 통째로 죽는 문제를 �
 | | |
 |---|---|
 | `traffic_project/` | **프로그램 본체.** 백엔드·프론트엔드·ML 파이프라인. 자세한 내용은 [traffic_project/README.md](traffic_project/README.md) |
+| `training/` | **차량 모델 학습.** 데이터 전처리 · EDA · 분할 스크립트, 파인튜닝 노트북, 팀 실험 결과표. [training/README.md](training/README.md) |
 | `traffic-deploy/` | 설치 스크립트 (`install.sh`, `windows-setup.ps1`, 클라우드용 `provision.sh`) |
-| [`docs/발표자료.pdf`](docs/발표자료.pdf) | **발표 슬라이드** 35장. 슬라이드 원고는 [한국어](docs/presentation.ko.md) · [English](docs/presentation.en.md) |
+| [`docs/발표자료.pdf`](docs/발표자료.pdf) | **발표 슬라이드** 34장 (최종본). 슬라이드 원고는 [한국어](docs/presentation.ko.md) · [English](docs/presentation.en.md) |
 | `setup/` | 윈도우 전원 설정 · WSL keepalive |
 | [`DEPLOY.md`](DEPLOY.md) | **노트북 배포 운영 메모** — 설치 절차, 복구 명령, 실제로 막혔던 문제 5가지 |
 | `키입력.example.txt` | 키 입력 템플릿 |
@@ -172,8 +211,10 @@ Metal 커맨드 버퍼를 만지면 프로세스가 통째로 죽는 문제를 �
 
 | 폴더 | 상류 저장소 | 커밋 | 날짜 |
 |---|---|---|---|
-| `traffic_project/` | [hantaeho123/traffic_project](https://github.com/hantaeho123/traffic_project) | `4fc5d58` efficient logic | 2026-09-20 |
+| `traffic_project/` | [hantaeho123/traffic_project](https://github.com/hantaeho123/traffic_project) | `6acc9b7` sam3 alone | 2026-09-22 |
 | `traffic-deploy/` | [Hanhws/traffic-deploy](https://github.com/Hanhws/traffic-deploy) | `484ad98` 설치 키트 | 2026-09-20 |
+
+`traffic_project/` 는 팀 최종 제출본의 데모 코드와 같다.
 
 ### 저장소에 없는 것
 
@@ -181,6 +222,7 @@ Metal 커맨드 버퍼를 만지면 프로세스가 통째로 죽는 문제를 �
 |---|---|
 | `키입력.txt` | ITS 인증키·HF 토큰·ngrok 토큰. `키입력.example.txt` 를 복사해서 직접 채운다 |
 | `models/*.pt` | AI-Hub 데이터로 학습한 산출물이라 재배포하지 않는다 |
+| 학습 데이터셋 | AI-Hub 원천 데이터와 전처리 · 분할본(4.4GB). 재배포할 수 없어서 `training/` 의 스크립트로 다시 만든다 |
 | `data/` `.venv/` `node_modules/` | 실행하면서 생기는 것. `install.sh` 가 만든다 |
 
 ---
@@ -200,7 +242,7 @@ bash scripts/run_prod.sh       # http://localhost:8000
 
 | | |
 |---|---|
-| `yolov8s_seg_vehicle.pt` | 파인튜닝한 차량 YOLO-seg |
+| 차량 YOLO-seg | 파인튜닝한 가중치. 기본 파일명은 `yolov8s_seg_vehicle.pt` 이고, 다른 파일을 쓰려면 `.env` 의 `YOLO_WEIGHTS` 로 지정한다. 최종 모델(YOLO26s-seg, `yolo26_s_1280_best.pt`)은 `YOLO_IMGSZ=1280` 과 함께 쓴다 |
 | `sam3.pt` | `python scripts/download_sam3.py --token hf_xxx` — [facebook/sam3](https://huggingface.co/facebook/sam3) 라이선스 동의가 먼저 필요하다 |
 
 윈도우 노트북(WSL2 + GPU)에 무중단으로 올리는 방법은 [DEPLOY.md](DEPLOY.md) 를 참고.
