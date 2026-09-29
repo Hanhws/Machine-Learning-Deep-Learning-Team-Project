@@ -77,6 +77,8 @@ def compute_occupancy(vehicle: VehicleResult, road_label: np.ndarray, n_directio
     for d in [0] + list(range(1, n_directions + 1)):
         row = table[1 : road_max + 1].sum(0) if d == 0 else (table[d] if d <= road_max else np.zeros(stride, np.int64))
         road_px = int(row.sum())
+        if d > 0 and road_px == 0:
+            continue  # 마스크를 칠하지 않은 방향 = 미측정. 0% 로 내보내지 않는다
         vehicle_px = int(row[1:].sum())
         m = DirectionMetrics(
             direction_index=d,

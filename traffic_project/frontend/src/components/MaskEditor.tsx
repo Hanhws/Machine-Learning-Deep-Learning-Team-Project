@@ -108,6 +108,7 @@ export default function MaskEditor({ imageUrl, width, height, snapshotId, camera
   const [err, setErr] = useState<string | null>(null)
   const [samStatus, setSamStatus] = useState<{ backend: string; text_prompt: boolean } | null>(null)
   const [opacity, setOpacity] = useState(0.45)
+  const [pendingVeh, setPendingVeh] = useState(0)
   const [pending, setPending] = useState<Uint8Array | null>(null)
   const [cursor, setCursor] = useState<{ x: number; y: number } | null>(null)
   const [bgSrc, setBgSrc] = useState('')
@@ -269,20 +270,21 @@ export default function MaskEditor({ imageUrl, width, height, snapshotId, camera
 
   // ---- SAM ----
   const ref = () => (snapshotId ? { snapshot_id: snapshotId } : { camera_id: cameraId })
-  const toPending = async (b64: string) => {
-    const m = await decodeMaskPng(b64, width, height)
+  const toPending = async (r: { mask_png_base64: string; vehicles_added?: number }) => {
+    const m = await decodeMaskPng(r.mask_png_base64, width, height)
     for (let i = 0; i < m.length; i++) m[i] = m[i] > 127 ? 1 : 0
+    setPendingVeh(r.vehicles_added ?? 0)
     setPending(m)
   }
   const runSam = async (kind: 'point' | 'box' | 'text' | 'auto') => {
     setErr(null)
     setBusy({ point: 'SAM 점 추론 중…', box: 'SAM 박스 추론 중…', text: 'SAM3 텍스트 추론 중…', auto: '도로 자동 제안 중… (수 초)' }[kind])
     try {
-      if (kind === 'text') await toPending((await api.segment.text({ ...ref(), text })).mask_png_base64)
-      else if (kind === 'point') await toPending((await api.segment.prompt({ ...ref(), points: points.map((p) => [p.x, p.y]), labels: points.map((p) => p.label) })).mask_png_base64)
-      else if (kind === 'box' && box) await toPending((await api.segment.prompt({ ...ref(), boxes: [[Math.min(box.x1, box.x2), Math.min(box.y1, box.y2), Math.max(box.x1, box.x2), Math.max(box.y1, box.y2)]] })).mask_png_base64)
+      if (kind === 'text') await toPending(await api.segment.text({ ...ref(), text }))
+      else if (kind === 'point') await toPending(await api.segment.prompt({ ...ref(), points: points.map((p) => [p.x, p.y]), labels: points.map((p) => p.label) }))
+      else if (kind === 'box' && box) await toPending(await api.segment.prompt({ ...ref(), boxes: [[Math.min(box.x1, box.x2), Math.min(box.y1, box.y2), Math.max(box.x1, box.x2), Math.max(box.y1, box.y2)]] }))
       else if (kind === 'auto') {
-        if (samStatus?.text_prompt) await toPending((await api.segment.text({ ...ref(), text: 'road' })).mask_png_base64)
+        if (samStatus?.text_prompt) await toPending(await api.segment.text({ ...ref(), text: 'road' }))
         else {
           // SAM2 대체: 화면 하단 여러 지점에 점 프롬프트를 각각 주고 합집합
           const spots = [[0.3, 0.72], [0.5, 0.8], [0.7, 0.72], [0.4, 0.55], [0.6, 0.55]]
@@ -294,6 +296,7 @@ export default function MaskEditor({ imageUrl, width, height, snapshotId, camera
             if (cov > 0.6) continue // 화면 대부분을 잡은 결과(하늘/전체)는 버림
             for (let i = 0; i < m.length; i++) if (m[i] > 127) union[i] = 1
           }
+          setPendingVeh(0)
           setPending(union)
         }
       }
@@ -422,7 +425,7 @@ export default function MaskEditor({ imageUrl, width, height, snapshotId, camera
 
       <div className="toolbar" style={{ marginBottom: 0 }}>
         <div className="group">
-          <button className="sm primary" onClick={() => runSam('auto')} disabled={!!busy} title={samStatus?.text_prompt ? 'SAM3 텍스트 "road"' : 'SAM2: 화면 하단 여러 점으로 추론해 합칩니다'}><Sparkles />도로 자동 제안</button>
+          <button className="sm primary" onClick={() => runSam('auto')} disabled={!!busy} title={samStatus?.text_prompt ? 'SAM3 "road" + 그 위의 차량 자리까지 한 번에 (분모 = 노면 전체)' : 'SAM2: 화면 하단 여러 점으로 추론해 합칩니다 (차량 자리 포함)'}><Sparkles />도로 자동 제안</button>
           {samStatus?.text_prompt && (<><input value={text} onChange={(e) => setText(e.target.value)} style={{ width: 90 }} /><button className="sm" onClick={() => runSam('text')} disabled={!!busy}><Wand2 />텍스트</button></>)}
         </div>
         <div className="group">
@@ -458,7 +461,7 @@ export default function MaskEditor({ imageUrl, width, height, snapshotId, camera
 
       {pending && (
         <div className="banner warn" style={{ alignItems: 'center' }}>
-          <span className="grow">노란 미리보기 영역({((pending.reduce((a, v) => a + v, 0) / total) * 100).toFixed(1)}%)을 어디에 넣을까요?</span>
+          <span className="grow">노란 미리보기 영역({((pending.reduce((a, v) => a + v, 0) / total) * 100).toFixed(1)}%{pendingVeh > 0 ? `, 그중 차량 자리 ${(pendingVeh * 100).toFixed(1)}%` : ''})을 어디에 넣을까요?</span>
           {mergeMode === 'add' ? directions.map((d) => <button key={d.index} className="sm primary" onClick={() => applyPending(d.index)}><span className="dot" style={{ background: d.color, width: 8, height: 8 }} />{d.name} 에 추가</button>) : <button className="sm danger" onClick={() => applyPending()}>도로에서 제외</button>}
           <button className="sm ghost" onClick={() => setPending(null)}>버리기</button>
         </div>
@@ -470,7 +473,7 @@ export default function MaskEditor({ imageUrl, width, height, snapshotId, camera
           <div key={d.index} className="group row" style={{ gap: 4, padding: '3px 6px', background: 'var(--panel-2)', border: `1px solid ${current === d.index ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 8, cursor: 'pointer' }} onClick={() => setCurrent(d.index)}>
             <span className="kbd">{d.index}</span>
             <input type="color" value={d.color} onChange={(e) => onDirectionsChange(directions.map((x) => (x.index === d.index ? { ...x, color: e.target.value } : x)))} onClick={(e) => e.stopPropagation()} style={{ width: 26, height: 26 }} />
-            <input value={d.name} onChange={(e) => onDirectionsChange(directions.map((x) => (x.index === d.index ? { ...x, name: e.target.value } : x)))} onClick={(e) => e.stopPropagation()} style={{ width: 120, padding: '3px 6px' }} />
+            <input value={d.destination ?? ''} placeholder="방면 (예: 서울)" title="화면 속 표지판의 목적지. 예: ⬇ 부산 · 서울 ⬆ → 이 색 영역이 서울로 가는 차로면 '서울'" onChange={(e) => onDirectionsChange(directions.map((x) => (x.index === d.index ? { ...x, destination: e.target.value, name: e.target.value.trim() ? `${e.target.value.trim()} 방면` : `방향 ${x.index}` } : x)))} onClick={(e) => e.stopPropagation()} style={{ width: 120, padding: '3px 6px' }} />
             <span className="muted num">{(((st[d.index] || 0) / total) * 100).toFixed(1)}%</span>
           </div>
         ))}

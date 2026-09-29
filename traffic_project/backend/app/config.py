@@ -40,7 +40,7 @@ class Settings(BaseSettings):
 
     # ---- 실시간 처리 ----
     infer_fps: float = 2.0  # '실시간' 모드의 카메라당 초당 추론 횟수
-    default_infer_interval_s: float = 10.0  # 새 카메라의 기본 추론 주기(초). 0 = 실시간
+    default_infer_interval_s: float = 5.0  # 새 카메라의 기본 추론 주기(초). 0 = 실시간
     roi_crop: bool = True  # 도로 마스크 바운딩 박스만 잘라 추론
     roi_pad: int = 32
     sample_write_interval: float = 5.0

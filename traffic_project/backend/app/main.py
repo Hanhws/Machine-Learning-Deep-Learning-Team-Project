@@ -56,7 +56,8 @@ if dist.exists() and (dist / "index.html").exists():
         candidate = dist / full_path
         if full_path and candidate.is_file():
             return FileResponse(candidate)
-        return FileResponse(dist / "index.html")
+        # 화면 껍데기는 캐시하지 않는다 (빌드가 바뀌면 바로 새 JS 를 받도록). JS/CSS 는 파일명에 해시가 있어 캐시돼도 안전
+        return FileResponse(dist / "index.html", headers={"Cache-Control": "no-cache"})
 
 else:
 

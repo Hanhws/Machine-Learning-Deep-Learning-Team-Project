@@ -63,7 +63,7 @@ class VehicleSegmenter:
         except Exception as e:  # pragma: no cover
             log.warning("YOLO 워밍업 실패(무시): %s", e)
 
-    def infer(self, frame_bgr: np.ndarray) -> VehicleResult:
+    def infer(self, frame_bgr: np.ndarray, conf: float | None = None) -> VehicleResult:
         import time
 
         h, w = frame_bgr.shape[:2]
@@ -73,7 +73,7 @@ class VehicleSegmenter:
             results = self.model.predict(
                 frame_bgr,
                 imgsz=self.imgsz,
-                conf=self.conf,
+                conf=self.conf if conf is None else conf,
                 device=self.device,
                 retina_masks=True,
                 verbose=False,

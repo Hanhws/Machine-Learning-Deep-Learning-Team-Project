@@ -36,8 +36,10 @@ def init_db() -> None:
 
     with engine.begin() as conn:
         conn.execute(text("ALTER TABLE cameras ADD COLUMN IF NOT EXISTS infer_interval_s DOUBLE PRECISION"))
-        for col, typ in (("road", "VARCHAR(100)"), ("heading_deg", "DOUBLE PRECISION"), ("lat", "DOUBLE PRECISION"), ("lon", "DOUBLE PRECISION")):
+        for col, typ in (("road", "VARCHAR(100)"), ("heading_deg", "DOUBLE PRECISION"), ("lat", "DOUBLE PRECISION"), ("lon", "DOUBLE PRECISION"), ("destination", "VARCHAR(50)"), ("heading_source", "VARCHAR(10)")):
             conn.execute(text(f"ALTER TABLE directions ADD COLUMN IF NOT EXISTS {col} {typ}"))
+        # 칠하지 않은 방향이 남긴 가짜 0% 샘플 제거 (도로 픽셀 0 = 미측정)
+        conn.execute(text("DELETE FROM occupancy_samples WHERE direction_index > 0 AND road_px = 0"))
         # 주기가 비어 있는 카메라는 기본 주기로 (실시간은 0 으로 명시 저장)
         conn.execute(
             text("UPDATE cameras SET infer_interval_s = :d WHERE infer_interval_s IS NULL"),

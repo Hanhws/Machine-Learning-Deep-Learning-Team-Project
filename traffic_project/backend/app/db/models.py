@@ -71,6 +71,9 @@ class Direction(Base):
     color: Mapped[str] = mapped_column(String(16), default="#2a78d6")
     # 한 CCTV 에 도로가 여러 개일 수 있다 (본선/램프, 교차 도로). 같은 road 끼리 묶어 보여준다.
     road: Mapped[str | None] = mapped_column(String(100))
+    # 방면: 화면 속 표지판의 목적지 (예: 서울, 부산). 이름·지도 진행 방향을 이 값으로 정한다
+    destination: Mapped[str | None] = mapped_column(String(50))
+    heading_source: Mapped[str | None] = mapped_column(String(10))  # auto | manual
     # 지도 표시: 진행 방향 각도(북=0, 시계방향, 도) 와 화살표 위치(없으면 카메라 좌표)
     heading_deg: Mapped[float | None] = mapped_column(Float)
     lat: Mapped[float | None] = mapped_column(Float)

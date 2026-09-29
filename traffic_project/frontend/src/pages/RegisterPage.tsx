@@ -55,8 +55,8 @@ export default function RegisterPage() {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null)
   // ---- 마스크 ----
   const [directions, setDirections] = useState<Direction[]>([
-    { index: 1, name: '방향 1', color: DIRECTION_PALETTE[0] },
-    { index: 2, name: '방향 2', color: DIRECTION_PALETTE[1] },
+    { index: 1, name: '방향 1', color: DIRECTION_PALETTE[0], destination: '' },
+    { index: 2, name: '방향 2', color: DIRECTION_PALETTE[1], destination: '' },
   ])
   const editorRef = useRef<MaskEditorHandle | null>(null)
   const onEditorReady = useCallback((h: MaskEditorHandle) => { editorRef.current = h }, [])
@@ -265,7 +265,7 @@ export default function RegisterPage() {
 
       {step === 2 && snapshot && (
         <div className="stack">
-          <Banner kind="info">분모(도로)는 차량이 덮을 수 있는 <b>노면 전체</b>를 포함해야 합니다(갓길·중앙분리대 제외). 방향이 나뉜 도로는 방향마다 라벨을 다르게 칠하세요.</Banner>
+          <Banner kind="info">화면 속 방면 표지(예: "⬇ 부산 · 서울 ⬆")를 보고 <b>방면마다 다른 색</b>으로 차로를 칠하고, 아래 색 칩에 그 방면(예: 서울)을 적으세요. 보이는 방면은 <b>모두</b> 칠해야 합니다. 칠하지 않은 방면은 "미측정" 으로 남습니다. 분모는 차량이 덮을 수 있는 노면 전체입니다(갓길·중앙분리대 제외).</Banner>
           <MaskEditor imageUrl={snapshot.url} width={snapshot.width} height={snapshot.height} snapshotId={snapshot.snapshot_id} directions={directions} onDirectionsChange={setDirections} onReady={onEditorReady} />
           <div className="row between">
             <button onClick={() => setStep(1)}>← 소스 다시 선택</button>
@@ -294,7 +294,7 @@ export default function RegisterPage() {
               <label>추론 주기</label>
               <div className="row">
                 <select value={interval} onChange={(e) => setInterval_(+e.target.value)}>{INTERVAL_OPTIONS.map((o) => <option key={o.v} value={o.v}>{o.l}</option>)}</select>
-                <span className="muted">기본 10초마다 1장. 실시간은 GPU 를 계속 쓰므로 카메라가 많으면 부담이 큽니다 (나중에 변경 가능).</span>
+                <span className="muted">기본 5초마다 1장. 실시간은 GPU 를 계속 쓰므로 카메라가 많으면 부담이 큽니다 (나중에 변경 가능).</span>
               </div>
             </div>
             <div className="row" style={{ marginTop: 16 }}>
@@ -311,7 +311,7 @@ export default function RegisterPage() {
           </Card>
         </div>
           <Card title="방향 · 도로 · 지도 표시" icon={<Compass size={16} />} actions={<span className="muted">선택 사항 · 나중에 상세 페이지에서도 지정 가능</span>}>
-            <DirectionMapEditor directions={directions} onChange={setDirections} cameraLat={meta.lat ? +meta.lat : null} cameraLon={meta.lon ? +meta.lon : null} route={meta.route || null} roadType={selectedIts?.road_type ?? 'ex'} />
+            <DirectionMapEditor directions={directions} onChange={setDirections} cameraLat={meta.lat ? +meta.lat : null} cameraLon={meta.lon ? +meta.lon : null} route={meta.route || null} roadType={selectedIts?.road_type ?? 'ex'} roadPx={editorRef.current ? Object.fromEntries(Object.entries(editorRef.current.stats()).map(([k, v]) => [String(k), v])) : null} />
           </Card>
         </div>
       )}

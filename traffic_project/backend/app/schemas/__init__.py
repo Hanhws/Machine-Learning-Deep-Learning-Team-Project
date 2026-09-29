@@ -13,7 +13,9 @@ class DirectionIn(BaseModel):
     index: int = Field(ge=1, le=8)
     name: str
     color: str = "#2a78d6"
-    road: str | None = None  # 소속 도로 (예: 경부선 본선, 강동IC 진출램프)
+    road: str | None = None  # 노선 (예: 경부선, 강동IC 진출램프)
+    destination: str | None = None  # 방면 = 표지판 목적지 (예: 서울)
+    heading_source: str | None = Field(default=None, pattern="^(auto|manual)$")
     heading_deg: float | None = Field(default=None, ge=0, lt=360)  # 진행 방향 (북=0, 시계방향)
     lat: float | None = None  # 지도 화살표 위치 (없으면 카메라 좌표)
     lon: float | None = None
@@ -101,6 +103,7 @@ class SegmentTextIn(BaseModel):
     snapshot_id: str | None = None  # 등록 전 임시 스냅샷
     text: str = "road"
     conf: float | None = None
+    fill_vehicles: bool = True  # 스냅샷의 차량 자리도 도로로 (분모 = 노면 전체). 화면에서는 항상 켬
 
 
 class SegmentPromptIn(BaseModel):
@@ -109,6 +112,7 @@ class SegmentPromptIn(BaseModel):
     points: list[list[float]] | None = None  # [[x,y],...]
     labels: list[int] | None = None  # 1=포함 0=제외
     boxes: list[list[float]] | None = None  # [[x1,y1,x2,y2],...]
+    fill_vehicles: bool = True
 
 
 class MaskOut(BaseModel):
@@ -117,6 +121,7 @@ class MaskOut(BaseModel):
     width: int
     height: int
     backend: str
+    vehicles_added: float = 0.0  # 차량 자리로 채운 픽셀 비율 (프레임 대비)
 
 
 # ---------- 응용 그룹 ----------

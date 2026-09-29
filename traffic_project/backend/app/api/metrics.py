@@ -30,7 +30,11 @@ def _cam_brief(c: Camera) -> dict:
         "has_mask": bool(c.mask_path),
         "infer_interval_s": c.infer_interval_s,
         "directions": [
-            {"index": d.index, "name": d.name, "color": d.color, "road": d.road, "heading_deg": d.heading_deg, "lat": d.lat, "lon": d.lon}
+            {
+                "index": d.index, "name": d.name, "color": d.color, "road": d.road, "destination": d.destination,
+                "heading_deg": d.heading_deg, "heading_source": d.heading_source, "lat": d.lat, "lon": d.lon,
+                "measured": bool(((c.meta or {}).get("road_px") or {}).get(str(d.index))),
+            }
             for d in c.directions
         ],
     }
@@ -158,6 +162,7 @@ def summary(
             "direction_index": d,
             "name": "전체" if d == 0 else dir_names.get((cid, d), f"방향 {d}"),
             "road": None if d == 0 else getattr(dir_rows.get((cid, d)), "road", None),
+            "destination": None if d == 0 else getattr(dir_rows.get((cid, d)), "destination", None),
             "heading_deg": None if d == 0 else getattr(dir_rows.get((cid, d)), "heading_deg", None),
             "occupancy": float(occ),
             "max": float(mx),

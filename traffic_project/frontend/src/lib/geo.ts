@@ -90,3 +90,28 @@ export function groupByRoad<T extends { road?: string | null }>(dirs: T[]): [str
   })
   return [...m.entries()]
 }
+
+/** 줌·위도에서 1픽셀이 몇 m 인지 (Web Mercator) */
+export function metersPerPixel(zoom: number, lat: number): number {
+  return (156543.03392 * Math.cos((lat * Math.PI) / 180)) / Math.pow(2, zoom)
+}
+
+/** 진행 방향 순서의 선을 오른쪽으로 meters 만큼 평행 이동 (우측통행: 그 방면 차선 쪽) */
+export function offsetLine(coords: number[][], meters: number): [number, number][] {
+  if (coords.length < 2) return coords.map((c) => [c[0], c[1]] as [number, number])
+  const lat0 = coords[0][0]
+  const kx = Math.cos((lat0 * Math.PI) / 180) * 111320
+  const ky = 110540
+  const xy = coords.map(([la, lo]) => [lo * kx, la * ky])
+  const out: [number, number][] = []
+  for (let i = 0; i < xy.length; i++) {
+    const a = xy[Math.max(0, i - 1)], b = xy[Math.min(xy.length - 1, i + 1)]
+    let dx = b[0] - a[0], dy = b[1] - a[1]
+    const L = Math.hypot(dx, dy) || 1
+    dx /= L; dy /= L
+    // 진행 방향 (dx, dy) 의 오른쪽 법선 = (dy, -dx)
+    const x = xy[i][0] + dy * meters, y = xy[i][1] - dx * meters
+    out.push([y / ky, x / kx])
+  }
+  return out
+}

@@ -102,6 +102,20 @@ class RoadSegmenter:
 
         return self._run(lambda: run_gpu(_go, device=self.device))
 
+    def segment_concepts(self, image_bgr: np.ndarray, concepts: list[str], conf: float | None = None) -> dict[str, np.ndarray]:
+        """SAM3 한 번 호출로 여러 개념(예: road, car, truck, bus)을 찾아 개념별 합집합 마스크로 돌려준다."""
+        h, w = image_bgr.shape[:2]
+        concepts = [c.strip() for c in concepts if c.strip()]
+
+        def _go():
+            pred = self._load_semantic()
+            pred.args.conf = conf if conf is not None else self.conf
+            results = pred(source=image_bgr, text=concepts)
+            return _by_class(results, h, w, len(concepts))
+
+        per = self._run(lambda: run_gpu(_go, device=self.device))
+        return {c: per[i] for i, c in enumerate(concepts)}
+
     def segment_prompt(
         self,
         image_bgr: np.ndarray,
@@ -141,3 +155,21 @@ def _union(results, h: int, w: int) -> np.ndarray:
 
         m = np.stack([cv2.resize(x.astype(np.uint8), (w, h), interpolation=cv2.INTER_NEAREST) > 0 for x in m])
     return m.any(0)
+
+
+def _by_class(results, h: int, w: int, n: int) -> list[np.ndarray]:
+    """SAM3 결과를 텍스트 프롬프트(클래스) 별 합집합 마스크로."""
+    out = [np.zeros((h, w), dtype=bool) for _ in range(n)]
+    r = results[0]
+    if r.masks is None or len(r.masks) == 0:
+        return out
+    m = r.masks.data.cpu().numpy() > 0.5
+    if m.shape[1:] != (h, w):
+        import cv2
+
+        m = np.stack([cv2.resize(x.astype(np.uint8), (w, h), interpolation=cv2.INTER_NEAREST) > 0 for x in m])
+    cls = r.boxes.cls.cpu().numpy().astype(int) if r.boxes is not None else np.zeros(len(m), int)
+    for mi, ci in zip(m, cls):
+        if 0 <= ci < n:
+            out[ci] |= mi
+    return out

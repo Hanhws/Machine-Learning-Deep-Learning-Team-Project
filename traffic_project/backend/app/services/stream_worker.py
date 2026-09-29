@@ -88,6 +88,7 @@ class StreamWorker(threading.Thread):
         self.n_directions: int = 0
         self.direction_names: dict[int, str] = {}
         self.direction_roads: dict[int, str | None] = {}
+        self.direction_dests: dict[int, str | None] = {}
         self.direction_colors: list[tuple[int, int, int]] = list(DIRECTION_COLORS)
         self.name = ""
         self._cam_meta: dict = {}
@@ -121,6 +122,7 @@ class StreamWorker(threading.Thread):
                 self.roi = roi_from_mask(self.road_label, self.settings.roi_pad)
             self.direction_names = {d.index: d.name for d in cam.directions}
             self.direction_roads = {d.index: d.road for d in cam.directions}
+            self.direction_dests = {d.index: d.destination for d in cam.directions}
             self.direction_colors = [
                 hex_to_bgr(d.color, DIRECTION_COLORS[(d.index - 1) % len(DIRECTION_COLORS)]) for d in cam.directions
             ] or list(DIRECTION_COLORS)
@@ -429,6 +431,7 @@ class StreamWorker(threading.Thread):
             j = self.state.metrics_json(self.settings.congestion_thresholds, self.direction_names)
         for d in j["directions"]:
             d["road"] = self.direction_roads.get(d["direction_index"])
+            d["destination"] = self.direction_dests.get(d["direction_index"])
         j["name"] = self.name
         j["interval_s"] = self.interval or None
         return j

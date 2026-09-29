@@ -196,6 +196,15 @@ def put_mask(camera_id: int, body: MaskUpdate, db: Session = Depends(get_db)):
         cam.directions.append(Direction(**_dir_fields(d)))
     stats = {str(i): int((label == i).sum()) for i in idx}
     cam.meta = dict(cam.meta or {}, road_px=stats, road_coverage=float((label > 0).mean()))
+    try:
+        from app.services import routes as _rs
+
+        db.flush()
+        _rs.auto_resolve_directions(cam)
+    except Exception as e:
+        import logging
+
+        logging.getLogger(__name__).warning("방면 자동 해석 실패: %s", e)
     db.commit()
     db.refresh(cam)
     if manager.is_running(cam.id):
@@ -204,7 +213,7 @@ def put_mask(camera_id: int, body: MaskUpdate, db: Session = Depends(get_db)):
 
 
 def _dir_fields(d: DirectionIn) -> dict:
-    return dict(index=d.index, name=d.name, color=d.color, road=(d.road or None), heading_deg=d.heading_deg, lat=d.lat, lon=d.lon)
+    return dict(index=d.index, name=d.name, color=d.color, road=(d.road or None), destination=(d.destination or None), heading_source=d.heading_source, heading_deg=d.heading_deg, lat=d.lat, lon=d.lon)
 
 
 @router.put("/{camera_id}/directions", response_model=CameraOut)
@@ -218,6 +227,15 @@ def put_directions(camera_id: int, body: list[DirectionIn], db: Session = Depend
         row = existing[d.index]
         for k, v in _dir_fields(d).items():
             setattr(row, k, v)
+    # 방면이 있고 수동 지정이 아니면 노선 선으로 진행 방향 자동 계산
+    try:
+        from app.services import routes as _rs
+
+        _rs.auto_resolve_directions(cam)
+    except Exception as e:  # 네트워크 등 — 저장은 계속
+        import logging
+
+        logging.getLogger(__name__).warning("방면 자동 해석 실패: %s", e)
     # 카메라 좌표가 없고 화살표 위치가 있으면 그 평균을 카메라 좌표로
     pts = [(d.lat, d.lon) for d in body if d.lat is not None and d.lon is not None]
     if (cam.lat is None or cam.lon is None) and pts:

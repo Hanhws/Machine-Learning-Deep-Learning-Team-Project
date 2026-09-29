@@ -1,5 +1,5 @@
 import type { Direction, LiveState } from '../api/client'
-import { CLASS_COLORS, CLASS_LABELS, DIRECTION_PALETTE, pct } from '../lib/format'
+import { CLASS_COLORS, CLASS_LABELS, DIRECTION_PALETTE, dirLabel, pct } from '../lib/format'
 import { compass } from '../lib/geo'
 import LevelBadge from './LevelBadge'
 import OccupancyBar from './OccupancyBar'
@@ -13,6 +13,8 @@ export default function DirectionPanel({ live, directions, showClasses, compact 
         {live?.error ? <div className="error" style={{ marginTop: 4 }}>{live.error}</div> : null}
       </div>
     )
+  const liveIdx = new Set(live.directions.map((d) => d.direction_index))
+  const unmeasured = directions.filter((d) => !liveIdx.has(d.index))
   const colorOf = (idx: number) => directions.find((d) => d.index === idx)?.color ?? DIRECTION_PALETTE[(idx - 1) % DIRECTION_PALETTE.length]
   const roadOf = (idx: number) => directions.find((d) => d.index === idx)?.road?.trim() || ''
   const headingOf = (idx: number) => directions.find((d) => d.index === idx)?.heading_deg
@@ -28,7 +30,7 @@ export default function DirectionPanel({ live, directions, showClasses, compact 
           )}
           <div className="row" style={{ gap: 8, marginBottom: 2 }}>
             {d.direction_index !== 0 && <span className="dot" style={{ background: colorOf(d.direction_index) }} />}
-            <strong style={{ fontSize: 13 }}>{d.name}</strong>
+            <strong style={{ fontSize: 13 }}>{d.direction_index === 0 ? (unmeasured.length ? '측정 방면 전체' : '전체') : dirLabel(directions.find((x) => x.index === d.direction_index) ?? { name: d.name, destination: d.destination })}</strong>
             <LevelBadge level={d.level} size="sm" />
             <span className="muted">{d.n_vehicles}대</span>
             {d.direction_index !== 0 && headingOf(d.direction_index) != null && <span className="muted">→ {compass(headingOf(d.direction_index))}</span>}
@@ -46,6 +48,14 @@ export default function DirectionPanel({ live, directions, showClasses, compact 
               ))}
             </div>
           )}
+        </div>
+      ))}
+      {unmeasured.map((d) => (
+        <div key={`u${d.index}`} className="row" style={{ gap: 8, opacity: 0.75 }}>
+          <span className="dot" style={{ background: '#555' }} />
+          <strong style={{ fontSize: 13 }}>{dirLabel(d)}</strong>
+          <span className="badge none" style={{ fontSize: 11 }}>미측정</span>
+          {!compact && <span className="muted">마스크에 이 방면 차로를 칠하지 않음</span>}
         </div>
       ))}
     </div>

@@ -43,17 +43,26 @@ export const DIRECTION_PALETTE = ['#2a78d6', '#eb6834', '#1baf7a', '#c850c8', '#
 export const INTERVAL_OPTIONS: { v: number; l: string }[] = [
   { v: 0, l: '실시간 (연속)' },
   { v: 1, l: '1초마다' },
-  { v: 5, l: '5초마다' },
-  { v: 10, l: '10초마다 (기본)' },
+  { v: 5, l: '5초마다 (기본)' },
+  { v: 10, l: '10초마다' },
   { v: 15, l: '15초마다' },
   { v: 30, l: '30초마다' },
   { v: 60, l: '1분마다' },
   { v: 300, l: '5분마다' },
   { v: 600, l: '10분마다' },
 ]
-export const DEFAULT_INTERVAL = 10
+export const DEFAULT_INTERVAL = 5
 export function intervalLabel(v: number | null | undefined): string {
   if (v == null) v = DEFAULT_INTERVAL
   if (v === 0) return '실시간'
   return INTERVAL_OPTIONS.find((o) => o.v === v)?.l ?? (v >= 60 ? `${Math.round(v / 60)}분마다` : `${v}초마다`)
+}
+
+/** 방향 표시 이름: 방면이 있으면 '서울 방면', 없으면 저장된 이름 */
+export function dirLabel(d: { destination?: string | null; name: string }): string {
+  return d.destination?.trim() ? `${d.destination.trim()} 방면` : d.name
+}
+/** 짧은 이름: '서울' 또는 이름 */
+export function dirShort(d: { destination?: string | null; name: string }): string {
+  return d.destination?.trim() || d.name.replace(/\s*방면$/, '')
 }

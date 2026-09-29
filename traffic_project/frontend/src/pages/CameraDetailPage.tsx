@@ -148,7 +148,7 @@ function DirectionsSection({ cam, onSaved }: { cam: Camera; onSaved: () => void 
   const { run, busy } = useAction()
   return (
     <div className="stack">
-      <DirectionMapEditor directions={directions} onChange={setDirections} cameraLat={cam.lat} cameraLon={cam.lon} previewUrl={`${API_BASE}/api/cameras/${cam.id}/preview.jpg`} route={cam.route} roadType={cam.its_road_type ?? 'ex'} />
+      <DirectionMapEditor directions={directions} onChange={setDirections} cameraLat={cam.lat} cameraLon={cam.lon} previewUrl={`${API_BASE}/api/cameras/${cam.id}/preview.jpg`} route={cam.route} roadType={cam.its_road_type ?? 'ex'} roadPx={cam.meta?.road_px as Record<string, number> | undefined} />
       <div className="row">
         <button className="primary" disabled={!!busy} onClick={() => run('방향 저장', async () => { await api.cameras.putDirections(cam.id, directions); onSaved() }, '방향 정보를 저장했습니다')}>방향 저장</button>
         <span className="muted">마스크 라벨(칠한 픽셀)은 그대로이고 이름·도로·지도 방향만 바뀝니다.</span>
